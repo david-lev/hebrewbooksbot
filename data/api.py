@@ -6,18 +6,21 @@ from data import utils
 BASE_API = 'https://beta.hebrewbooks.org/api/api.ashx'
 
 
+@lru_cache
 def get_letters() -> list[Letter]:
     """Get all letters from HebrewBooks.org"""
     data = requests.get(f'{BASE_API}?req=subject_list&type=letter&callback=setSubjects').text
     return [Letter(**letter) for letter in utils.js_to_py(data)]
 
 
+@lru_cache
 def get_date_ranges() -> list[DateRange]:
     """Get all date ranges from HebrewBooks.org"""
     data = requests.get(f'{BASE_API}?req=subject_list&type=daterange&callback=setSubjects').text
     return [DateRange(**date_range) for date_range in utils.js_to_py(data)]
 
 
+@lru_cache
 def get_subjects() -> list[Subject]:
     """Get all subjects from HebrewBooks.org"""
     data = requests.get(f'{BASE_API}?req=subject_list&type=subject&callback=setSubjects').text
@@ -39,6 +42,7 @@ def get_book(book_id: int) -> Book:
     return Book(**utils.js_to_py(data, to='dict'))
 
 
+@lru_cache(maxsize=1_000)
 def search(title: str = '', author: str = '', offset: int = 1, limit: int = 30) -> tuple[list[SearchResults], int]:
     """
     Search for books on HebrewBooks.org
@@ -59,6 +63,7 @@ def search(title: str = '', author: str = '', offset: int = 1, limit: int = 30) 
     return [SearchResults(**b) for b in data['data']], data['total']
 
 
+@lru_cache(maxsize=1_000)
 def browse(_type: str, _id: int | str, offset: int = 1, limit: int = 30) -> list[SearchResults]:
     """
     Browse books on HebrewBooks.org

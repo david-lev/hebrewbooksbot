@@ -1,0 +1,6 @@
+*.session*
+venv
+*json
+__pycache__
+.idea
+*.pyc

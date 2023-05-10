@@ -3,7 +3,7 @@ import requests
 from functools import lru_cache
 from data.models import Letter, DateRange, Subject, Book, SearchResults
 
-BASE_API = 'https://beta.hebrewbooks.org/api/api.ashx'
+BASE_API = 'https://beta.hebrewbooks.org'
 
 
 def js_to_py(data: str, to: str) -> dict | list:
@@ -12,39 +12,51 @@ def js_to_py(data: str, to: str) -> dict | list:
     return json.loads(data[data.index(start):data.rindex(end) + 1])
 
 
-def _make_request(prams: dict[str, str], convert_to: str) -> dict | list:
+def _make_request(endpoint: str, params: dict[str, str], convert_to: str | None) -> dict | list:
     """
     Make a request to HebrewBooks.org
 
     Args:
-        prams: The parameters to send (e.g. {'req': 'search', 'searchtype': 'all', 'search': 'אבגדה'})
+        endpoint: The endpoint to send the request to (e.g. '/search')
+        params: The parameters to send (e.g. {'searchtype': 'all', 'search': 'אבגדה'})
         convert_to: The type to convert the response to (either 'dict' or 'list')
     """
-    res = requests.get(f'{BASE_API}?callback=bot', params=prams)
-    print(res.url)
+    res = requests.get(f'{BASE_API}{endpoint}', params=params)
     res.raise_for_status()
     start, end = ('[', ']') if convert_to == 'list' else ('{', '}')
-    return json.loads(res.text[res.text.index(start):res.text.rindex(end) + 1])
+    return json.loads(res.text[res.text.index(start):res.text.rindex(end) + 1]) if convert_to else res.json()
 
 
 @lru_cache
 def get_letters() -> list[Letter]:
     """Get all letters from HebrewBooks.org"""
-    data = _make_request({'req': 'subject_list', 'type': 'letter'}, convert_to='list')
+    data = _make_request(
+        endpoint='/api/api.ashx',
+        params={'req': 'subject_list', 'type': 'letter', 'callback': 'bot'},
+        convert_to='list'
+    )
     return [Letter(**letter) for letter in data]
 
 
 @lru_cache
 def get_date_ranges() -> list[DateRange]:
     """Get all date ranges from HebrewBooks.org"""
-    data = _make_request({'req': 'subject_list', 'type': 'daterange'}, convert_to='list')
+    data = _make_request(
+        endpoint='/api/api.ashx',
+        params={'req': 'subject_list', 'type': 'daterange', 'callback': 'bot'},
+        convert_to='list'
+    )
     return [DateRange(**date_range) for date_range in data]
 
 
 @lru_cache
 def get_subjects() -> list[Subject]:
     """Get all subjects from HebrewBooks.org"""
-    data = _make_request({'req': 'subject_list', 'type': 'subject'}, convert_to='list')
+    data = _make_request(
+        endpoint='/api/api.ashx',
+        params={'req': 'subject_list', 'type': 'subject', 'callback': 'bot'},
+        convert_to='list'
+    )
     return [Subject(**subject) for subject in data]
 
 
@@ -60,7 +72,11 @@ def get_book(book_id: int) -> Book | None:
         Book: The book's information
     """
     try:
-        return Book(**_make_request({'req': 'book_info', 'id': book_id}, convert_to='dict'))
+        return Book(**_make_request(
+            endpoint='/api/api.ashx',
+            params={'req': 'book_info', 'id': book_id, 'callback': 'bot'},
+            convert_to='dict'
+        ))
     except requests.HTTPError as e:
         if e.response.status_code == 400:
             return None
@@ -68,7 +84,7 @@ def get_book(book_id: int) -> Book | None:
 
 
 @lru_cache(maxsize=10_000)
-def search(title: str = '', author: str = '', offset: int = 1, limit: int = 30) -> tuple[list[SearchResults], int]:
+def search(title: str, author: str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
     """
     Search for books on HebrewBooks.org
 
@@ -83,15 +99,18 @@ def search(title: str = '', author: str = '', offset: int = 1, limit: int = 30) 
     if not any((title, author)):
         raise ValueError('You must specify a title or author')
     try:
-        data = _make_request({'author_search': author, 'title_search': title, 'start': offset, 'length': limit},
-                             convert_to='dict')
+        data = _make_request(
+            endpoint='/api/api.ashx',
+            params={'author_search': author, 'title_search': title, 'start': offset, 'length': limit, 'callback': 'bot'},
+            convert_to='dict'
+        )
     except ValueError:
         return [], 0
     return [SearchResults(**b) for b in data['data']], data['total']
 
 
 @lru_cache(maxsize=10_000)
-def browse(_type: str, _id: int | str, offset: int = 1, limit: int = 30) -> tuple[list[SearchResults], int]:
+def browse(_type: str, _id: int | str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
     """
     Browse books on HebrewBooks.org
 
@@ -105,9 +124,34 @@ def browse(_type: str, _id: int | str, offset: int = 1, limit: int = 30) -> tupl
     """
     if _type not in ('letter', 'daterange', 'subject'):
         raise ValueError('Invalid type')
-    data = _make_request({'req': 'title_list_for_subject', 'list_type': _type, 'id': _id,
-                          'start': offset, 'length': limit}, convert_to='dict')
+    data = _make_request(
+        endpoint='/api/api.ashx',
+        params={'req': 'title_list_for_subject', 'list_type': _type, 'id': _id,
+                'start': offset, 'length': limit, 'callback': 'bot'},
+        convert_to='dict'
+    )
     return [SearchResults(**book) for book in data['data']], data['total']
+
+
+@lru_cache(maxsize=10_000)
+def get_suggestions(query: str, _type: str, limit: int) -> list[str]:
+    """
+    Get suggestions for a search on HebrewBooks.org
+
+    Args:
+        query: The query to search for
+        _type: The type of search
+        limit: The number of results to return
+    Returns:
+        list[str]: The search results
+    """
+    if _type not in ('title', 'auth', 'ocr'):
+        raise ValueError('Invalid type')
+    return _make_request(
+        endpoint='/suggest/suggest.ashx',
+        params={'json': 1, 'autosuggest': 1,  'limit': limit, 'src': _type, 'q': query},
+        convert_to=None
+    )
 
 
 if __name__ == '__main__':
@@ -121,4 +165,6 @@ if __name__ == '__main__':
     assert get_book(search_res[0].id).id == search_res[0].id
     assert len(search_res) == 10
     assert all(('דוד' in res.title for res in search_res))
-    assert search(title='123456789') == ([], 0)
+    assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
+    assert len(get_suggestions(query='דוד', _type='title', limit=10)) == 10
+

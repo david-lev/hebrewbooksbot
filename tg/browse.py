@@ -3,24 +3,6 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, InlineQuery, InlineQueryResultArticle, CallbackQuery
 
 
-async def start(_: Client, message: Message | CallbackQuery):
-    kwargs = {
-        "text": "Start",
-        "reply_markup": InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("חיפוש", switch_inline_query_current_chat=""),
-                    InlineKeyboardButton("עיון", callback_data="browse")
-                ]
-            ]
-        )
-    }
-    if isinstance(message, Message):
-        await message.reply(**kwargs)
-    else:
-        await message.edit_message_text(**kwargs)
-
-
 def browse_menu(_: Client, query: CallbackQuery):
     query.edit_message_text(
         text="בחר סוג עיון",

@@ -48,8 +48,6 @@ class SearchResults:
         return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png'
 
 
-
-
 @dataclass(slots=True)
 class Book:
     id: int

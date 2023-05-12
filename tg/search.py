@@ -61,5 +61,5 @@ def search_books(_: Client, query: InlineQuery):
         switch_pm_text="מספר תוצאות: " + str(total),
         switch_pm_parameter="search",
         results=articles,
-        next_offset=str(get_offset(int(query.offset or 1), total))
+        next_offset=str(get_offset(int(query.offset or 1), total, increase=5))
     )

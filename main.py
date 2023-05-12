@@ -33,7 +33,13 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        browse.browse, filters=filters.create(lambda _, __, query: query.data.startswith("browse_") and query.data != "browse_menu")
+        browse.browse, filters=filters.create(lambda _, __, query: len(query.data.split(":")) == 2)
+    )
+)
+
+app.add_handler(
+    CallbackQueryHandler(
+        browse.browse_results, filters=filters.create(lambda _, __, query: len(query.data.split(":")) == 5)
     )
 )
 

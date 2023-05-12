@@ -13,6 +13,12 @@ app.add_handler(
 )
 
 app.add_handler(
+    CallbackQueryHandler(
+        utils.start, filters.create(lambda _, __, query: query.data == "start_menu")
+    )
+)
+
+app.add_handler(
     InlineQueryHandler(search.search_books, filters=filters.create(lambda _, __, query: len(query.query) > 2)),
 )
 app.add_handler(

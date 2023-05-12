@@ -1,11 +1,13 @@
 from pyrogram import Client, emoji
+from pyrogram.enums import MessageEntityType
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, \
-    InlineKeyboardButton
+    InlineKeyboardButton, MessageEntity
 
 from data import api
 from tg.utils import get_offset
 
 RTL = '\u200f'
+LTR = '\u200e'
 
 
 def empty_search(_: Client, query: InlineQuery):
@@ -37,7 +39,7 @@ def search_books(_: Client, query: InlineQuery):
             description=f"{book.author} • {book.year} • {book.city}",
             input_message_content=InputTextMessageContent(
                 message_text=(
-                    f"{RTL}📚 {book.title}\n"
+                    f"{RTL}[📚]({book.pdf_url}) {book.title}\n"
                     f"{RTL}👤 {book.author}\n"
                     f"{RTL}📅 {book.year}\n"
                     f"{RTL}🏙 {book.city}\n"
@@ -49,7 +51,7 @@ def search_books(_: Client, query: InlineQuery):
                     [
                         InlineKeyboardButton(emoji.UP_ARROW, callback_data=f"action_upload_{book.id}"),
                         InlineKeyboardButton(emoji.DOWN_ARROW, url=book.pdf_url),
-                        InlineKeyboardButton(emoji.OPEN_BOOK, url=f"https://hebrewbooks.org/pdfpager.aspx?req={book.id}")
+                        InlineKeyboardButton(emoji.OPEN_BOOK, callback_data=f"read:{book.id}:1:{book.pages}")
                     ]
                 ]
             ),

@@ -1,4 +1,4 @@
-from pyrogram import Client
+from pyrogram import Client, emoji
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
 
@@ -37,3 +37,24 @@ def start(_: Client, msg_or_callback: Message | CallbackQuery):
         msg_or_callback.reply_text(**kwargs)
     else:
         msg_or_callback.edit_message_text(**kwargs)
+
+
+def read(_: Client, clb: CallbackQuery):
+    _, book_id, page, total = clb.data.split(':')
+    book_name = clb.message.text.splitlines()[0].split('📚 ')[-1]
+    next_prev_buttons = []
+    if int(page) > 1:
+        next_prev_buttons.append(InlineKeyboardButton(
+            emoji.LEFT_ARROW,
+            callback_data=f"read:{book_id}:{int(page) - 1}:{total}"
+        ))
+    if int(page) < int(total):
+        next_prev_buttons.append(InlineKeyboardButton(
+            emoji.RIGHT_ARROW,
+            callback_data=f"read:{book_id}:{int(page) + 1}:{total}"
+        ))
+
+    clb.message.edit_text(
+        text=f"{emoji.OPEN_BOOK} {book_name}\n\n{emoji.PAGE_FACING_UP} עמוד {page} מתוך {total}",
+        reply_markup=InlineKeyboardMarkup([next_prev_buttons])
+    )

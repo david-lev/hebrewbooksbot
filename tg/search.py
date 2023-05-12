@@ -1,54 +1,65 @@
-from pyrogram import Client
+from pyrogram import Client, emoji
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, \
-    InlineKeyboardButton, Message
+    InlineKeyboardButton
 
 from data import api
+from tg.utils import get_offset
+
+RTL = '\u200f'
+
+
+def empty_search(_: Client, query: InlineQuery):
+    query.answer(
+        results=[
+            InlineQueryResultArticle(
+                id="1",
+                title="התחילו לחפש",
+                description="הקלד מילות חיפוש",
+                input_message_content=InputTextMessageContent(
+                    message_text="הקלד מילות חיפוש"
+                )
+            )
+        ]
+    )
 
 
 def search_books(_: Client, query: InlineQuery):
     results, total = api.search(
         title=query.query,
-        offset=int(query.offset or 0),
-        limit=10
+        author='',
+        offset=int(query.offset or 1),
+        limit=5
     )
-    current_offset = int(query.offset or 0)
-    offset = current_offset + 10 if total > current_offset + 10 else ""
-    query.answer(
-        results=[
-            InlineQueryResultArticle(
-                id=str(book.id),
-                title=book.title,
-                description=book.author,
-                input_message_content=InputTextMessageContent(
-                    book.pdf_url,
-                ),
-                reply_markup=InlineKeyboardMarkup(
+    articles = [
+        InlineQueryResultArticle(
+            id=str(book.id),
+            title=book.title,
+            description=f"{book.author} • {book.year} • {book.city}",
+            input_message_content=InputTextMessageContent(
+                message_text=(
+                    f"{RTL}📚 {book.title}\n"
+                    f"{RTL}👤 {book.author}\n"
+                    f"{RTL}📅 {book.year}\n"
+                    f"{RTL}🏙 {book.city}\n"
+                    f"{RTL}📖 {book.pages}\n"
+                )
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                [
                     [
-                        [
-                            InlineKeyboardButton("Upload", callback_data=f"action_upload_{book.id}"),
-                            InlineKeyboardButton("Download", url=book.pdf_url),
-                            InlineKeyboardButton("Read", url=f"https://hebrewbooks.org/pdfpager.aspx?req={book.id}")
-                        ]
+                        InlineKeyboardButton(emoji.UP_ARROW, callback_data=f"action_upload_{book.id}"),
+                        InlineKeyboardButton(emoji.DOWN_ARROW, url=book.pdf_url),
+                        InlineKeyboardButton(emoji.OPEN_BOOK, url=f"https://hebrewbooks.org/pdfpager.aspx?req={book.id}")
                     ]
-                ),
-                thumb_url=book.cover_url
-            ) for book in (api.get_book(b.id) for b in results)
+                ]
+            ),
+            thumb_url=book.cover_url
+        ) for book in (api.get_book(b.id) for b in results)
 
-        ],
-        next_offset=str(offset)
-    )
-
-
-def search_books(_: Client, msg: Message):
-    kb = [[InlineKeyboardButton(
-        text=f"{book.title} | {book.author}",
-        callback_data=f"book_{book.id}")]
-        for book in (b.to_book() for b in api.search(msg.text)[0])
     ]
-
-    kb.append([InlineKeyboardButton(text="Next", callback_data=f"action_next_10_{msg.text}")])
-
-    msg.reply_text(
-        text="Results",
-        reply_markup=InlineKeyboardMarkup(kb)
+    query.answer(
+        switch_pm_text="מספר תוצאות: " + str(total),
+        switch_pm_parameter="search",
+        results=articles,
+        next_offset=str(get_offset(int(query.offset or 1), total))
     )

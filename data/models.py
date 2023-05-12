@@ -34,6 +34,21 @@ class SearchResults:
     def __post_init__(self):
         self.id = int(self.id)
 
+    @property
+    def cover_url(self) -> str:
+        """Get the book's cover URL"""
+        return self.get_page_url(page=1, width=100, height=100)
+
+    @property
+    def pdf_url(self) -> str:
+        """Get the book's PDF URL"""
+        return f'https://download.hebrewbooks.org/downloadhandler.ashx?req={self.id}'
+
+    def get_page_url(self, page: int, width: int = 600, height: int = 800) -> str:
+        return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png'
+
+
+
 
 @dataclass(slots=True)
 class Book:

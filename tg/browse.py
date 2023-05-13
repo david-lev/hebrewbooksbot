@@ -1,9 +1,9 @@
-from data import api
-from pyrogram import Client, filters
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, InlineQuery, InlineQueryResultArticle, CallbackQuery
+from pyrogram import Client
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
+from data import api
 from data.api import get_book
-from tg.utils import get_offset
+from tg import utils
 
 
 def browse_menu(_: Client, query: CallbackQuery):
@@ -54,29 +54,29 @@ def browse_results(_: Client, query: CallbackQuery):
         [
             InlineKeyboardButton(
                 text=f"{book.author} • {book.year} • {book.city}",
-                callback_data=f"book_{book.id}"
+                callback_data=f"browse:book:{book.id}:{browse_type}:{browse_id}:{offset}:{total}"
             )
         ] for book in (get_book(result.id) for result in results)
     ]
-    next_offset = get_offset(int(offset), int(total), increase=5)
+    next_offset = utils.get_offset(int(offset), int(total), increase=5)
 
-    next_previous_bts = []
+    next_previous_buttons = []
     if next_offset:
-        next_previous_bts.append(
+        next_previous_buttons.append(
             InlineKeyboardButton(
                 text="הבא",
                 callback_data=f"browse:{browse_type}:{browse_id}:{next_offset}:{total}"
             )
         )
     if offset != "1" and int(offset) - 5 > 0:
-        next_previous_bts.append(
+        next_previous_buttons.append(
             InlineKeyboardButton(
                 text="הקודם",
                 callback_data=f"browse:{browse_type}:{browse_id}:{int(offset) - 5}:{total}"
             )
         )
-    if next_previous_bts:
-        buttons.append(next_previous_bts)
+    if next_previous_buttons:
+        buttons.append(next_previous_buttons)
 
     buttons.append(
         [
@@ -88,5 +88,19 @@ def browse_results(_: Client, query: CallbackQuery):
         text="בחר",
         reply_markup=InlineKeyboardMarkup(
             buttons
+        )
+    )
+
+
+def browse_book(_: Client, clb: CallbackQuery):
+    book_id, browse_type, browse_id, offset, total = clb.data.split(":")[2:]
+    book = get_book(book_id)
+    clb.message.edit_text(
+        text=utils.get_book_text(book),
+        reply_markup=InlineKeyboardMarkup(
+            [
+                utils.get_book_buttons(book) +
+                [InlineKeyboardButton(text="חזור", callback_data=f"browse:{browse_type}:{browse_id}:{offset}:{total}")]
+            ],
         )
     )

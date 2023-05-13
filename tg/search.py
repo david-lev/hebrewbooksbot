@@ -42,7 +42,7 @@ def search_books_inline(_: Client, query: InlineQuery):
                 message_text=utils.get_book_text(book)
             ),
             reply_markup=InlineKeyboardMarkup(
-                [utils.get_book_buttons(book)]
+                [utils.get_book_buttons(book, clb_data=f"book:{book.id}")]
             ),
             thumb_url=book.cover_url
         ) for book in (api.get_book(b.id) for b in results)
@@ -136,7 +136,7 @@ def search_book(_: Client, clb: CallbackQuery):
         text=utils.get_book_text(book),
         reply_markup=InlineKeyboardMarkup(
             [
-                utils.get_book_buttons(book) +
+                utils.get_book_buttons(book, clb_data=clb.data) +
                 [InlineKeyboardButton("חזרה", callback_data=f"search:{offset}:{total}")]
             ]
         )

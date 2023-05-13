@@ -24,16 +24,17 @@ def get_book_text(book: Book, page: int | None = None) -> str:
     ))
 
 
-def get_book_buttons(book: Book) -> list[InlineKeyboardButton]:
+def get_book_buttons(book: Book, clb_data: str) -> list[InlineKeyboardButton]:
     """
     Get the buttons for a book.
 
     Args:
         book: The book.
+        clb_data: The callback data.
     """
     return [
         InlineKeyboardButton(emoji.DOWN_ARROW, url=book.pdf_url),
-        InlineKeyboardButton(emoji.OPEN_BOOK, callback_data=f"read:{book.id}:1:{book.pages}")
+        InlineKeyboardButton(emoji.OPEN_BOOK, callback_data=f"read:{book.id}:1:{book.pages}:{clb_data}"),
     ]
 
 
@@ -76,20 +77,23 @@ def start(_: Client, msg_or_callback: Message | CallbackQuery):
 
 
 def read(_: Client, clb: CallbackQuery):
-    _, book_id, page, total = clb.data.split(':')
+    book_id, page, total, *clb_data = clb.data.split(':')[1:]
     book = api.get_book(book_id)
     next_previous_buttons = []
     if int(page) > 1:
         next_previous_buttons.append(InlineKeyboardButton(
             emoji.LEFT_ARROW,
-            callback_data=f"read:{book_id}:{int(page) - 1}:{total}"
+            callback_data=f"read:{book_id}:{int(page) - 1}:{total}:{':'.join(clb_data)}"
         ))
     if int(page) < int(total):
         next_previous_buttons.append(InlineKeyboardButton(
             emoji.RIGHT_ARROW,
-            callback_data=f"read:{book_id}:{int(page) + 1}:{total}"
+            callback_data=f"read:{book_id}:{int(page) + 1}:{total}:{':'.join(clb_data)}"
         ))
-
+    clb.answer(
+        text='יש להמתין מספר שניות לטעינת התצוגה המקדימה',
+        show_alert=False
+    )
     clb.edit_message_text(
         text="".join((
             "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(RTL, page, total),
@@ -98,7 +102,17 @@ def read(_: Client, clb: CallbackQuery):
         reply_markup=InlineKeyboardMarkup(
             [
                 next_previous_buttons,
-                [InlineKeyboardButton("חזור", callback_data=f"book:{book_id}")]
+                [InlineKeyboardButton("חזור", callback_data=":".join(clb_data))],
             ]
         ),
+    )
+
+
+def show_book(_: Client, clb: CallbackQuery):
+    book = api.get_book(int(clb.data.split(':')[-1]))
+    clb.edit_message_text(
+        text=get_book_text(book),
+        reply_markup=InlineKeyboardMarkup(
+            [get_book_buttons(book, f"book:{book.id}")]
+        )
     )

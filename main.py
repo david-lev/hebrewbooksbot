@@ -83,4 +83,12 @@ app.add_handler(
     )
 )
 
+app.add_handler(
+    CallbackQueryHandler(
+        utils.show_book, filters=filters.create(
+            lambda _, __, query: query.data.startswith("book:")
+        )
+    )
+)
+
 app.run()

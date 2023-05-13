@@ -1,5 +1,40 @@
 from pyrogram import Client, emoji
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from data import api
+from data.models import Book
+
+RTL = '\u200f'
+LTR = '\u200e'
+
+
+def get_book_text(book: Book, page: int | None = None) -> str:
+    """
+    Get the text for a book.
+
+    Args:
+        book: The book.
+        page: If provided, the page url will be added to the text, else the pdf url will be added.
+    """
+    return "".join((
+        f"{RTL}[📚]({book.pdf_url if page is None else book.get_page_url(page, width=2138, height=3038)}) {book.title}\n",
+        f"{RTL}👤 {book.author}\n",
+        f"{RTL}📅 {book.year}\n" if book.year else "",
+        f"{RTL}🏙 {book.city}\n" if book.city else "",
+        f"{RTL}📖 {book.pages}\n",
+    ))
+
+
+def get_book_buttons(book: Book) -> list[InlineKeyboardButton]:
+    """
+    Get the buttons for a book.
+
+    Args:
+        book: The book.
+    """
+    return [
+        InlineKeyboardButton(emoji.DOWN_ARROW, url=book.pdf_url),
+        InlineKeyboardButton(emoji.OPEN_BOOK, callback_data=f"read:{book.id}:1:{book.pages}")
+    ]
 
 
 def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
@@ -11,10 +46,11 @@ def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
         total: The total number of results.
         increase: The number of results to increase. (default: 5)
     Returns:
-        The offset for the next query results.
+        The offset for the next query results (0 if there are no more results).
     """
-    if current_offset + increase > total:
-        return total - current_offset
+    if (current_offset + increase) > total:
+        offset = total - current_offset
+        return 0 if offset < increase else offset
     return current_offset + increase
 
 
@@ -41,20 +77,28 @@ def start(_: Client, msg_or_callback: Message | CallbackQuery):
 
 def read(_: Client, clb: CallbackQuery):
     _, book_id, page, total = clb.data.split(':')
-    book_name = clb.message.text.splitlines()[0].split('📚 ')[-1]
-    next_prev_buttons = []
+    book = api.get_book(book_id)
+    next_previous_buttons = []
     if int(page) > 1:
-        next_prev_buttons.append(InlineKeyboardButton(
+        next_previous_buttons.append(InlineKeyboardButton(
             emoji.LEFT_ARROW,
             callback_data=f"read:{book_id}:{int(page) - 1}:{total}"
         ))
     if int(page) < int(total):
-        next_prev_buttons.append(InlineKeyboardButton(
+        next_previous_buttons.append(InlineKeyboardButton(
             emoji.RIGHT_ARROW,
             callback_data=f"read:{book_id}:{int(page) + 1}:{total}"
         ))
 
-    clb.message.edit_text(
-        text=f"{emoji.OPEN_BOOK} {book_name}\n\n{emoji.PAGE_FACING_UP} עמוד {page} מתוך {total}",
-        reply_markup=InlineKeyboardMarkup([next_prev_buttons])
+    clb.edit_message_text(
+        text="".join((
+            "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(RTL, page, total),
+            get_book_text(book, page=page),
+        )),
+        reply_markup=InlineKeyboardMarkup(
+            [
+                next_previous_buttons,
+                [InlineKeyboardButton("חזור", callback_data=f"book:{book_id}")]
+            ]
+        ),
     )

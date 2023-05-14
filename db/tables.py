@@ -1,11 +1,9 @@
-import os
+from data import config
 from sqlalchemy import create_engine, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
-sqlite_file_path = os.environ.get('SQLITE_FILE_PATH', '/home/david/Documents/hb.sqlite')
-
-engine = create_engine(f'sqlite:///{sqlite_file_path}', echo=True)
+engine = create_engine(f'sqlite:///{config.get_settings().sqlite_file_path}', echo=True)
 
 
 def get_session() -> Session:

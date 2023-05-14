@@ -96,4 +96,5 @@ app.add_handler(
     )
 )
 
-app.run()
+if __name__ == '__main__':
+    app.run()

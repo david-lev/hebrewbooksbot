@@ -37,7 +37,7 @@ def start(_: Client, msg_or_callback: Message | CallbackQuery):
     )
     if isinstance(msg_or_callback, Message):
         msg_or_callback.reply_text(**kwargs)
-        repository.add_tg_user(msg_or_callback.from_user.id)
+        repository.add_tg_user(msg_or_callback.from_user.id, msg_or_callback.from_user.language_code)
     else:
         try:
             msg_or_callback.edit_message_text(**kwargs)
@@ -74,14 +74,26 @@ def show_book(_: Client, clb: CallbackQuery):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(text="⬇️ הורדה ⬇️", url=book.pdf_url),
                     InlineKeyboardButton(
                         text="📖 קריאה מהירה 📖",
                         callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:{':'.join(clb_data)}"
-                    ),
+                    )
+                ], [
+                    InlineKeyboardButton(
+                        text="♻️ שיתוף ♻️",
+                        switch_inline_query=str(book.id)
+                    )
                 ],
-                [InlineKeyboardButton("🔙", callback_data=":".join(clb_data))] if clb_data != ["no_back"] else []
-            ]
+                [
+                    InlineKeyboardButton(text="⬇️ הורדה ⬇️", url=book.pdf_url)
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="🔙",
+                        callback_data=":".join(clb_data)
+                    )
+                ] if clb_data != ["no_back"] else []
+            ],
         )
     )
     repository.increase_books_read_count()

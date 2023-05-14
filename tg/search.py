@@ -2,6 +2,7 @@ from pyrogram import Client
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, \
     InlineKeyboardButton, Message, CallbackQuery
 from data import api
+from data.models import Book
 from db import repository
 from tg import helpers
 
@@ -13,12 +14,49 @@ def empty_search(_: Client, query: InlineQuery):
             InlineQueryResultArticle(
                 id="1",
                 title="התחילו לחפש",
-                description="הקלד מילות חיפוש",
+                description="טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות",
                 input_message_content=InputTextMessageContent(
-                    message_text="הקלד מילות חיפוש"
+                    message_text="/start"
                 )
             )
         ]
+    )
+
+
+def _get_book_article(book: Book) -> InlineQueryResultArticle:
+    """
+    Internal function to get an article for a book
+    """
+    return InlineQueryResultArticle(
+        id=str(book.id),
+        title=book.title,
+        description=f"{book.author}{f' • {book.year}' if book.year else ''}{f' • {book.city}' if book.city else ''}",
+        input_message_content=InputTextMessageContent(
+            message_text=helpers.get_book_text(book)
+        ),
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text="📖 קריאה מהירה 📖",
+                        callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:no_back"
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="♻️ שיתוף ♻️",
+                        switch_inline_query=str(book.id)
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="⬇️ הורדה ⬇️",
+                        url=book.pdf_url
+                    ),
+                ]
+            ]
+        ),
+        thumb_url=book.get_page_img(page=1, width=100, height=100),
     )
 
 
@@ -29,7 +67,25 @@ def search_books_inline(_: Client, query: InlineQuery):
     query.query format: "{title}" / "{title}:{author}"
     """
     if query.offset is not None and query.offset == '0':
+        return  # No more results
+
+    if query.query.isdigit():  # The user searched for a book id
+        book = api.get_book(int(query.query))
+        if book is None:
+            query.answer(
+                results=[],
+                switch_pm_text="ספר לא נמצא",
+                switch_pm_parameter="search"
+            )
+            return
+        query.answer(
+            results=[_get_book_article(book)],
+            switch_pm_text="לחצו על התוצאה כדי לשתף את {}".format(book.title),
+            switch_pm_parameter="search"
+        )
+        repository.increase_books_read_count()
         return
+
     title, author = helpers.get_title_author(query.query)
     results, total = api.search(
         title=title.strip(),
@@ -37,36 +93,11 @@ def search_books_inline(_: Client, query: InlineQuery):
         offset=int(query.offset or 1),
         limit=5
     )
-    next_offset = helpers.get_offset(int(query.offset or 1), total, increase=5)
-
-    articles = [
-        InlineQueryResultArticle(
-            id=str(book.id),
-            title=book.title,
-            description=f"{book.author}{f' • {book.year}' if book.year else ''}{f' • {book.city}' if book.city else ''}",
-            input_message_content=InputTextMessageContent(
-                message_text=helpers.get_book_text(book)
-            ),
-            reply_markup=InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(text="⬇️ הורדה ⬇️", url=book.pdf_url),
-                        InlineKeyboardButton(
-                            text="📖 קריאה מהירה 📖",
-                            callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:no_back"
-                        ),
-                    ],
-                ]
-            ),
-            thumb_url=book.get_page_img(page=1, width=100, height=100),
-        ) for book in (api.get_book(b.id) for b in results)
-
-    ]
     query.answer(
         switch_pm_text="{}{} תוצאות עבור {}".format(helpers.RTL, total, f"{title}:{author}" if author else title),
         switch_pm_parameter="search",
-        results=articles,
-        next_offset=str(next_offset)
+        results=[_get_book_article(book) for book in (api.get_book(b.id) for b in results)],
+        next_offset=str(helpers.get_offset(int(query.offset or 1), total, increase=5))
     )
     repository.increase_search_count()
 

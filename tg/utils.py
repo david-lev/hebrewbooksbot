@@ -155,6 +155,18 @@ def jump_to_page(_: Client, msg: Message):
         return
 
     book = api.get_book(book_id)
+    new_next_previous_buttons = []
+    next_or_previous = msg.reply_to_message.reply_markup.inline_keyboard[2:-1][0][0].callback_data.split(':')
+    if jump_to < int(total):
+        new_next_previous_buttons.append(InlineKeyboardButton(
+            text="הבא ⏪",
+            callback_data=f"{':'.join(next_or_previous[:2])}:{jump_to + 1}:{':'.join(next_or_previous[3:])}"
+        ))
+    if jump_to > 1:
+        new_next_previous_buttons.append(InlineKeyboardButton(
+            text="⏩ הקודם",
+            callback_data=f"{':'.join(next_or_previous[:2])}:{jump_to - 1}:{':'.join(next_or_previous[3:])}"
+        ))
     kwargs = dict(
         text="".join((
             "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(helpers.RTL, jump_to, total),
@@ -162,9 +174,11 @@ def jump_to_page(_: Client, msg: Message):
         )),
         reply_markup=InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton(text=f"📄 {jump_to}/{total} 📄", callback_data=f"jump:{book_id}:{jump_to}:{total}")],
+                [InlineKeyboardButton(text=f"📄 {jump_to}/{total} 📄",
+                                      callback_data=f"jump:{book_id}:{jump_to}:{total}")],
                 [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(page))],
-                *msg.reply_to_message.reply_markup.inline_keyboard[2:]
+                new_next_previous_buttons,
+                [msg.reply_to_message.reply_markup.inline_keyboard[-1][-1]]
             ]
         )
     )
@@ -183,6 +197,7 @@ def jump_tip(_: Client, clb: CallbackQuery):
     clb.data: "jump:*"
     """
     clb.answer(
-        text="טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא",
+        text="טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא."
+             "\nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.",
         show_alert=True
     )

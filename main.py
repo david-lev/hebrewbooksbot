@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler
-from tg import search
+from tg import search, helpers
 from tg import browse
 from tg import utils
 
@@ -51,7 +51,7 @@ app.add_handler(
 app.add_handler(
     MessageHandler(
         search.search_books_message, filters=(
-                filters.text & ~filters.via_bot
+                filters.text & ~filters.via_bot & ~filters.create(lambda _, __, msg: msg.text.isdigit())
         )
     )
 )
@@ -66,15 +66,26 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.show_book, filters=filters.create(lambda _, __, query: query.data.startswith("show_book"))
+        utils.show_book, filters=filters.create(lambda _, __, query: query.data.startswith("show"))
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.read_book, filters=filters.create(lambda _, __, query: query.data.startswith("read_book"))
+        utils.read_book, filters=filters.create(lambda _, __, query: query.data.startswith("read"))
     )
 )
 
+
+app.add_handler(
+    MessageHandler(
+        utils.jump_to_page, filters=filters.create(
+            lambda _, __, msg: msg.text.isdigit()
+        ) & filters.reply
+        & filters.create(
+            lambda _, __, msg: helpers.has_read_book_msg(msg)
+        )
+    )
+)
 
 app.run()

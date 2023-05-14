@@ -1,12 +1,13 @@
-from pyrogram import Client
+from pyrogram import Client, emoji
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, \
     InlineKeyboardButton, Message, CallbackQuery
-
 from data import api
+from db import repository
 from tg import utils
 
 
 def empty_search(_: Client, query: InlineQuery):
+    """Show a message when the user searches for nothing"""
     query.answer(
         results=[
             InlineQueryResultArticle(
@@ -22,6 +23,11 @@ def empty_search(_: Client, query: InlineQuery):
 
 
 def search_books_inline(_: Client, query: InlineQuery):
+    """
+    Search books inline
+
+    query.query format: "{title}" / "{title}:{author}"
+    """
     if query.offset is not None and query.offset == '0':
         return
     title, author = query.query.split(':', 1) if ':' in query.query else (query.query, '')
@@ -42,9 +48,17 @@ def search_books_inline(_: Client, query: InlineQuery):
                 message_text=utils.get_book_text(book)
             ),
             reply_markup=InlineKeyboardMarkup(
-                [utils.get_book_buttons(book, clb_data=f"book:{book.id}")]
+                [
+                    [
+                        InlineKeyboardButton(text=emoji.DOWN_ARROW, url=book.pdf_url),
+                        InlineKeyboardButton(
+                            text=emoji.OPEN_BOOK,
+                            callback_data=f"read_book:{book.id}:1:{book.pages}:show_book:{book.id}:no_back"
+                        ),
+                    ],
+                ]
             ),
-            thumb_url=book.cover_url
+            thumb_url=book.get_page_url(page=1, width=100, height=100),
         ) for book in (api.get_book(b.id) for b in results)
 
     ]
@@ -54,10 +68,16 @@ def search_books_inline(_: Client, query: InlineQuery):
         results=articles,
         next_offset=str(next_offset)
     )
+    repository.increase_search_count()
 
 
 def search_books_message(_: Client, msg: Message):
-    title, author = msg.text.split(':', 1) if ':' in msg.text else (msg.text, '')
+    """
+    Search books from a message
+
+    msg.text format: "{title}" / "{title}:{author}"
+    """
+    title, author = utils.get_title_author(msg.text)
     results, total = api.search(
         title=title.strip(),
         author=author.strip(),
@@ -84,18 +104,26 @@ def search_books_message(_: Client, msg: Message):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(book.title, callback_data=f"search:book:{book.id}:{1}:{total}")
+                    InlineKeyboardButton(
+                        text=book.title,
+                        callback_data=f"show_book:{book.id}:search_nav:{1}:{total}"
+                    )
                 ] for book in results
             ] + [next_previous_buttons]
         ),
         quote=True
     )
+    repository.increase_search_count()
 
 
-def search_books_callback(_: Client, clb: CallbackQuery):
-    offset, total = clb.data.split(':')[1:]
-    search = clb.message.text.split(':', 1)[-1]
-    title, author = search.split(':', 1) if ':' in search else (search, '')
+def search_books_navigator(_: Client, clb: CallbackQuery):
+    """
+    Navigate through search results
+
+    clb.data format: "search_nav:{offset}:{total}" + back_button_data
+    """
+    offset, total, *clb_data = clb.data.split(':')[1:]
+    title, author = utils.get_title_author(clb.message.text.splitlines()[0].split(':', 1)[-1])
     results, total = api.search(
         title=title.strip(),
         author=author.strip(),
@@ -108,36 +136,25 @@ def search_books_callback(_: Client, clb: CallbackQuery):
         next_previous_buttons.append(
             InlineKeyboardButton(
                 text="הבא",
-                callback_data=f"search:{next_offset}:{total}"
+                callback_data=f"search_nav:{next_offset}:{total}"
             )
         )
     if int(offset) > 5:
         next_previous_buttons.append(
             InlineKeyboardButton(
                 text="הקודם",
-                callback_data=f"search:{int(offset) - 5}:{total}"
+                callback_data=f"search_nav:{int(offset) - 5}:{total}"
             )
         )
     clb.message.edit_reply_markup(
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(book.title, callback_data=f"search:book:{book.id}:{offset}:{total}")
+                    InlineKeyboardButton(
+                        text=book.title,
+                        callback_data=f"show_book:{book.id}:{1}:{total}:search_nav:{offset}:{total}"
+                    )
                 ] for book in results
             ] + [next_previous_buttons]
-        )
-    )
-
-
-def search_book(_: Client, clb: CallbackQuery):
-    book_id, offset, total = clb.data.split(':')[2:]
-    book = api.get_book(book_id)
-    clb.message.edit_text(
-        text=utils.get_book_text(book),
-        reply_markup=InlineKeyboardMarkup(
-            [
-                utils.get_book_buttons(book, clb_data=clb.data) +
-                [InlineKeyboardButton("חזרה", callback_data=f"search:{offset}:{total}")]
-            ]
         )
     )

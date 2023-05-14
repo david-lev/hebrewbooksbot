@@ -5,6 +5,7 @@ from tg import browse
 from tg import utils
 
 app = Client("my_session")
+
 app.add_handler(
     MessageHandler(
         utils.start, filters.command("start")
@@ -13,13 +14,14 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.start, filters.create(lambda _, __, query: query.data == "start_menu")
+        utils.start, filters.create(lambda _, __, query: query.data == "start")
     )
 )
 
 app.add_handler(
     InlineQueryHandler(search.search_books_inline, filters=filters.create(lambda _, __, query: len(query.query) > 2)),
 )
+
 app.add_handler(
     InlineQueryHandler(search.empty_search, filters=filters.create(lambda _, __, query: len(query.query) <= 2))
 )
@@ -32,16 +34,16 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        browse.browse, filters=filters.create(
-            lambda _, __, query: query.data.startswith("browse") and len(query.data.split(":")) == 2
+        browse.browse_types, filters=filters.create(
+            lambda _, __, query: query.data.startswith("browse_type")
         )
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        browse.browse_results, filters=filters.create(
-            lambda _, __, query: query.data.startswith("browse") and len(query.data.split(":")) == 5
+        browse.browse_books_navigator, filters=filters.create(
+            lambda _, __, query: query.data.startswith("browse_nav")
         )
     )
 )
@@ -49,46 +51,30 @@ app.add_handler(
 app.add_handler(
     MessageHandler(
         search.search_books_message, filters=(
-                filters.text & ~filters.via_bot & filters.create(lambda _, __, msg: len(msg.text) > 2))
-    )
-)
-
-app.add_handler(
-    CallbackQueryHandler(
-        search.search_books_callback, filters=filters.create(
-            lambda _, __, query: query.data.startswith("search") and len(query.data.split(":")) == 3
+                filters.text & ~filters.via_bot
         )
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.read, filters=filters.create(lambda _, __, query: query.data.startswith("read"))
-    )
-)
-
-app.add_handler(
-    CallbackQueryHandler(
-        browse.browse_book, filters=filters.create(
-            lambda _, __, query: query.data.startswith("browse:book")
+        search.search_books_navigator, filters=filters.create(
+            lambda _, __, query: query.data.startswith("search_nav")
         )
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        search.search_book, filters=filters.create(
-            lambda _, __, query: query.data.startswith("search:book")
-        )
+        utils.show_book, filters=filters.create(lambda _, __, query: query.data.startswith("show_book"))
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.show_book, filters=filters.create(
-            lambda _, __, query: query.data.startswith("book:")
-        )
+        utils.read_book, filters=filters.create(lambda _, __, query: query.data.startswith("read_book"))
     )
 )
+
 
 app.run()

@@ -95,7 +95,7 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
 
     buttons.append(
         [
-            InlineKeyboardButton(text="חזור", callback_data=f"browse_type:{browse_type}")
+            InlineKeyboardButton(text="🔙", callback_data=f"browse_type:{browse_type}")
         ]
     )
 

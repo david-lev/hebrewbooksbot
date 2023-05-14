@@ -1,9 +1,10 @@
 from pyrogram import Client, filters
-from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler
+from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler, EditedMessageHandler
 from data import config
-from tg import search, helpers
+from tg import search
 from tg import browse
 from tg import utils
+from tg.helpers import jump_to_page_filter
 
 cfg = config.get_settings()
 
@@ -84,14 +85,26 @@ app.add_handler(
     )
 )
 
-
 app.add_handler(
     MessageHandler(
         utils.jump_to_page, filters=filters.create(
             lambda _, __, msg: msg.text.isdigit()
-        ) & filters.reply
-        & filters.create(
-            lambda _, __, msg: helpers.has_read_book_msg(msg)
+        ) & filters.create(jump_to_page_filter)
+    )
+)
+
+app.add_handler(
+    EditedMessageHandler(
+        utils.jump_to_page, filters=filters.create(
+            lambda _, __, msg: msg.text.isdigit()
+        ) & filters.create(jump_to_page_filter)
+    )
+)
+
+app.add_handler(
+    CallbackQueryHandler(
+        utils.jump_tip, filters=filters.create(
+            lambda _, __, query: query.data.startswith("jump")
         )
     )
 )

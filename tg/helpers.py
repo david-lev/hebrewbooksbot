@@ -47,9 +47,9 @@ def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
     return current_offset + increase
 
 
-def has_read_book_msg(msg: Message) -> bool:
-    """Check if a message is a read book message reply."""
+def jump_to_page_filter(_, __, msg: Message) -> bool:
+    """Filter for jump_to_page_handler."""
     try:
-        return msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.startswith("read_book")
+        return msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.startswith('jump:')
     except (AttributeError, IndexError):
         return False

@@ -67,7 +67,6 @@ def show_book(_: Client, clb: CallbackQuery):
     """
     book_id, *clb_data = clb.data.split(':')[1:]
     book = api.get_book(int(book_id))
-    print(f"read:{book.id}:1:{book.pages}:show:{book.id}:{':'.join(clb_data)}")
     clb.edit_message_text(
         text=helpers.get_book_text(book),
         reply_markup=InlineKeyboardMarkup(
@@ -112,12 +111,6 @@ def read_book(_: Client, clb: CallbackQuery):
             text="הבא ⏪",
             callback_data=f"read:{book_id}:{int(page) + 1}:{total}:{':'.join(clb_data)}"
         ))
-    next_previous_buttons.append(
-        InlineKeyboardButton(
-            text=f"{page}/{total}",
-            url=book.get_page_url(page)
-        )
-    )
     if int(page) > 1:
         next_previous_buttons.append(InlineKeyboardButton(
             text="⏩ הקודם",
@@ -135,8 +128,10 @@ def read_book(_: Client, clb: CallbackQuery):
             )),
             reply_markup=InlineKeyboardMarkup(
                 [
+                    [InlineKeyboardButton(text=f"📄 {page}/{total} 📄", callback_data=f"jump:{book_id}:{page}:{total}")],
+                    [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(page))],
                     next_previous_buttons,
-                    [InlineKeyboardButton("חזור", callback_data=":".join(clb_data))],
+                    [InlineKeyboardButton("🔙", callback_data=":".join(clb_data))],
                 ]
             ),
         )
@@ -147,18 +142,47 @@ def read_book(_: Client, clb: CallbackQuery):
         )
 
 
-def jump_to_page(_: Client, msg: Message):  # TODO finish (maybe read from the middle button - the url)
+def jump_to_page(_: Client, msg: Message):
     """
     Jump to a page.
 
     msg.text: number
     """
-    action, book_id, page, total, *clb_data = \
-        msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.split(':')
-    if int(msg.text) > int(total):
+    book_id, page, total = msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.split(":")[1:]
+    jump_to = int(msg.text)
+    if jump_to > int(total):
         msg.reply_text(text="העמוד לא קיים! (כמות עמודים: {})".format(total))
         return
 
-    msg.reply_to_message.edit_text(
+    book = api.get_book(book_id)
+    kwargs = dict(
+        text="".join((
+            "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(helpers.RTL, jump_to, total),
+            helpers.get_book_text(book, page=jump_to),
+        )),
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton(text=f"📄 {jump_to}/{total} 📄", callback_data=f"jump:{book_id}:{jump_to}:{total}")],
+                [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(page))],
+                *msg.reply_to_message.reply_markup.inline_keyboard[2:]
+            ]
+        )
+    )
+    if msg.reply_to_message.via_bot:
+        msg.reply(**kwargs)  # Can't edit messages sent by the user
+    else:
+        msg.reply_to_message.edit(
+            **kwargs
+        )
 
+
+def jump_tip(_: Client, clb: CallbackQuery):
+    """
+    Jump to a page tip.
+
+    clb.data: "jump:*"
+    """
+    clb.answer(
+        text="טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא",
+        show_alert=True
     )

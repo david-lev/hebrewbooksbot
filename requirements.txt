@@ -3,8 +3,10 @@ charset-normalizer==3.1.0
 greenlet==2.0.2
 idna==3.4
 pyaes==1.6.1
+pydantic==1.10.7
 Pyrogram==2.0.106
 PySocks==1.7.1
+python-dotenv==1.0.0
 requests==2.30.0
 SQLAlchemy==2.0.13
 TgCrypto==1.2.5

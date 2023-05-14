@@ -1,10 +1,18 @@
 from pyrogram import Client, filters
 from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler
+from data import config
 from tg import search, helpers
 from tg import browse
 from tg import utils
 
-app = Client("my_session")
+cfg = config.get_settings()
+
+app = Client(
+    name="hebrewbooksbot",
+    api_id=cfg.tg_api_id,
+    api_hash=cfg.tg_api_hash,
+    bot_token=cfg.tg_bot_token
+)
 
 app.add_handler(
     MessageHandler(

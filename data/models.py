@@ -47,7 +47,7 @@ class Book:
         """Get the book's PDF URL"""
         return f'https://download.hebrewbooks.org/downloadhandler.ashx?req={self.id}'
 
-    def get_page_url(self, page: int, width: int, height: int) -> str:
+    def get_page_img(self, page: int, width: int, height: int) -> str:
         """
         Get the book's page image URL
 
@@ -57,3 +57,12 @@ class Book:
             height: The height of the image.
         """
         return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png'
+
+    def get_page_url(self, page: int) -> str:
+        """
+        Get the book's page URL
+
+        Args:
+            page: The page number.
+        """
+        return f'https://hebrewbooks.org/pdfpager.aspx?req={self.id}&pgnum={page}'

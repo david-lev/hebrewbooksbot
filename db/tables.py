@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import create_engine, BigInteger
+from sqlalchemy import create_engine, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
@@ -21,9 +21,10 @@ class TgUser(BaseTable):
     __tablename__ = 'tg_user'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tg_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+    lang: Mapped[str] = mapped_column(String(5))
     active: Mapped[bool] = mapped_column(default=True)
     candle_pressed: Mapped[bool] = mapped_column(default=False)
-
+    
 
 class Stats(BaseTable):
     __tablename__ = 'stats'

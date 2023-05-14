@@ -176,7 +176,7 @@ def jump_to_page(_: Client, msg: Message):
             [
                 [InlineKeyboardButton(text=f"📄 {jump_to}/{total} 📄",
                                       callback_data=f"jump:{book_id}:{jump_to}:{total}")],
-                [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(page))],
+                [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(jump_to))],
                 new_next_previous_buttons,
                 [msg.reply_to_message.reply_markup.inline_keyboard[-1][-1]]
             ]

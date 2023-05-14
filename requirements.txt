@@ -1,0 +1,12 @@
+certifi==2023.5.7
+charset-normalizer==3.1.0
+greenlet==2.0.2
+idna==3.4
+pyaes==1.6.1
+Pyrogram==2.0.106
+PySocks==1.7.1
+requests==2.30.0
+SQLAlchemy==2.0.13
+TgCrypto==1.2.5
+typing_extensions==4.5.0
+urllib3==2.0.2

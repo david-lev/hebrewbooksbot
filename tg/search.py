@@ -1,4 +1,4 @@
-from pyrogram import Client, emoji
+from pyrogram import Client
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, \
     InlineKeyboardButton, Message, CallbackQuery
 from data import api
@@ -50,9 +50,9 @@ def search_books_inline(_: Client, query: InlineQuery):
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton(text=emoji.DOWN_ARROW, url=book.pdf_url),
+                        InlineKeyboardButton(text="⬇️ הורדה ⬇️", url=book.pdf_url),
                         InlineKeyboardButton(
-                            text=emoji.OPEN_BOOK,
+                            text="📖 קריאה מהירה 📖",
                             callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:no_back"
                         ),
                     ],
@@ -95,7 +95,7 @@ def search_books_message(_: Client, msg: Message):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הבא",
+                text="הבא ⏪",
                 callback_data=f"search_nav:{next_offset}:{total}"
             )
         )
@@ -146,14 +146,14 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הבא",
+                text="הבא ⏪",
                 callback_data=f"search_nav:{next_offset}:{total}"
             )
         )
     if int(offset) > 5:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הקודם",
+                text="⏩ הקודם",
                 callback_data=f"search_nav:{int(offset) - 5}:{total}"
             )
         )

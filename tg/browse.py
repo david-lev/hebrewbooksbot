@@ -40,7 +40,7 @@ def browse_types(_: Client, query: CallbackQuery):
     else:
         results = api.get_subjects()
     query.edit_message_text(
-        text="בחר ספר",
+        text="בחר",
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -50,7 +50,7 @@ def browse_types(_: Client, query: CallbackQuery):
                     )
                 ] for result in results
             ] + [[
-                InlineKeyboardButton(text="חזור", callback_data="browse_menu")
+                InlineKeyboardButton(text="🔙", callback_data="browse_menu")
             ]]
         )
     )
@@ -67,7 +67,8 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{book.author} • {book.year} • {book.city}",
+                text=f"{book.title} • {book.author}{f' • {book.year}' if book.year else ''}"
+                     f"{f' • {book.city}' if book.city else ''}",
                 callback_data=f"show:{book.id}:{clb.data}"
             )
         ] for book in (get_book(result.id) for result in results)
@@ -78,14 +79,14 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הבא",
+                text="הבא ⏪",
                 callback_data=f"browse_nav:{browse_type}:{browse_id}:{next_offset}:{total}"
             )
         )
     if offset != "1" and int(offset) - 5 > 0:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הקודם",
+                text="⏩ הקודם",
                 callback_data=f"browse_nav:{browse_type}:{browse_id}:{int(offset) - 5}:{total}"
             )
         )

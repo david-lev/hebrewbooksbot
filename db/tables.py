@@ -22,6 +22,7 @@ class TgUser(BaseTable):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tg_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     active: Mapped[bool] = mapped_column(default=True)
+    candle_pressed: Mapped[bool] = mapped_column(default=False)
 
 
 class Stats(BaseTable):

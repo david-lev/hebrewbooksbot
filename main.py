@@ -8,13 +8,13 @@ app = Client("my_session")
 
 app.add_handler(
     MessageHandler(
-        utils.start, filters.command("start")
+        utils.start, filters=filters.command("start")
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.start, filters.create(lambda _, __, query: query.data == "start")
+        utils.start, filters=filters.create(lambda _, __, query: query.data.startswith("start"))
     )
 )
 

@@ -110,23 +110,23 @@ def search(title: str, author: str, offset: int, limit: int) -> tuple[list[Searc
 
 
 @lru_cache(maxsize=10_000)
-def browse(_type: str, _id: int | str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
+def browse(browse_type: str, browse_id: int | str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
     """
     Browse books on HebrewBooks.org
 
     Args:
-        _type: The type of search
-        _id: The ID of the search
+        browse_type: The type of search
+        browse_id: The ID of the search
         offset: The offset to start from
         limit: The number of results to return
     Returns:
         tuple[list[SearchResults], int]: The search results and the total number of results
     """
-    if _type not in ('letter', 'daterange', 'subject'):
+    if browse_type not in ('letter', 'daterange', 'subject'):
         raise ValueError('Invalid type')
     data = _make_request(
         endpoint='/api/api.ashx',
-        params={'req': 'title_list_for_subject', 'list_type': _type, 'id': _id,
+        params={'req': 'title_list_for_subject', 'list_type': browse_type, 'id': browse_id,
                 'start': offset, 'length': limit, 'callback': 'bot'},
         convert_to='dict'
     )
@@ -134,22 +134,22 @@ def browse(_type: str, _id: int | str, offset: int, limit: int) -> tuple[list[Se
 
 
 @lru_cache(maxsize=10_000)
-def get_suggestions(query: str, _type: str, limit: int) -> list[str]:
+def get_suggestions(query: str, search_type: str, limit: int) -> list[str]:
     """
     Get suggestions for a search on HebrewBooks.org
 
     Args:
         query: The query to search for
-        _type: The type of search
+        search_type: The type of search
         limit: The number of results to return
     Returns:
         list[str]: The search results
     """
-    if _type not in ('title', 'auth', 'ocr'):
+    if search_type not in ('title', 'auth', 'ocr'):
         raise ValueError('Invalid type')
     return _make_request(
         endpoint='/suggest/suggest.ashx',
-        params={'json': 1, 'autosuggest': 1,  'limit': limit, 'src': _type, 'q': query},
+        params={'json': 1, 'autosuggest': 1,  'limit': limit, 'src': search_type, 'q': query},
         convert_to=None
     )
 
@@ -166,5 +166,5 @@ if __name__ == '__main__':
     assert len(search_res) == 10
     assert all(('דוד' in res.title for res in search_res))
     assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
-    assert len(get_suggestions(query='דוד', _type='title', limit=10)) == 10
+    assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
 

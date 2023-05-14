@@ -11,7 +11,6 @@ def start(_: Client, msg_or_callback: Message | CallbackQuery):
     if isinstance(msg_or_callback, CallbackQuery) and msg_or_callback.data.endswith("stats"):
         repository.press_candle(msg_or_callback.from_user.id)
     candle_pressed_count = repository.get_candle_pressed_count()
-    print(candle_pressed_count)
     kwargs = dict(
         text="".join((
             "**📚 ברוכים הבאים להיברו-בוקס בטלגרם! 📚**\n\n",

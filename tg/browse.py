@@ -3,6 +3,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQ
 from data import api
 from data.api import get_book
 from tg import helpers
+from tg.strings import String as s, get_string as gs
 
 
 def browse_menu(_: Client, query: CallbackQuery):
@@ -12,13 +13,13 @@ def browse_menu(_: Client, query: CallbackQuery):
     query.data format: "browse_menu"
     """
     query.edit_message_text(
-        text="בחר סוג דפדוף",
+        text=gs(mqc=query, string=s.CHOOSE_BROWSE_TYPE),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🗂 נושאים", callback_data="browse_type:subject"),
-                    InlineKeyboardButton("🔠 אותיות", callback_data="browse_type:letter"),
-                    InlineKeyboardButton("📅 תאריכים", callback_data="browse_type:daterange"),
+                    InlineKeyboardButton(gs(mqc=query, string=s.SUBJECTS), callback_data="browse_type:subject"),
+                    InlineKeyboardButton(gs(mqc=query, string=s.LETTERS), callback_data="browse_type:letter"),
+                    InlineKeyboardButton(gs(mqc=query, string=s.DATES), callback_data="browse_type:daterange"),
                 ],
                 [InlineKeyboardButton("🔙", callback_data="start")]
             ]
@@ -40,7 +41,7 @@ def browse_types(_: Client, query: CallbackQuery):
     else:
         results = api.get_subjects()
     query.edit_message_text(
-        text="בחר",
+        text=gs(mqc=query, string=s.CHOOSE),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -79,14 +80,14 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הבא ⏪",
+                text=gs(mqc=clb, string=s.NEXT),
                 callback_data=f"browse_nav:{browse_type}:{browse_id}:{next_offset}:{total}"
             )
         )
     if offset != "1" and int(offset) - 5 > 0:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="⏩ הקודם",
+                text=gs(mqc=clb, string=s.PREVIOUS),
                 callback_data=f"browse_nav:{browse_type}:{browse_id}:{int(offset) - 5}:{total}"
             )
         )
@@ -100,7 +101,7 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
     )
 
     clb.edit_message_text(
-        text="בחר",
+        text=gs(mqc=clb, string=s.CHOOSE),
         reply_markup=InlineKeyboardMarkup(
             buttons
         )

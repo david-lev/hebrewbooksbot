@@ -30,11 +30,12 @@ class String(Enum):
     SLOW_DOWN = auto()  # V
     PAGE_NOT_EXIST = auto()  # V
     JUMP_TIP = auto()  # V
-    CHOOSE_BROWSE_TYPE = auto()
-    SUBJECTS = auto()
-    LETTERS = auto()
-    DATES = auto()
+    CHOOSE_BROWSE_TYPE = auto()  # V
+    SUBJECTS = auto()  # V
+    LETTERS = auto()  # V
+    DATES = auto()  # V
     BACK = auto()
+    CHOOSE = auto()  # V
     START_SEARCH_INLINE = auto()  # V
     SEARCH_INLINE_TIP = auto()  # V
     BOOK_NOT_FOUND = auto()  # V
@@ -165,13 +166,25 @@ _STRINGS = {
         'en': 'The original search has been deleted',
         'he': 'החיפוש המקורי נמחק'
     },
-    String.SEARCH_IN_CHATS: {
-        'en': '',
-        'he': ''
+    String.CHOOSE_BROWSE_TYPE: {
+        'en': 'Select a browsing type',
+        'he': 'בחר סוג דפדוף'
     },
-    String.SEARCH_IN_CHATS: {
-        'en': '',
-        'he': ''
+    String.SUBJECTS: {
+        'en': '🗂 Themes',
+        'he': '🗂 נושאים'
+    },
+    String.LETTERS: {
+        'en': '🔠 letters',
+        'he': '🔠 אותיות'
+    },
+    String.DATES: {
+        'en': '📅 Dates',
+        'he': '📅 תאריכים'
+    },
+    String.CHOOSE: {
+        'en': 'choose',
+        'he': 'בחר'
     }
 }
 

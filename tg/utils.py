@@ -2,31 +2,26 @@ from pyrogram import Client
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from tg import helpers
+from tg.strings import String as s, get_string as gs
 from data import api
 from db import repository
 
 
-def start(_: Client, msg_or_callback: Message | CallbackQuery):
+def start(_: Client, mb: Message | CallbackQuery):
     """Start message"""
-    if isinstance(msg_or_callback, CallbackQuery) and msg_or_callback.data.endswith("stats"):
-        repository.press_candle(msg_or_callback.from_user.id)
+    if isinstance(mb, CallbackQuery) and mb.data.endswith("stats"):
+        repository.press_candle(mb.from_user.id)
     candle_pressed_count = repository.get_candle_pressed_count()
     kwargs = dict(
-        text="".join((
-            "**📚 ברוכים הבאים להיברו-בוקס בטלגרם! 📚**\n\n",
-            "🔎 בוט זה מאפשר חיפוש ועיון ספרים באתר hebrewbooks.org\n",
-            "**📜 הוראות שימוש:** לחצו על חיפוש או על דפדוף כדי להתחיל או פשוט שלחו מילת חיפוש.\n",
-            "**💡 טיפ:** ניתן לחפש בפורמט `כותר:מחבר` כדי לקבל תוצאות מדוייקות יותר.\n\n",
-            "__🕯 לעילוי נשמת סבי הרב אהרן יצחק בן שמואל זנוויל זצ״ל 🕯__\n\n",
-        )),
+        text=gs(mb, s.WELCOME),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔎 חיפוש 🔎", switch_inline_query_current_chat=""),
-                    InlineKeyboardButton("📚 דפדוף 📚", callback_data="browse_menu"),
+                    InlineKeyboardButton(gs(mb, s.SEARCH), switch_inline_query_current_chat=""),
+                    InlineKeyboardButton(gs(mb, s.BROWSE), callback_data="browse_menu"),
                 ],
                 [
-                    InlineKeyboardButton(f"🕯 {candle_pressed_count:,} 🕯", callback_data="start_stats"),
+                    InlineKeyboardButton(f"🕯 הדליקו נר ({candle_pressed_count:,})", callback_data="start_stats"),
                     InlineKeyboardButton("📤", switch_inline_query=""),
                 ],
                 [InlineKeyboardButton("⭐️ גיטהאב ⭐️", url="https://github.com/david-lev/hebrewbooksbot")],
@@ -34,18 +29,18 @@ def start(_: Client, msg_or_callback: Message | CallbackQuery):
             ]
         )
     )
-    if isinstance(msg_or_callback, Message):
-        msg_or_callback.reply_text(**kwargs)
-        repository.add_tg_user(msg_or_callback.from_user.id, msg_or_callback.from_user.language_code)
+    if isinstance(mb, Message):
+        mb.reply_text(**kwargs)
+        repository.add_tg_user(mb.from_user.id, mb.from_user.language_code)
     else:
         try:
-            msg_or_callback.edit_message_text(**kwargs)
+            mb.edit_message_text(**kwargs)
         except MessageNotModified:
             pass
-        if msg_or_callback.data.endswith("stats"):
+        if mb.data.endswith("stats"):
             users_count = repository.get_tg_users_count()
             stats = repository.get_stats()
-            msg_or_callback.answer(
+            mb.answer(
                 text="".join((
                     "📊 סטטיסטיקות הבוט 📊\n\n",
                     f"👥 משתמשים רשומים: {users_count}\n", \

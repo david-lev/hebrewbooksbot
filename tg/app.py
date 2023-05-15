@@ -60,7 +60,9 @@ app.add_handler(
 app.add_handler(
     MessageHandler(
         search.search_books_message, filters=(
-                filters.text & ~filters.via_bot & ~filters.create(lambda _, __, msg: msg.text.isdigit())
+                filters.text & ~filters.via_bot &
+                ~filters.create(lambda _, __, msg: msg.text.isdigit())
+                & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
         )
     )
 )

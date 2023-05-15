@@ -21,11 +21,12 @@ def start(_: Client, mb: Message | CallbackQuery):
                     InlineKeyboardButton(gs(mb, s.BROWSE), callback_data="browse_menu"),
                 ],
                 [
-                    InlineKeyboardButton(f"🕯 הדליקו נר ({candle_pressed_count:,})", callback_data="start_stats"),
+                    InlineKeyboardButton(text=gs(mb, s.LIGHT_A_CANDLE).format(candle_pressed_count),
+                                         callback_data="start_stats"),
                     InlineKeyboardButton("📤", switch_inline_query=""),
                 ],
-                [InlineKeyboardButton("⭐️ גיטהאב ⭐️", url="https://github.com/david-lev/hebrewbooksbot")],
-                [InlineKeyboardButton("🌍 אתר היברובוקס 🌍", url="https://hebrewbooks.org")],
+                [InlineKeyboardButton(text=gs(mb, s.GITHUB), url="https://github.com/david-lev/hebrewbooksbot")],
+                [InlineKeyboardButton(text=gs(mb, s.HEBREWBOOKS_SITE), url="https://hebrewbooks.org")],
             ]
         )
     )
@@ -41,14 +42,11 @@ def start(_: Client, mb: Message | CallbackQuery):
             users_count = repository.get_tg_users_count()
             stats = repository.get_stats()
             mb.answer(
-                text="".join((
-                    "📊 סטטיסטיקות הבוט 📊\n\n",
-                    f"👥 משתמשים רשומים: {users_count}\n", \
-                    f"🕯 נרות הודלקו: {candle_pressed_count}\n"
-                    f"📚 ספרים נקראו: {stats.books_read}\n",
-                    f"📖 עמודים נקראו: {stats.pages_read}\n",
-                    f"🔎 חיפושים בוצעו: {stats.searches}\n",
-                )),
+                text="".join(gs(mb, s.STATS)).format(
+                    users_count=users_count,
+                    candle_pressed_count=candle_pressed_count,
+                    books_read=stats.books_read, pages_read=stats.pages_read,
+                    searches=stats.searches),
                 show_alert=True,
                 cache_time=300
             )
@@ -68,17 +66,17 @@ def show_book(_: Client, clb: CallbackQuery):
             [
                 [
                     InlineKeyboardButton(
-                        text="📖 קריאה מהירה 📖",
+                        text=gs(mqc=clb, string=s.BOOKS_READ),
                         callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:{':'.join(clb_data)}"
                     )
                 ], [
                     InlineKeyboardButton(
-                        text="♻️ שיתוף ♻️",
+                        text=gs(mqc=clb, string=s.SHARE),
                         switch_inline_query=str(book.id)
                     )
                 ],
                 [
-                    InlineKeyboardButton(text="⬇️ הורדה ⬇️", url=book.pdf_url)
+                    InlineKeyboardButton(text=gs(mqc=clb, string=s.DOWNLOAD), url=book.pdf_url)
                 ],
                 [
                     InlineKeyboardButton(
@@ -103,16 +101,16 @@ def read_book(_: Client, clb: CallbackQuery):
     next_previous_buttons = []
     if int(page) < int(total):
         next_previous_buttons.append(InlineKeyboardButton(
-            text="הבא ⏪",
+            text=gs(mqc=clb, string=s.NEXT),
             callback_data=f"read:{book_id}:{int(page) + 1}:{total}:{':'.join(clb_data)}"
         ))
     if int(page) > 1:
         next_previous_buttons.append(InlineKeyboardButton(
-            text="⏩ הקודם",
+            text=gs(mqc=clb, string=s.PREVIOUS),
             callback_data=f"read:{book_id}:{int(page) - 1}:{total}:{':'.join(clb_data)}"
         ))
     clb.answer(
-        text='יש להמתין מספר שניות לטעינת התצוגה המקדימה',
+        text=gs(mqc=clb, string=s.WAIT_FOR_PREVIEW),
         show_alert=False
     )
     try:
@@ -124,7 +122,7 @@ def read_book(_: Client, clb: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(
                 [
                     [InlineKeyboardButton(text=f"📄 {page}/{total} 📄", callback_data=f"jump:{book_id}:{page}:{total}")],
-                    [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(page))],
+                    [InlineKeyboardButton(text=gs(mqc=clb, string=s.READ_ON_SITE), url=book.get_page_url(page))],
                     next_previous_buttons,
                     [InlineKeyboardButton("🔙", callback_data=":".join(clb_data))],
                 ]
@@ -133,7 +131,7 @@ def read_book(_: Client, clb: CallbackQuery):
         repository.increase_pages_read_count()
     except MessageNotModified:
         clb.answer(
-            text="אני לא מלאך.. לאט יותר"
+            text=gs(mqc=clb, string=s.SLOW_DOWN)
         )
 
 
@@ -146,7 +144,7 @@ def jump_to_page(_: Client, msg: Message):
     book_id, page, total = msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.split(":")[1:]
     jump_to = int(msg.text)
     if jump_to > int(total):
-        msg.reply_text(text="העמוד לא קיים! (כמות עמודים: {})".format(total))
+        msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(total))
         return
 
     book = api.get_book(book_id)
@@ -154,12 +152,12 @@ def jump_to_page(_: Client, msg: Message):
     next_or_previous = msg.reply_to_message.reply_markup.inline_keyboard[2:-1][0][0].callback_data.split(':')
     if jump_to < int(total):
         new_next_previous_buttons.append(InlineKeyboardButton(
-            text="הבא ⏪",
+            text=gs(mqc=msg, string=s.NEXT),
             callback_data=f"{':'.join(next_or_previous[:2])}:{jump_to + 1}:{':'.join(next_or_previous[3:])}"
         ))
     if jump_to > 1:
         new_next_previous_buttons.append(InlineKeyboardButton(
-            text="⏩ הקודם",
+            text=gs(mqc=msg, string=s.PREVIOUS),
             callback_data=f"{':'.join(next_or_previous[:2])}:{jump_to - 1}:{':'.join(next_or_previous[3:])}"
         ))
     kwargs = dict(
@@ -171,7 +169,7 @@ def jump_to_page(_: Client, msg: Message):
             [
                 [InlineKeyboardButton(text=f"📄 {jump_to}/{total} 📄",
                                       callback_data=f"jump:{book_id}:{jump_to}:{total}")],
-                [InlineKeyboardButton(text=f"🌍 קריאה באתר 🌍", url=book.get_page_url(jump_to))],
+                [InlineKeyboardButton(text=gs(mqc=msg, string=s.READ_ON_SITE), url=book.get_page_url(jump_to))],
                 new_next_previous_buttons,
                 [msg.reply_to_message.reply_markup.inline_keyboard[-1][-1]]
             ]
@@ -192,7 +190,6 @@ def jump_tip(_: Client, clb: CallbackQuery):
     clb.data: "jump:*"
     """
     clb.answer(
-        text="טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא."
-             "\nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.",
+        text=gs(mqc=clb, string=s.JUMP_TIP),
         show_alert=True
     )

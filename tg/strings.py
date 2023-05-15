@@ -35,14 +35,14 @@ class String(Enum):
     LETTERS = auto()
     DATES = auto()
     BACK = auto()
-    START_SEARCH_INLINE = auto()
-    SEARCH_INLINE_TIP = auto()
-    BOOK_NOT_FOUND = auto()
-    PRESS_TO_SHARE = auto()
-    X_RESULTS_FOR_S = auto()
-    NO_RESULTS_FOR_S = auto()
-    SEARCH_INLINE = auto()
-    ORIGINAL_SEARCH_DELETED = auto()
+    START_SEARCH_INLINE = auto()  # V
+    SEARCH_INLINE_TIP = auto()  # V
+    BOOK_NOT_FOUND = auto()  # V
+    PRESS_TO_SHARE = auto()  # V
+    X_RESULTS_FOR_S = auto()  # RTL ⚠️
+    NO_RESULTS_FOR_S = auto()  # V
+    SEARCH_INLINE = auto()  # V
+    ORIGINAL_SEARCH_DELETED = auto()  # V
 
 
 _STRINGS = {
@@ -137,21 +137,33 @@ _STRINGS = {
         'en': 'The page does not exist! (Number of pages: {})',
         'he': 'העמוד לא קיים! (כמות עמודים: {})'
     },
-    String.SEARCH_IN_CHATS: {
-        'en': '',
-        'he': ''
+    String.SEARCH_INLINE_TIP: {
+        'en': "Tip: You can search in the 'Title: Author' format in order to get accurate results",
+        'he': "טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות"
     },
-    String.SEARCH_IN_CHATS: {
-        'en': '',
-        'he': ''
+    String.START_SEARCH_INLINE: {
+        'en': 'start looking',
+        'he': 'התחילו לחפש'
     },
-    String.SEARCH_IN_CHATS: {
-        'en': '',
-        'he': ''
+    String.BOOK_NOT_FOUND: {
+        'en': 'Book not found',
+        'he': 'ספר לא נמצא'
     },
-    String.SEARCH_IN_CHATS: {
-        'en': '',
-        'he': ''
+    String.PRESS_TO_SHARE: {
+        'en': 'Click on the result to share {}',
+        'he': 'לחצו על התוצאה כדי לשתף את {}'
+    },
+    String.NO_RESULTS_FOR_S: {
+        'en': 'no results were found for: {}',
+        'he': 'לא נמצאו תוצאות עבור: {}'
+    },
+    String.SEARCH_INLINE: {
+        'en': '🔎 Inline search',
+        'he': '🔎 חיפוש באינליין'
+    },
+    String.ORIGINAL_SEARCH_DELETED: {
+        'en': 'The original search has been deleted',
+        'he': 'החיפוש המקורי נמחק'
     },
     String.SEARCH_IN_CHATS: {
         'en': '',

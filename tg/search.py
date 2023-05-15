@@ -5,6 +5,7 @@ from data import api
 from data.models import Book
 from db import repository
 from tg import helpers
+from tg.strings import String as s, get_string as gs
 
 
 def empty_search(_: Client, query: InlineQuery):
@@ -13,8 +14,8 @@ def empty_search(_: Client, query: InlineQuery):
         results=[
             InlineQueryResultArticle(
                 id="1",
-                title="התחילו לחפש",
-                description="טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות",
+                title=gs(mqc=query, string=s.START_SEARCH_INLINE),
+                description=gs(mqc=query, string=s.SEARCH_INLINE_TIP),
                 input_message_content=InputTextMessageContent(
                     message_text="/start"
                 )
@@ -23,7 +24,7 @@ def empty_search(_: Client, query: InlineQuery):
     )
 
 
-def _get_book_article(book: Book) -> InlineQueryResultArticle:
+def _get_book_article(book: Book, query: InlineQuery) -> InlineQueryResultArticle:
     """
     Internal function to get an article for a book
     """
@@ -38,19 +39,19 @@ def _get_book_article(book: Book) -> InlineQueryResultArticle:
             [
                 [
                     InlineKeyboardButton(
-                        text="📖 קריאה מהירה 📖",
+                        text=gs(mqc=query, string=s.PREVIOUS),
                         callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:no_back"
                     ),
                 ],
                 [
                     InlineKeyboardButton(
-                        text="♻️ שיתוף ♻️",
+                        text=gs(mqc=query, string=s.SHARE),
                         switch_inline_query=str(book.id)
                     )
                 ],
                 [
                     InlineKeyboardButton(
-                        text="⬇️ הורדה ⬇️",
+                        text=gs(mqc=query, string=s.DOWNLOAD),
                         url=book.pdf_url
                     ),
                 ]
@@ -74,13 +75,13 @@ def search_books_inline(_: Client, query: InlineQuery):
         if book is None:
             query.answer(
                 results=[],
-                switch_pm_text="ספר לא נמצא",
+                switch_pm_text=gs(mqc=query, string=s.BOOK_NOT_FOUND),
                 switch_pm_parameter="search"
             )
             return
         query.answer(
-            results=[_get_book_article(book)],
-            switch_pm_text="לחצו על התוצאה כדי לשתף את {}".format(book.title),
+            results=[_get_book_article(book, query)],
+            switch_pm_text=gs(mqc=query, string=s.PRESS_TO_SHARE).format(book.title),
             switch_pm_parameter="search"
         )
         repository.increase_books_read_count()
@@ -96,7 +97,7 @@ def search_books_inline(_: Client, query: InlineQuery):
     query.answer(
         switch_pm_text="{}{} תוצאות עבור {}".format(helpers.RTL, total, f"{title}:{author}" if author else title),
         switch_pm_parameter="search",
-        results=[_get_book_article(book) for book in (api.get_book(b.id) for b in results)],
+        results=[_get_book_article(book, query=query) for book in (api.get_book(b.id) for b in results)],
         next_offset=str(helpers.get_offset(int(query.offset or 1), total, increase=5))
     )
     repository.increase_search_count()
@@ -117,7 +118,7 @@ def search_books_message(_: Client, msg: Message):
     )
     if total == 0:
         msg.reply_text(
-            text="לא נמצאו תוצאות עבור: {}".format(msg.text),
+            text=gs(mqc=msg, string=s.NO_RESULTS_FOR_S).format(msg.text),
             quote=True
         )
         return
@@ -126,7 +127,7 @@ def search_books_message(_: Client, msg: Message):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הבא ⏪",
+                text=gs(mqc=msg, string=s.NEXT),
                 callback_data=f"search_nav:{next_offset}:{total}"
             )
         )
@@ -142,7 +143,7 @@ def search_books_message(_: Client, msg: Message):
                 ] for book in results
             ] + [
                 next_previous_buttons,
-                [InlineKeyboardButton("🔎 חיפוש באינליין", switch_inline_query_current_chat=msg.text)]
+                [InlineKeyboardButton(gs(mqc=msg, string=s.SEARCH_INLINE), switch_inline_query_current_chat=msg.text)]
             ]
         ),
         quote=True
@@ -162,7 +163,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
         if not search:
             raise AttributeError
     except AttributeError:
-        clb.answer("החיפוש המקורי נמחק", show_alert=True)
+        clb.answer(gs(mqc=clb, string=s.ORIGINAL_SEARCH_DELETED), show_alert=True)
         return
 
     title, author = helpers.get_title_author(search)
@@ -177,14 +178,14 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="הבא ⏪",
+                text=gs(mqc=clb, string=s.NEXT),
                 callback_data=f"search_nav:{next_offset}:{total}"
             )
         )
     if int(offset) > 5:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text="⏩ הקודם",
+                text=gs(mqc=clb, string=s.PREVIOUS),
                 callback_data=f"search_nav:{int(offset) - 5}:{total}"
             )
         )
@@ -200,7 +201,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
                 ] for book in results
             ] + [
                 next_previous_buttons,
-                [InlineKeyboardButton("🔎 חיפוש באינליין", switch_inline_query_current_chat=search)]
+                [InlineKeyboardButton(gs(mqc=clb, string=s.SEARCH_INLINE), switch_inline_query_current_chat=search)]
             ]
         )
     )

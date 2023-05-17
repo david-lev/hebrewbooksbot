@@ -48,17 +48,18 @@ class CallbackData:
         """
         return sep.join([self.__clbname__, *(str(getattr(self, field)) for field in self.__annotations__)])
 
-    def join_to_callback(self, *others, sep: str = ',') -> str:
+    def join_to_callback(self, *others, sep: str = ',', clb_sep: str = ':') -> str:
         """
         Join the callback data with other callback data
 
         Args:
             others: Other ``CallbackData`` objects or strings
             sep: The separator between the callback strings (default: ',')
+            clb_sep: The separator between the fields in the callback fields (default: ':')
         """
         return sep.join([
             self.to_callback(),
-            *(other.to_callback() if isinstance(other, CallbackData) else other for other in others)
+            *(other.to_callback(sep=clb_sep) if isinstance(other, CallbackData) else other for other in others)
         ])
 
 

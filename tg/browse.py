@@ -1,7 +1,7 @@
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from data import api
-from data.models import BrowseType as BrowseTypeEnum
+from data.enums import BrowseType as BrowseTypeEnum
 from tg import helpers
 from tg.strings import String as s, get_string as gs
 from tg.callbacks import BrowseNavigation, BrowseType, ShowBook

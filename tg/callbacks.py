@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
-from data.models import BrowseType as BrowseTypeEnum
+from data.enums import BrowseType as BrowseTypeEnum
 
 
 class CallbackData:

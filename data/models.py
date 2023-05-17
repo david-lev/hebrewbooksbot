@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from enum import Enum
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,14 +66,3 @@ class Book:
             page: The page number.
         """
         return f'https://hebrewbooks.org/pdfpager.aspx?req={self.id}&pgnum={page}'
-
-
-class BaseEnum(str, Enum):
-    def __str__(self):
-        return self.value
-
-
-class BrowseType(BaseEnum):
-    SUBJECT = "subject"
-    LETTER = "letter"
-    DATERANGE = "daterange"

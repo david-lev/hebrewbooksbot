@@ -1,7 +1,9 @@
 import json
 import requests
 from functools import lru_cache
-from data.models import Letter, DateRange, Subject, Book, SearchResults, BrowseType
+from data.enums import BrowseType
+from data.models import Letter, DateRange, Subject, Book, SearchResults, Masechet, MasechetPage, PageContent, Section
+from bs4 import BeautifulSoup, ResultSet, PageElement
 
 BASE_API = 'https://beta.hebrewbooks.org'
 

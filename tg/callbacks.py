@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 from data.models import BrowseType as BrowseTypeEnum
 
 
@@ -6,8 +7,7 @@ class CallbackData:
     """
     Base class for callback data classes
     """
-    __slots__ = ('__name__',)
-    __name__: str  # Must be overridden in subclasses
+    __clbname__: str  # Must be overridden in subclasses
 
     def __init__(self, *args, **kwargs):
         pass
@@ -27,7 +27,7 @@ class CallbackData:
             callback_data: The callback string (e.g. "browse_nav:subject:342:5:10")
             sep: The separator between the fields in the callback string (default: ':')
         """
-        if not callback_data.startswith(cls.__name__):
+        if not callback_data.startswith(cls.__clbname__):
             raise ValueError(f"Invalid callback data: {callback_data}")
         try:
             return cls(*(
@@ -47,14 +47,14 @@ class CallbackData:
         Args:
             sep: The separator between the fields in the callback string (default: ':')
         """
-        return sep.join([self.__name__, *(str(getattr(self, field)) for field in self.__annotations__)])
+        return sep.join([self.__clbname__, *(str(getattr(self, field)) for field in self.__annotations__)])
 
-    def join_to_callback(self, *others: str | 'CallbackData', sep: str = ',') -> str:
+    def join_to_callback(self, *others, sep: str = ',') -> str:
         """
         Join the callback data with other callback data
 
         Args:
-            others: Other callback data objects or strings
+            others: Other ``CallbackData`` objects or strings
             sep: The separator between the callback strings (default: ',')
         """
         return sep.join([
@@ -65,7 +65,7 @@ class CallbackData:
 
 @dataclass(frozen=True, slots=True)
 class BrowseNavigation(CallbackData):
-    __name__ = 'browse_nav'
+    __clbname__ = 'browse_nav'
     type: BrowseTypeEnum
     id: str
     offset: int
@@ -74,26 +74,34 @@ class BrowseNavigation(CallbackData):
 
 @dataclass(frozen=True, slots=True)
 class BrowseType(CallbackData):
-    __name__ = 'browse_type'
+    __clbname__ = 'browse_type'
     type: BrowseTypeEnum
 
 
 @dataclass(frozen=True, slots=True)
 class SearchNavigation(CallbackData):
-    __name__ = 'search_nav'
+    __clbname__ = 'search_nav'
     offset: int
     total: int
 
 
 @dataclass(frozen=True, slots=True)
 class ShowBook(CallbackData):
-    __name__ = 'show'
+    __clbname__ = 'show'
     id: int
 
 
 @dataclass(frozen=True, slots=True)
 class ReadBook(CallbackData):
-    __name__ = 'read'
+    __clbname__ = 'read'
+    id: int
+    page: int
+    total: int
+
+
+@dataclass(frozen=True, slots=True)
+class JumpToPage(CallbackData):
+    __clbname__ = 'jump'
     id: int
     page: int
     total: int

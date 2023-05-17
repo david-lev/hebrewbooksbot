@@ -5,7 +5,7 @@ from tg import search, helpers
 from tg import browse
 from tg import utils
 from tg.helpers import jump_to_page_filter
-from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation
+from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage
 
 cfg = config.get_settings()
 
@@ -84,7 +84,7 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.read_book, filters=filters.create(lambda _, __, query: query.data.startswith("read"))
+        utils.read_book, filters=filters.create(lambda _, __, query: helpers.callback_matcher(query, ReadBook))
     )
 )
 
@@ -107,7 +107,7 @@ app.add_handler(
 app.add_handler(
     CallbackQueryHandler(
         utils.jump_tip, filters=filters.create(
-            lambda _, __, query: query.data.startswith("jump")
+            lambda _, __, query: helpers.callback_matcher(query, JumpToPage)
         )
     )
 )

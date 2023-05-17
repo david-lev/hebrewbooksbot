@@ -5,7 +5,7 @@ from data import api
 from data.models import Book
 from db import repository
 from tg import helpers
-from tg.callbacks import SearchNavigation, ShowBook
+from tg.callbacks import SearchNavigation, ShowBook, ReadBook
 from tg.strings import String as s, get_string as gs
 
 
@@ -40,8 +40,8 @@ def _get_book_article(book: Book, query: InlineQuery) -> InlineQueryResultArticl
             [
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.PREVIOUS),
-                        callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:no_back"
+                        text=gs(mqc=query, string=s.BOOKS_READ),
+                        callback_data=ReadBook(id=book.id, page=1, total=book.pages).join_to_callback(ShowBook(id=book.id))
                     ),
                 ],
                 [
@@ -112,8 +112,8 @@ def search_books_message(_: Client, msg: Message):
     """
     title, author = helpers.get_title_author(msg.text)
     results, total = api.search(
-        title=title.strip(),
-        author=author.strip(),
+        title=title,
+        author=author,
         offset=1,
         limit=5
     )
@@ -139,7 +139,7 @@ def search_books_message(_: Client, msg: Message):
                 [
                     InlineKeyboardButton(
                         text=book.title,
-                        callback_data=f"show:{book.id}:search_nav:{1}:{total}"
+                        callback_data=ShowBook(book.id).join_to_callback(SearchNavigation(offset=1, total=total))
                     )
                 ] for book in results
             ] + [
@@ -156,7 +156,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
     """
     Navigate through search results
     """
-    search_nav = SearchNavigation.from_callback(clb)
+    search_nav = SearchNavigation.from_callback(clb.data)
     try:
         search = clb.message.reply_to_message.text
         if not search:
@@ -167,8 +167,8 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
 
     title, author = helpers.get_title_author(search)
     results, total = api.search(
-        title=title.strip(),
-        author=author.strip(),
+        title=title,
+        author=author,
         offset=search_nav.offset,
         limit=5
     )
@@ -195,7 +195,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
                 [
                     InlineKeyboardButton(
                         text=book.title,
-                        callback_data=f"show:{book.id}:search_nav:{search_nav.offset}:{total}"
+                        callback_data=ShowBook(book.id).join_to_callback(search_nav)
                     )
                 ] for book in results
             ] + [

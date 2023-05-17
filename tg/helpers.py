@@ -1,6 +1,6 @@
 from pyrogram.types import Message, CallbackQuery
 from data.models import Book
-from tg.callbacks import CallbackData
+from tg.callbacks import CallbackData, JumpToPage
 
 RTL = '\u200f'
 LTR = '\u200e'
@@ -27,7 +27,7 @@ def get_title_author(text: str) -> tuple[str, str]:
     """
     Get the title and author from a text.
     """
-    return text.split(':', 1) if ':' in text else (text, '')
+    return (t.strip() for t in text.split(':', 1)) if ':' in text else (text.strip(), '')
 
 
 def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
@@ -50,12 +50,15 @@ def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
 def jump_to_page_filter(_, __, msg: Message) -> bool:
     """Filter for jump_to_page_handler."""
     try:
-        return msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.startswith('jump:')
+        return callback_matcher(
+            clb=msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data,
+            data=JumpToPage
+        )
     except (AttributeError, IndexError):
         return False
 
 
-def callback_matcher(clb: CallbackQuery, data: type[CallbackData]) -> bool:
+def callback_matcher(clb: CallbackQuery | str, data: type[CallbackData]) -> bool:
     """
     Check if the callback query matches the callback data.
 
@@ -63,4 +66,4 @@ def callback_matcher(clb: CallbackQuery, data: type[CallbackData]) -> bool:
         clb: The callback query.
         data: The callback data.
     """
-    return clb.data.startswith(data.__name__)
+    return (clb.data if isinstance(clb, CallbackQuery) else clb).startswith(data.__clbname__)

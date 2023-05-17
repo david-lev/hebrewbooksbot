@@ -154,11 +154,11 @@ def get_suggestions(query: str, search_type: str, limit: int) -> list[str]:
 
 if __name__ == '__main__':
     letters = get_letters()
-    assert len(browse('letter', letters[0].id, offset=1, limit=5)[0]) == 5
+    assert len(browse(BrowseType.LETTER, letters[0].id, offset=1, limit=5)[0]) == 5
     subjects = get_subjects()
-    assert len(browse('subject', subjects[0].id, offset=1, limit=5)[0]) == 5
+    assert len(browse(BrowseType.SUBJECT, subjects[0].id, offset=1, limit=5)[0]) == 5
     daterange = get_date_ranges()
-    assert len(browse('daterange', daterange[0].id, offset=1, limit=5)[0]) == 5
+    assert len(browse(BrowseType.DATERANGE, daterange[0].id, offset=1, limit=5)[0]) == 5
     search_res, total = search(title="דוד", author='דוד', offset=1, limit=10)
     assert get_book(search_res[0].id).id == search_res[0].id
     assert len(search_res) == 10

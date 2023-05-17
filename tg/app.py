@@ -1,10 +1,11 @@
 from pyrogram import Client, filters
 from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler, EditedMessageHandler
 from data import config
-from tg import search
+from tg import search, helpers
 from tg import browse
 from tg import utils
 from tg.helpers import jump_to_page_filter
+from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation
 
 cfg = config.get_settings()
 
@@ -44,7 +45,7 @@ app.add_handler(
 app.add_handler(
     CallbackQueryHandler(
         browse.browse_types, filters=filters.create(
-            lambda _, __, query: query.data.startswith("browse_type")
+            lambda _, __, query: helpers.callback_matcher(query, BrowseType)
         )
     )
 )
@@ -52,7 +53,7 @@ app.add_handler(
 app.add_handler(
     CallbackQueryHandler(
         browse.browse_books_navigator, filters=filters.create(
-            lambda _, __, query: query.data.startswith("browse_nav")
+            lambda _, __, query: helpers.callback_matcher(query, BrowseNavigation)
         )
     )
 )
@@ -70,14 +71,14 @@ app.add_handler(
 app.add_handler(
     CallbackQueryHandler(
         search.search_books_navigator, filters=filters.create(
-            lambda _, __, query: query.data.startswith("search_nav")
+            lambda _, __, query: helpers.callback_matcher(query, SearchNavigation)
         )
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.show_book, filters=filters.create(lambda _, __, query: query.data.startswith("show"))
+        utils.show_book, filters=filters.create(lambda _, __, query: helpers.callback_matcher(query, ShowBook))
     )
 )
 

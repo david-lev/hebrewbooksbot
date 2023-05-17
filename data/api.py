@@ -1,7 +1,7 @@
 import json
 import requests
 from functools import lru_cache
-from data.models import Letter, DateRange, Subject, Book, SearchResults
+from data.models import Letter, DateRange, Subject, Book, SearchResults, BrowseType
 
 BASE_API = 'https://beta.hebrewbooks.org'
 
@@ -110,7 +110,7 @@ def search(title: str, author: str, offset: int, limit: int) -> tuple[list[Searc
 
 
 @lru_cache(maxsize=10_000)
-def browse(browse_type: str, browse_id: int | str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
+def browse(browse_type: BrowseType, browse_id: int | str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
     """
     Browse books on HebrewBooks.org
 
@@ -122,11 +122,9 @@ def browse(browse_type: str, browse_id: int | str, offset: int, limit: int) -> t
     Returns:
         tuple[list[SearchResults], int]: The search results and the total number of results
     """
-    if browse_type not in ('letter', 'daterange', 'subject'):
-        raise ValueError('Invalid type')
     data = _make_request(
         endpoint='/api/api.ashx',
-        params={'req': 'title_list_for_subject', 'list_type': browse_type, 'id': browse_id,
+        params={'req': 'title_list_for_subject', 'list_type': browse_type.value, 'id': browse_id,
                 'start': offset, 'length': limit, 'callback': 'bot'},
         convert_to='dict'
     )

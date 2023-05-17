@@ -5,6 +5,7 @@ from data import api
 from data.models import Book
 from db import repository
 from tg import helpers
+from tg.callbacks import SearchNavigation, ShowBook
 from tg.strings import String as s, get_string as gs
 
 
@@ -128,7 +129,7 @@ def search_books_message(_: Client, msg: Message):
         next_previous_buttons.append(
             InlineKeyboardButton(
                 text=gs(mqc=msg, string=s.NEXT),
-                callback_data=f"search_nav:{next_offset}:{total}"
+                callback_data=SearchNavigation(offset=next_offset, total=total).to_callback()
             )
         )
     msg.reply(
@@ -154,10 +155,8 @@ def search_books_message(_: Client, msg: Message):
 def search_books_navigator(_: Client, clb: CallbackQuery):
     """
     Navigate through search results
-
-    clb.data format: "search_nav:{offset}:{total}" + back_button_data
     """
-    offset, total, *clb_data = clb.data.split(':')[1:]
+    search_nav = SearchNavigation.from_callback(clb)
     try:
         search = clb.message.reply_to_message.text
         if not search:
@@ -170,23 +169,23 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
     results, total = api.search(
         title=title.strip(),
         author=author.strip(),
-        offset=int(offset),
+        offset=search_nav.offset,
         limit=5
     )
-    next_offset = helpers.get_offset(int(offset), int(total), increase=5)
+    next_offset = helpers.get_offset(search_nav.offset, int(total), increase=5)
     next_previous_buttons = []
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
                 text=gs(mqc=clb, string=s.NEXT),
-                callback_data=f"search_nav:{next_offset}:{total}"
+                callback_data=SearchNavigation(offset=next_offset, total=total).to_callback()
             )
         )
-    if int(offset) > 5:
+    if search_nav.offset > 5:
         next_previous_buttons.append(
             InlineKeyboardButton(
                 text=gs(mqc=clb, string=s.PREVIOUS),
-                callback_data=f"search_nav:{int(offset) - 5}:{total}"
+                callback_data=SearchNavigation(offset=search_nav.offset - 5, total=total).to_callback()
             )
         )
     clb.message.edit_text(
@@ -196,7 +195,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
                 [
                     InlineKeyboardButton(
                         text=book.title,
-                        callback_data=f"show:{book.id}:search_nav:{offset}:{total}"
+                        callback_data=f"show:{book.id}:search_nav:{search_nav.offset}:{total}"
                     )
                 ] for book in results
             ] + [

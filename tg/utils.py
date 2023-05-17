@@ -2,6 +2,7 @@ from pyrogram import Client
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from tg import helpers
+from tg.callbacks import ShowBook, ReadBook
 from tg.strings import String as s, get_string as gs
 from data import api
 from db import repository
@@ -58,8 +59,9 @@ def show_book(_: Client, clb: CallbackQuery):
 
     clb.data: "show:book_id" + back_button_data
     """
-    book_id, *clb_data = clb.data.split(':')[1:]
-    book = api.get_book(int(book_id))
+    _book_id, *clb_data = clb.data.split(',', maxsplit=1)
+
+    book = api.get_book(ShowBook.from_callback(_book_id).id)
     clb.edit_message_text(
         text=helpers.get_book_text(book),
         reply_markup=InlineKeyboardMarkup(
@@ -67,7 +69,9 @@ def show_book(_: Client, clb: CallbackQuery):
                 [
                     InlineKeyboardButton(
                         text=gs(mqc=clb, string=s.BOOKS_READ),
-                        callback_data=f"read:{book.id}:1:{book.pages}:show:{book.id}:{':'.join(clb_data)}"
+                        callback_data=ReadBook(id=book.id, page=1, total=book.pages).join_to_callback(
+                            ShowBook(id=book.id), *clb_data
+                        )
                     )
                 ], [
                     InlineKeyboardButton(
@@ -96,18 +100,23 @@ def read_book(_: Client, clb: CallbackQuery):
 
     clb.data: "read:book_id:page:total" + back_button_data
     """
-    book_id, page, total, *clb_data = clb.data.split(':')[1:]
-    book = api.get_book(book_id)
+    _read_book, *clb_data = clb.data.split(',', maxsplit=1)
+    read_clb = ReadBook.from_callback(clb.data)
+    book = api.get_book(read_clb.id)
     next_previous_buttons = []
-    if int(page) < int(total):
+    if read_clb.page < read_clb.total:
         next_previous_buttons.append(InlineKeyboardButton(
             text=gs(mqc=clb, string=s.NEXT),
-            callback_data=f"read:{book_id}:{int(page) + 1}:{total}:{':'.join(clb_data)}"
+            callback_data=ReadBook(id=read_clb.id, page=read_clb.page + 1, total=read_clb.total).join_to_callback(
+                *clb_data
+            )
         ))
-    if int(page) > 1:
+    if read_clb.page > 1:
         next_previous_buttons.append(InlineKeyboardButton(
             text=gs(mqc=clb, string=s.PREVIOUS),
-            callback_data=f"read:{book_id}:{int(page) - 1}:{total}:{':'.join(clb_data)}"
+            callback_data=ReadBook(id=read_clb.id, page=read_clb.page - 1, total=read_clb.total).join_to_callback(
+                *clb_data
+            )
         ))
     clb.answer(
         text=gs(mqc=clb, string=s.WAIT_FOR_PREVIEW),
@@ -116,13 +125,13 @@ def read_book(_: Client, clb: CallbackQuery):
     try:
         clb.edit_message_text(
             text="".join((
-                "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(helpers.RTL, page, total),
-                helpers.get_book_text(book, page=page),
+                "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(helpers.RTL, read_clb.page, read_clb.total),
+                helpers.get_book_text(book, page=read_clb.page),
             )),
             reply_markup=InlineKeyboardMarkup(
                 [
-                    [InlineKeyboardButton(text=f"📄 {page}/{total} 📄", callback_data=f"jump:{book_id}:{page}:{total}")],
-                    [InlineKeyboardButton(text=gs(mqc=clb, string=s.READ_ON_SITE), url=book.get_page_url(page))],
+                    [InlineKeyboardButton(text=f"📄 {read_clb.page}/{read_clb.total} 📄", callback_data="jump")],
+                    [InlineKeyboardButton(text=gs(mqc=clb, string=s.READ_ON_SITE), url=book.get_page_url(read_clb.page))],
                     next_previous_buttons,
                     [InlineKeyboardButton("🔙", callback_data=":".join(clb_data))],
                 ]

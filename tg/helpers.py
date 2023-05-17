@@ -1,6 +1,6 @@
-from pyrogram.types import Message
+from pyrogram.types import Message, CallbackQuery
 from data.models import Book
-
+from tg.callbacks import CallbackData
 
 RTL = '\u200f'
 LTR = '\u200e'
@@ -53,3 +53,14 @@ def jump_to_page_filter(_, __, msg: Message) -> bool:
         return msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data.startswith('jump:')
     except (AttributeError, IndexError):
         return False
+
+
+def callback_matcher(clb: CallbackQuery, data: type[CallbackData]) -> bool:
+    """
+    Check if the callback query matches the callback data.
+
+    Args:
+        clb: The callback query.
+        data: The callback data.
+    """
+    return clb.data.startswith(data.__name__)

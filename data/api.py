@@ -1,4 +1,5 @@
 import json
+from typing import Callable
 import requests
 from functools import lru_cache
 from data.enums import BrowseType
@@ -14,19 +15,25 @@ def js_to_py(data: str, to: str) -> dict | list:
     return json.loads(data[data.index(start):data.rindex(end) + 1])
 
 
-def _make_request(endpoint: str, params: dict[str, str], convert_to: str | None) -> dict | list:
+def _make_request(
+        endpoint: str,
+        params: dict[str, str | int] | None = None,
+        convert_to: str | None = None
+) -> dict | list | str:
     """
     Make a request to HebrewBooks.org
 
     Args:
         endpoint: The endpoint to send the request to (e.g. '/search')
         params: The parameters to send (e.g. {'searchtype': 'all', 'search': 'אבגדה'})
-        convert_to: The type to convert the response to (either 'dict' or 'list')
+        convert_to: The type to convert the response to (either 'dict', 'list' or 'html')
     """
+    print("Making request...")
     res = requests.get(f'{BASE_API}{endpoint}', params=params)
     res.raise_for_status()
     start, end = ('[', ']') if convert_to == 'list' else ('{', '}')
-    return json.loads(res.text[res.text.index(start):res.text.rindex(end) + 1]) if convert_to else res.json()
+    return json.loads(res.text[res.text.index(start):res.text.rindex(end) + 1]) \
+        if convert_to not in ('html', None) else res.text if convert_to == 'html' else res.json()
 
 
 @lru_cache
@@ -149,8 +156,128 @@ def get_suggestions(query: str, search_type: str, limit: int) -> list[str]:
         raise ValueError('Invalid type')
     return _make_request(
         endpoint='/suggest/suggest.ashx',
-        params={'json': 1, 'autosuggest': 1,  'limit': limit, 'src': search_type, 'q': query},
+        params={'json': 1, 'autosuggest': 1, 'limit': limit, 'src': search_type, 'q': query},
         convert_to=None
+    )
+
+
+@lru_cache
+def get_masechtot() -> list[Masechet]:
+    """
+    Get all masechtot from HebrewBooks.org
+    """
+    html = _make_request(
+        endpoint='/shas.aspx',
+        convert_to='html'
+    )
+    return [
+        Masechet(id=int(m['value']), name=m.text)
+        for m in BeautifulSoup(html, 'html.parser').find('select', {'id': 'cpMstr_ddlMesechtas'}).find_all('option')
+    ]
+
+
+@lru_cache
+def get_masehet(masehet: Masechet) -> Masechet:
+    """
+    Get a masechet from HebrewBooks.org
+
+    Args:
+        masehet: The masechet to get
+    """
+    html = _make_request(
+        endpoint=f'/shas.aspx',
+        params={'mesechta': masehet.id},
+        convert_to='html'
+    )
+    soup = BeautifulSoup(html, 'html.parser')
+    book_id = int(soup.find('div', {'id': 'shaspngcont'}).get('rel').split('_')[0])
+    return Masechet(
+        id=masehet.id,
+        name=masehet.name,
+        pages=[
+            MasechetPage(id=p['value'], masechet_id=masehet.id, name=p.text, book_id=book_id)
+            for p in soup.find('select', {'id': 'cpMstr_ddlDafim'}).find_all('option')
+        ]
+    )
+
+
+def _get_sections(
+        soup: BeautifulSoup,
+        soup_func: Callable[[BeautifulSoup], ResultSet[PageElement]],
+        title_funcs: tuple[Callable[[PageElement], str], ...],
+        content_funcs: tuple[Callable[[PageElement], str], ...],
+        sep: str = ' '
+) -> list[Section]:
+    """
+    Get a section from a BeautifulSoup object
+
+    Args:
+        soup: The BeautifulSoup object
+        soup_func: The function to get the page element
+        title_funcs: The functions to get the title
+        content_funcs: The functions to get the content
+        sep: The separator to use when joining the results
+    Returns:
+        list[Section]: The sections
+    """
+    page_element = soup_func(soup)
+    sections = []
+    for span in page_element:
+        try:
+            sections.append(
+                Section(
+                    title=sep.join([func(span).strip() for func in title_funcs]),
+                    content=sep.join([func(span).strip() for func in content_funcs])
+                )
+            )
+        except AttributeError:
+            print("failed to parse section")
+
+    return sections
+
+
+@lru_cache
+def get_page(page: MasechetPage) -> MasechetPage:
+    """
+    Get a masechet page from HebrewBooks.org
+
+    Args:
+        page: The page to get
+    """
+    html = _make_request(
+        endpoint=f'/shas.aspx',
+        params={'mesechta': page.masechet_id, 'daf': page.id, 'format': 'text'},
+        convert_to='html'
+    )
+    soup = BeautifulSoup(html, 'html.parser')
+    return MasechetPage(
+        id=page.id,
+        masechet_id=page.masechet_id,
+        book_id=page.book_id,
+        name=page.name,
+        content=PageContent(
+            gmara=_get_sections(
+                soup=soup,
+                soup_func=lambda sp: sp.find('div', class_='shastext2').find_all('span'),
+                title_funcs=(lambda spn: spn.text,),
+                content_funcs=(lambda spn: spn.next_sibling if spn.next_sibling else '',)
+            ),
+            rashi=_get_sections(
+                soup=soup,
+                soup_func=lambda sp: sp.find('div', class_='shastext3').find_all('span', class_='five'),
+                title_funcs=(lambda spn: spn.text,),
+                content_funcs=(lambda spn: str(spn.next_sibling if spn.next_sibling else ''),)
+            ) if soup.find('div', class_='shastext3') else None,
+            tosfot=_get_sections(
+                soup=soup,
+                soup_func=lambda sp: sp.find('div', class_='shastext4').find_all('div'),
+                title_funcs=(
+                    lambda spn: spn.find('span', class_='shastitle7').text,
+                    lambda spn: spn.find('span', class_='five').text,
+                ),
+                content_funcs=(lambda spn: str(spn.find('span', class_='five').next_sibling),)
+            ) if soup.find('div', class_='shastext4') else None
+        )
     )
 
 
@@ -167,4 +294,8 @@ if __name__ == '__main__':
     assert all(('דוד' in res.title for res in search_res))
     assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
     assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
-
+    masechtot = get_masechtot()
+    assert len(masechtot) == 37
+    masehet = get_masehet(masechtot[0])
+    assert masehet.id == masechtot[0].id
+    assert get_page(masehet.pages[0]).id == masehet.pages[0].id

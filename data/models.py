@@ -23,6 +23,40 @@ class Subject:
     has_children: str  # y/n
 
 
+@dataclass(frozen=True, slots=True)
+class Section:
+    title: str
+    content: str
+
+
+@dataclass(frozen=True, slots=True)
+class PageContent:
+    gmara: list[Section]
+    rashi: list[Section] | None = None
+    tosfot: list[Section] | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class MasechetPage:
+    id: int
+    masechet_id: int
+    name: str
+    book_id: int
+    content: PageContent | None = None
+
+    @property
+    def pdf_url(self) -> str:
+        """Get the page's PDF URL"""
+        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.book_id}_{self.id}.pdf'
+
+
+@dataclass(frozen=True, slots=True)
+class Masechet:
+    id: int
+    name: str
+    pages: list[MasechetPage] | None = None
+
+
 @dataclass(slots=True)
 class SearchResults:
     id: int

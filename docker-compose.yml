@@ -6,5 +6,4 @@ services:
       dockerfile: Dockerfile
     command: ["python3", "tg/app.py"]
     volumes:
-      - ./.env:/app/.env
-      - ./hb.sqlite:/app/hb.sqlite
+      - .:/app

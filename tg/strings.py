@@ -26,10 +26,14 @@ class String(Enum):
     PAGE_NOT_EXIST = auto()  # V
     JUMP_TIP = auto()  # V
     CHOOSE_BROWSE_TYPE = auto()  # V
+    SHAS = auto()  # V
     SUBJECTS = auto()  # V
     LETTERS = auto()  # V
     DATES = auto()  # V
-    CHOOSE = auto()  # V
+    CHOOSE_LETTER = auto()  # V
+    CHOOSE_SUBJECT = auto()  # V
+    CHOOSE_DATE_RANGE = auto()  # V
+    CHOOSE_MASECHET = auto()  # V
     START_SEARCH_INLINE = auto()  # V
     SEARCH_INLINE_TIP = auto()  # V
     BOOK_NOT_FOUND = auto()  # V
@@ -172,6 +176,10 @@ _STRINGS = {
         'en': 'Choose a browse type',
         'he': 'בחר סוג עיון'
     },
+    String.SHAS: {
+        'en': '📚 Shas',
+        'he': '📚 ש"ס'
+    },
     String.SUBJECTS: {
         'en': '🗂 Subjects',
         'he': '🗂 נושאים'
@@ -184,9 +192,21 @@ _STRINGS = {
         'en': '📅 Date Ranges',
         'he': '📅 תאריכים'
     },
-    String.CHOOSE: {
-        'en': 'Choose',
-        'he': 'בחר'
+    String.CHOOSE_LETTER: {
+        'en': 'Choose a letter',
+        'he': 'בחרו אות'
+    },
+    String.CHOOSE_SUBJECT: {
+        'en': 'Choose a subject',
+        'he': 'בחרו נושא'
+    },
+    String.CHOOSE_DATE_RANGE: {
+        'en': 'Choose a date range',
+        'he': 'בחרו טווח תאריכים'
+    },
+    String.CHOOSE_MASECHET: {
+        'en': 'Choose a masechet',
+        'he': 'בחרו מסכת'
     },
     String.PAGE_X_OF_Y: {
         'en': 'Page {page} of {pages}',

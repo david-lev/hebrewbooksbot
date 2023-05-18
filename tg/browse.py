@@ -13,26 +13,23 @@ def browse_menu(_: Client, query: CallbackQuery):
 
     query.data format: "browse_menu"
     """
+    menu = [
+        [(BrowseTypeEnum.SHAS, s.SHAS), (BrowseTypeEnum.SUBJECT, s.SUBJECTS)],
+        [(BrowseTypeEnum.LETTER, s.LETTERS), (BrowseTypeEnum.DATERANGE, s.DATES)]
+    ]
     query.edit_message_text(
         text=gs(mqc=query, string=s.CHOOSE_BROWSE_TYPE),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.SUBJECTS),
-                        callback_data=BrowseType(BrowseTypeEnum.SUBJECT).to_callback()
-                    ),
-                    InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.LETTERS),
-                        callback_data=BrowseType(BrowseTypeEnum.LETTER).to_callback()
-                    ),
-                    InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.DATES),
-                        callback_data=BrowseType(BrowseTypeEnum.DATERANGE).to_callback()
-                    )
-                ],
-                [InlineKeyboardButton("🔙", callback_data="start")]
-            ]
+                        text=gs(mqc=query, string=string),
+                        callback_data=BrowseType(browse_type).to_callback()
+                    ) for browse_type, string in item
+                ] for item in menu
+            ] + [[
+                InlineKeyboardButton(text="🔙", callback_data="search_menu")
+            ]]
         )
     )
 
@@ -42,30 +39,40 @@ def browse_types(_: Client, clb: CallbackQuery):
     Browse types
     """
     browse_type = BrowseType.from_callback(clb.data)
-    if browse_type.type is BrowseTypeEnum.LETTER:
+    if browse_type.type is BrowseTypeEnum.SHAS:
+        results = api.get_masechtot()
+        choose = s.CHOOSE_MASECHET
+        buttons_in_row = 3
+    elif browse_type.type is BrowseTypeEnum.LETTER:
         results = api.get_letters()
+        buttons_in_row = 3
+        choose = s.CHOOSE_LETTER
     elif browse_type.type is BrowseTypeEnum.DATERANGE:
         results = api.get_date_ranges()
+        buttons_in_row = 2
+        choose = s.CHOOSE_DATE_RANGE
     elif browse_type.type is BrowseTypeEnum.SUBJECT:
         results = api.get_subjects()
+        buttons_in_row = 2
+        choose = s.CHOOSE_SUBJECT
     else:
         raise ValueError(f"Invalid browse type: {browse_type}")
 
     clb.edit_message_text(
-        text=gs(mqc=clb, string=s.CHOOSE),
+        text=gs(mqc=clb, string=choose),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text=f"{result.name} ({result.total})",
+                        text=f"{res.name} {f'({res.total})' if res.total else ''}",
                         callback_data=BrowseNavigation(
                             type=browse_type.type,
-                            id=result.id,
+                            id=str(res.id),
                             offset=1,
-                            total=result.total
+                            total=res.total or 0
                         ).to_callback()
-                    )
-                ] for result in results
+                    ) for res in results
+                ][i:i + buttons_in_row][::-1] for i in range(0, len(results), buttons_in_row)
             ] + [[
                 InlineKeyboardButton(text="🔙", callback_data="browse_menu")
             ]]

@@ -29,7 +29,8 @@ class String(Enum):
     SHAS = auto()  # V
     SUBJECTS = auto()  # V
     LETTERS = auto()  # V
-    DATES = auto()  # V
+    DATE_RANGES = auto()  # V
+    CHOOSE = auto()  # V
     CHOOSE_LETTER = auto()  # V
     CHOOSE_SUBJECT = auto()  # V
     CHOOSE_DATE_RANGE = auto()  # V
@@ -115,11 +116,11 @@ _STRINGS = {
         'he': '⬇️ הורדה ⬇️'
     },
     String.NEXT: {
-        'en': 'Next ⏪',
+        'en': '⏪ Next',
         'he': 'הבא ⏪'
     },
     String.PREVIOUS: {
-        'en': '⏩ Previous',
+        'en': 'Previous ⏩',
         'he': '⏩ הקודם'
     },
     String.WAIT_FOR_PREVIEW: {
@@ -188,9 +189,13 @@ _STRINGS = {
         'en': '🔠 Letters',
         'he': '🔠 אותיות'
     },
-    String.DATES: {
+    String.DATE_RANGES: {
         'en': '📅 Date Ranges',
         'he': '📅 תאריכים'
+    },
+    String.CHOOSE: {
+        'en': 'Choose',
+        'he': 'בחרו'
     },
     String.CHOOSE_LETTER: {
         'en': 'Choose a letter',

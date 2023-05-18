@@ -2,6 +2,7 @@ from pyrogram import Client
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from tg import helpers
+from tg.helpers import Menu
 from tg.callbacks import ShowBook, ReadBook, JumpToPage
 from tg.strings import String as s, get_string as gs
 from data import api
@@ -10,7 +11,7 @@ from db import repository
 
 def start(_: Client, mb: Message | CallbackQuery):
     """Start message"""
-    if isinstance(mb, CallbackQuery) and mb.data.endswith("stats"):
+    if isinstance(mb, CallbackQuery) and mb.data == Menu.STATS:
         repository.press_candle(mb.from_user.id)
     candle_pressed_count = repository.get_candle_pressed_count()
     kwargs = dict(
@@ -19,15 +20,17 @@ def start(_: Client, mb: Message | CallbackQuery):
             [
                 [
                     InlineKeyboardButton(gs(mb, s.SEARCH), switch_inline_query_current_chat=""),
-                    InlineKeyboardButton(gs(mb, s.BROWSE), callback_data="browse_menu"),
+                    InlineKeyboardButton(gs(mb, s.BROWSE), callback_data=Menu.BROWSE),
                 ],
                 [
-                    InlineKeyboardButton(text=gs(mb, s.LIGHT_A_CANDLE).format(count=candle_pressed_count),
-                                         callback_data="start_stats"),
+                    InlineKeyboardButton(
+                        text=gs(mb, s.LIGHT_A_CANDLE).format(count=candle_pressed_count),
+                        callback_data=Menu.STATS
+                    ),
                     InlineKeyboardButton("📤", switch_inline_query=""),
                 ],
-                [InlineKeyboardButton(text=gs(mb, s.GITHUB), url="https://github.com/david-lev/hebrewbooksbot")],
-                [InlineKeyboardButton(text=gs(mb, s.HEBREWBOOKS_SITE), url="https://hebrewbooks.org")],
+                [InlineKeyboardButton(text=gs(mb, s.GITHUB), url=Menu.GITHUB_URL)],
+                [InlineKeyboardButton(text=gs(mb, s.HEBREWBOOKS_SITE), url=Menu.HEBREWBOOKS_SITE_URL)],
             ]
         )
     )
@@ -39,7 +42,7 @@ def start(_: Client, mb: Message | CallbackQuery):
             mb.edit_message_text(**kwargs)
         except MessageNotModified:
             pass
-        if mb.data.endswith("stats"):
+        if mb.data == Menu.STATS:
             users_count = repository.get_tg_users_count()
             stats = repository.get_stats()
             mb.answer(
@@ -83,7 +86,7 @@ def show_book(_: Client, clb: CallbackQuery):
                 ],
                 [
                     InlineKeyboardButton(
-                        text="🔙",
+                        text=gs(mqc=clb, string=s.BACK),
                         callback_data=",".join(others)
                     )
                 ] if others else others
@@ -118,7 +121,8 @@ def read_book(_: Client, clb: CallbackQuery):
     try:
         clb.edit_message_text(
             text="".join((
-                "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(helpers.RTL, read_clb.page, read_clb.total),
+                gs(mqc=clb, string=s.INSTANT_READ),
+                "\n\n",
                 helpers.get_book_text(book, page=read_clb.page),
             )),
             reply_markup=InlineKeyboardMarkup(
@@ -128,8 +132,8 @@ def read_book(_: Client, clb: CallbackQuery):
                         callback_data=JumpToPage(read_clb.id, read_clb.page, read_clb.total).to_callback()
                     )],
                     [InlineKeyboardButton(text=gs(mqc=clb, string=s.READ_ON_SITE), url=book.get_page_url(read_clb.page))],
-                    next_previous_buttons,
-                    [InlineKeyboardButton("🔙", callback_data=",".join(others))],
+                    next_previous_buttons,  # TODO reverse in RTL
+                    [InlineKeyboardButton(text=gs(mqc=clb, string=s.BACK), callback_data=",".join(others))],
                 ]
             ),
         )
@@ -148,7 +152,7 @@ def jump_to_page(client: Client, msg: Message):
     """
     jump_clb = JumpToPage.from_callback(msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data)
     jump_to = int(msg.text)
-    if jump_to > jump_clb.total:
+    if jump_to > jump_clb.total or jump_to < 1:
         msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(total=jump_clb.total))
         return
 
@@ -176,7 +180,8 @@ def jump_to_page(client: Client, msg: Message):
         ))
     kwargs = dict(
         text="".join((
-            "{}קריאה מהירה • עמוד {} מתוך {}\n\n".format(helpers.RTL, jump_to, jump_clb.total),
+            gs(mqc=msg, string=s.INSTANT_READ),
+            "\n\n",
             helpers.get_book_text(book, page=jump_to),
         )),
         reply_markup=InlineKeyboardMarkup(
@@ -186,7 +191,7 @@ def jump_to_page(client: Client, msg: Message):
                     callback_data=JumpToPage(id=jump_clb.id, page=jump_to, total=jump_clb.total).to_callback()
                 )],
                 [InlineKeyboardButton(text=gs(mqc=msg, string=s.READ_ON_SITE), url=book.get_page_url(jump_to))],
-                new_next_previous_buttons,
+                new_next_previous_buttons,  # TODO reverse in RTL
                 [msg.reply_to_message.reply_markup.inline_keyboard[-1][-1]]
             ]
         )

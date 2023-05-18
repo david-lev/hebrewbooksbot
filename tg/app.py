@@ -4,7 +4,7 @@ from data import config
 from tg import search, helpers
 from tg import browse
 from tg import utils
-from tg.helpers import jump_to_page_filter
+from tg.helpers import jump_to_page_filter, Menu
 from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage
 
 cfg = config.get_settings()
@@ -19,13 +19,13 @@ app = Client(
 
 app.add_handler(
     MessageHandler(
-        utils.start, filters=filters.command("start")
+        utils.start, filters=filters.command(Menu.START)
     )
 )
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.start, filters=filters.create(lambda _, __, query: query.data.startswith("start"))
+        utils.start, filters=filters.create(lambda _, __, query: query.data.startswith(Menu.START))
     )
 )
 
@@ -39,7 +39,7 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        browse.browse_menu, filters=filters.create(lambda _, __, query: query.data == "browse_menu")
+        browse.browse_menu, filters=filters.create(lambda _, __, query: query.data == Menu.BROWSE)
     )
 )
 

@@ -1,9 +1,23 @@
+from enum import Enum
+from functools import lru_cache
+from typing import Callable, Any
 from pyrogram.types import Message, CallbackQuery
+from data import api
 from data.models import Book
+from data.enums import BrowseType as BrowseTypeEnum
 from tg.callbacks import CallbackData, JumpToPage
+from tg.strings import String as s
 
 RTL = '\u200f'
 LTR = '\u200e'
+
+
+class Menu:
+    START = 'start'
+    BROWSE = 'browse_menu'
+    STATS = 'start_stats'
+    GITHUB_URL = 'https://github.com/david-lev/hebrewbooksbot'
+    HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
 
 
 def get_book_text(book: Book, page: int | None = None) -> str:
@@ -67,3 +81,25 @@ def callback_matcher(clb: CallbackQuery | str, data: type[CallbackData]) -> bool
         data: The callback data.
     """
     return (clb.data if isinstance(clb, CallbackQuery) else clb).startswith(data.__clbname__)
+
+
+@lru_cache
+def get_browse_type_data(browse_type: BrowseTypeEnum) -> tuple[Callable[[], list[Any]], s, s, int]:
+    """
+    Helper function to get the data for a browse type.
+
+    Args:
+        browse_type: The browse type.
+
+    Returns:
+        ``Callable`` to get results, ``String`` for the browse type, ``String`` for the choose message, ``int`` for the number of columns.
+    """
+    if browse_type == BrowseTypeEnum.SUBJECT:
+        return api.get_subjects, s.SUBJECTS, s.CHOOSE_SUBJECT, 2
+    elif browse_type == BrowseTypeEnum.LETTER:
+        return api.get_letters, s.LETTERS, s.CHOOSE_LETTER, 3
+    elif browse_type == BrowseTypeEnum.DATERANGE:
+        return api.get_date_ranges, s.DATE_RANGES, s.CHOOSE_DATE_RANGE, 2
+    elif browse_type == BrowseTypeEnum.SHAS:
+        return api.get_masechtot, s.SHAS, s.CHOOSE_MASECHET, 3
+    raise ValueError(f"Invalid browse type: {browse_type}")

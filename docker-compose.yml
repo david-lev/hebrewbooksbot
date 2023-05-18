@@ -4,8 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["python3", "/app/tg/app.py"]
+    command: ["python3", "tg/app.py"]
     volumes:
-      - .:/app
-    environment:
-      - PYTHONPATH=/app
+      - ./.env:/app/.env
+      - ./hb.sqlite:/app/hb.sqlite

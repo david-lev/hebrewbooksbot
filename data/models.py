@@ -56,6 +56,11 @@ class Masechet:
     name: str
     pages: list[MasechetPage] | None = None
 
+    @property
+    def total(self):
+        """Get the masechet's total pages"""
+        return len(self.pages) if self.pages else None
+
 
 @dataclass(slots=True)
 class SearchResults:

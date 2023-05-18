@@ -1,10 +1,11 @@
 import json
-from typing import Callable
 import requests
 from functools import lru_cache
 from data.enums import BrowseType
-from data.models import Letter, DateRange, Subject, Book, SearchResults, Masechet, MasechetPage, PageContent, Section
-from bs4 import BeautifulSoup, ResultSet, PageElement
+from data.models import Letter, DateRange, Subject, Book, SearchResults, MasechetBase, Masechet, MasechetPage, \
+    PageContent
+from data import helpers
+from bs4 import BeautifulSoup
 
 BASE_API = 'https://beta.hebrewbooks.org'
 
@@ -163,16 +164,19 @@ def get_suggestions(query: str, search_type: str, limit: int) -> list[str]:
 
 
 @lru_cache
-def get_masechtot() -> list[Masechet]:
+def get_masechtot() -> list[MasechetBase]:
     """
     Get all masechtot from HebrewBooks.org
+
+    The id of the masechet is not the hebrewbooks id, but the index in the masechtot list + 1,
+    so you can use it to get the masechet from `api.get_masechet()`
     """
     html = _make_request(
         endpoint='/shas.aspx',
         convert_to='html'
     )
     return [
-        Masechet(id=int(m['value']), name=m.text)
+        MasechetBase(id=int(m['value']), name=m.text)
         for m in BeautifulSoup(html, 'html.parser').find('select', {'id': 'cpMstr_ddlMesechtas'}).find_all('option')
     ]
 
@@ -203,41 +207,6 @@ def get_masechet(masehet_id: int) -> Masechet:
     )
 
 
-def _get_sections(
-        soup: BeautifulSoup,
-        soup_func: Callable[[BeautifulSoup], ResultSet[PageElement]],
-        title_funcs: tuple[Callable[[PageElement], str], ...],
-        content_funcs: tuple[Callable[[PageElement], str], ...],
-        sep: str = ' '
-) -> list[Section]:
-    """
-    Get a section from a BeautifulSoup object
-
-    Args:
-        soup: The BeautifulSoup object
-        soup_func: The function to get the page element
-        title_funcs: The functions to get the title
-        content_funcs: The functions to get the content
-        sep: The separator to use when joining the results
-    Returns:
-        list[Section]: The sections
-    """
-    page_element = soup_func(soup)
-    sections = []
-    for span in page_element:
-        try:
-            sections.append(
-                Section(
-                    title=sep.join([func(span).strip() for func in title_funcs]),
-                    content=sep.join([func(span).strip() for func in content_funcs])
-                )
-            )
-        except AttributeError:
-            print("failed to parse section")
-
-    return sections
-
-
 @lru_cache
 def get_page(page: MasechetPage) -> MasechetPage:
     """
@@ -257,19 +226,19 @@ def get_page(page: MasechetPage) -> MasechetPage:
         masechet_id=page.masechet_id,
         name=page.name,
         content=PageContent(
-            gmara=_get_sections(
+            gmara=helpers.get_sections(
                 soup=soup,
                 soup_func=lambda sp: sp.find('div', class_='shastext2').find_all('span'),
                 title_funcs=(lambda spn: spn.text,),
                 content_funcs=(lambda spn: spn.next_sibling if spn.next_sibling else '',)
             ),
-            rashi=_get_sections(
+            rashi=helpers.get_sections(
                 soup=soup,
                 soup_func=lambda sp: sp.find('div', class_='shastext3').find_all('span', class_='five'),
                 title_funcs=(lambda spn: spn.text,),
                 content_funcs=(lambda spn: str(spn.next_sibling if spn.next_sibling else ''),)
             ) if soup.find('div', class_='shastext3') else None,
-            tosfot=_get_sections(
+            tosfot=helpers.get_sections(
                 soup=soup,
                 soup_func=lambda sp: sp.find('div', class_='shastext4').find_all('div'),
                 title_funcs=(

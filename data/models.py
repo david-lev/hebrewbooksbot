@@ -59,15 +59,27 @@ class MasechetPage:
 
 
 @dataclass(frozen=True, slots=True)
+class MasechetBase:
+    """Masechet with id using gor requests, not the book id"""
+    id: int
+    name: str
+
+    @property
+    def total(self) -> None:
+        """Only for compatibility with BrowseType"""
+        return None
+
+
+@dataclass(frozen=True, slots=True)
 class Masechet:
     id: int
     name: str
-    pages: list[MasechetPage] | None = None
+    pages: list[MasechetPage]
 
     @property
-    def total(self):
-        """Get the masechet's total pages"""
-        return len(self.pages) if self.pages else None
+    def total(self) -> int:
+        """Get the total number of pages"""
+        return len(self.pages)
 
 
 @dataclass(slots=True)
@@ -104,6 +116,15 @@ class Book:
             height: The height of the image.
         """
         return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png'
+
+    def get_page_pdf(self, page: int) -> str:
+        """
+        Get the book's page PDF URL
+
+        Args:
+            page: The page number.
+        """
+        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.id}_{page}.pdf'
 
     def get_page_url(self, page: int) -> str:
         """

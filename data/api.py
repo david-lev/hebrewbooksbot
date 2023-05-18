@@ -28,7 +28,6 @@ def _make_request(
         params: The parameters to send (e.g. {'searchtype': 'all', 'search': 'אבגדה'})
         convert_to: The type to convert the response to (either 'dict', 'list' or 'html')
     """
-    print("Making request...")
     res = requests.get(f'{BASE_API}{endpoint}', params=params)
     res.raise_for_status()
     start, end = ('[', ']') if convert_to == 'list' else ('{', '}')
@@ -179,25 +178,26 @@ def get_masechtot() -> list[Masechet]:
 
 
 @lru_cache
-def get_masehet(masehet: Masechet) -> Masechet:
+def get_masechet(masehet_id: int) -> Masechet:
     """
     Get a masechet from HebrewBooks.org
 
     Args:
-        masehet: The masechet to get
+        masehet_id: The masechet to get
     """
+    masechet = get_masechtot()[masehet_id - 1]
     html = _make_request(
         endpoint=f'/shas.aspx',
-        params={'mesechta': masehet.id},
+        params={'mesechta': masechet.id},
         convert_to='html'
     )
     soup = BeautifulSoup(html, 'html.parser')
-    book_id = int(soup.find('div', {'id': 'shaspngcont'}).get('rel').split('_')[0])
+    masechet_id = int(soup.find('div', {'id': 'shaspngcont'}).get('rel').split('_')[0])
     return Masechet(
-        id=masehet.id,
-        name=masehet.name,
+        id=masechet_id,
+        name=masechet.name,
         pages=[
-            MasechetPage(id=p['value'], masechet_id=masehet.id, name=p.text, book_id=book_id)
+            MasechetPage(str_id=p['value'], masechet_id=masechet_id, name=p.text)
             for p in soup.find('select', {'id': 'cpMstr_ddlDafim'}).find_all('option')
         ]
     )
@@ -253,9 +253,8 @@ def get_page(page: MasechetPage) -> MasechetPage:
     )
     soup = BeautifulSoup(html, 'html.parser')
     return MasechetPage(
-        id=page.id,
+        str_id=page.str_id,
         masechet_id=page.masechet_id,
-        book_id=page.book_id,
         name=page.name,
         content=PageContent(
             gmara=_get_sections(
@@ -298,6 +297,5 @@ if __name__ == '__main__':
     assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
     masechtot = get_masechtot()
     assert len(masechtot) == 37
-    masehet = get_masehet(masechtot[0])
-    assert masehet.id == masechtot[0].id
-    assert get_page(masehet.pages[0]).id == masehet.pages[0].id
+    masehet = get_masechet(masechtot[0].id)
+    assert masehet.id != masechtot[0].id

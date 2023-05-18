@@ -38,16 +38,24 @@ class PageContent:
 
 @dataclass(frozen=True, slots=True)
 class MasechetPage:
-    id: int
+    str_id: str
     masechet_id: int
     name: str
-    book_id: int
     content: PageContent | None = None
+
+    @property
+    def id(self):
+        """Get the page ID"""
+        if self.str_id.endswith('b'):
+            num = int(self.str_id[:-1]) + 1
+            return (num - 2) + (num - 2)
+        else:
+            return (int(self.str_id) - 2) + (int(self.str_id) - 1)
 
     @property
     def pdf_url(self) -> str:
         """Get the page's PDF URL"""
-        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.book_id}_{self.id}.pdf'
+        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.masechet_id}_{self.id}.pdf'
 
 
 @dataclass(frozen=True, slots=True)

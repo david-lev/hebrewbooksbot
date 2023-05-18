@@ -1,25 +1,20 @@
 from enum import Enum, auto
-
 from pyrogram.types import Message, CallbackQuery, InlineQuery
-
 from db import repository
 
 
 class String(Enum):
     WELCOME = auto()  # V
     SEARCH = auto()  # V
-    SEARCH_IN_CHATS = auto()
+    SEARCH_IN_CHATS = auto()  # V
     BROWSE = auto()  # V
+    INSTANT_READ = auto()  # V
+    BACK = auto()  # V
     LIGHT_A_CANDLE = auto()  # V
     GITHUB = auto()  # V
     HEBREWBOOKS_SITE = auto()  # V
     STATS = auto()  # V
-    REGISTERED_USERS = auto()
-    BOOKS_READ = auto()  # V
-    PAGES_READ = auto()
-    SEARCHES = auto()
     CANDLE_LIGHTING = auto()
-    FAST_READING = auto()
     SHARE = auto()  # V
     DOWNLOAD = auto()  # V
     NEXT = auto()  # V
@@ -34,7 +29,6 @@ class String(Enum):
     SUBJECTS = auto()  # V
     LETTERS = auto()  # V
     DATES = auto()  # V
-    BACK = auto()
     CHOOSE = auto()  # V
     START_SEARCH_INLINE = auto()  # V
     SEARCH_INLINE_TIP = auto()  # V
@@ -62,30 +56,38 @@ _STRINGS = {
         'en': '🔎 Search',
         'he': '🔎 חיפוש'
     },
+    String.SEARCH_IN_CHATS: {
+        'en': '🔎 Search in chats',
+        'he': '🔎 חיפוש בצאטים'
+    },
     String.BROWSE: {
         'en': '📖 Browse',
         'he': '📖 עיון'
     },
+    String.BACK: {
+        'en': '🔙 Back',
+        'he': '🔙 חזרה'
+    },
     String.LIGHT_A_CANDLE: {
-        'en': '🕯 Light a candle ({})',
-        'he': '🕯 הדליקו נר ({})'
+        'en': '🕯 Light a candle ({count})',
+        'he': '🕯 הדליקו נר ({count})'
     },
     String.GITHUB: {
         'en': '⭐️ GitHub ⭐️',
         'he': '⭐️ גיטהאב ⭐️'
     },
     String.HEBREWBOOKS_SITE: {
-        'en': '🌍 Hiberbox site 🌍',
+        'en': '🌍 HebrewBooks Website 🌍',
         'he': '🌍 אתר היברובוקס 🌍'
     },
     String.STATS: {
         'en': (
             "📊 Bot Stats 📊\n\n",
             "👥 Registered users: {users_count}\n",
-            "🕯 Candles lit: {candle_pressed_count}\n"
+            "🕯 Candles: {candle_pressed_count}\n"
             "📚 Books read: {books_read}\n",
             "📖 Pages read: {pages_read}\n",
-            "🔎 Searches performed: {searches}\n",
+            "🔎 Searches: {searches}\n",
         ),
         'he': (
             "📊 סטטיסטיקות הבוט 📊\n\n",
@@ -93,15 +95,15 @@ _STRINGS = {
             "🕯 נרות הודלקו: {candle_pressed_count}\n"
             "📚 ספרים נקראו: {books_read}\n",
             "📖 עמודים נקראו: {pages_read}\n",
-            "🔎 חיפושים בוצעו: {searches}\n",
+            "🔎 חיפושים: {searches}\n",
         )
     },
-    String.BOOKS_READ: {
-        'en': '📖 Quick reading 📖',
+    String.INSTANT_READ: {
+        'en': '📖 Instant Read 📖',
         'he': '📖 קריאה מהירה 📖'
     },
     String.SHARE: {
-        'en': '♻️ Sharing ♻️',
+        'en': '♻️ Share ♻️',
         'he': '♻️ שיתוף ♻️'
     },
     String.DOWNLOAD: {
@@ -113,7 +115,7 @@ _STRINGS = {
         'he': 'הבא ⏪'
     },
     String.PREVIOUS: {
-        'en': '⏩ the previous one',
+        'en': '⏩ Previous',
         'he': '⏩ הקודם'
     },
     String.WAIT_FOR_PREVIEW: {
@@ -121,29 +123,29 @@ _STRINGS = {
         'he': 'יש להמתין מספר שניות לטעינת התצוגה המקדימה'
     },
     String.READ_ON_SITE: {
-        'en': '🌍 Reading on the site 🌍',
+        'en': '🌍 Read on site 🌍',
         'he': '🌍 קריאה באתר 🌍'
     },
     String.SLOW_DOWN: {
-        'en': "I'm not an angel.. slower",
+        'en': "Slow down...",
         'he': "אני לא מלאך.. לאט יותר"
     },
     String.JUMP_TIP: {
-        'en': 'Tip: instead of browsing, comment on this message with the page number you want to read.\
-              \nYou can also edit the number you sent and the page will change accordingly.',
+        'en': 'Tip: instead of browsing, reply to this message with the page number you want to read.\
+              \nYou can also edit the number you sent and the page will update accordingly.',
         'he': 'טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא.\
              \nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.'
     },
     String.PAGE_NOT_EXIST: {
-        'en': 'The page does not exist! (Number of pages: {})',
-        'he': 'העמוד לא קיים! (כמות עמודים: {})'
+        'en': 'The page does not exist! (Number of pages: {total})',
+        'he': 'העמוד לא קיים! (כמות עמודים: {total})'
     },
     String.SEARCH_INLINE_TIP: {
-        'en': "Tip: You can search in the 'Title: Author' format in order to get accurate results",
+        'en': "Tip: You can search in the 'Title:Author' format in order to get more accurate results",
         'he': "טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות"
     },
     String.START_SEARCH_INLINE: {
-        'en': 'start looking',
+        'en': 'Start searching',
         'he': 'התחילו לחפש'
     },
     String.BOOK_NOT_FOUND: {
@@ -151,41 +153,49 @@ _STRINGS = {
         'he': 'ספר לא נמצא'
     },
     String.PRESS_TO_SHARE: {
-        'en': 'Click on the result to share {}',
-        'he': 'לחצו על התוצאה כדי לשתף את {}'
+        'en': 'Click on the result to share {title}',
+        'he': 'לחצו על התוצאה כדי לשתף את {title}'
     },
     String.NO_RESULTS_FOR_S: {
-        'en': 'no results were found for: {}',
-        'he': 'לא נמצאו תוצאות עבור: {}'
+        'en': 'No results found for: {query}',
+        'he': 'לא נמצאו תוצאות עבור: {query}'
     },
     String.SEARCH_INLINE: {
-        'en': '🔎 Inline search',
+        'en': '🔎 Inline Search',
         'he': '🔎 חיפוש באינליין'
     },
     String.ORIGINAL_SEARCH_DELETED: {
-        'en': 'The original search has been deleted',
+        'en': 'The original search was deleted',
         'he': 'החיפוש המקורי נמחק'
     },
     String.CHOOSE_BROWSE_TYPE: {
-        'en': 'Select a browsing type',
-        'he': 'בחר סוג דפדוף'
+        'en': 'Choose a browse type',
+        'he': 'בחר סוג עיון'
     },
     String.SUBJECTS: {
-        'en': '🗂 Themes',
+        'en': '🗂 Subjects',
         'he': '🗂 נושאים'
     },
     String.LETTERS: {
-        'en': '🔠 letters',
+        'en': '🔠 Letters',
         'he': '🔠 אותיות'
     },
     String.DATES: {
-        'en': '📅 Dates',
+        'en': '📅 Date Ranges',
         'he': '📅 תאריכים'
     },
     String.CHOOSE: {
-        'en': 'choose',
+        'en': 'Choose',
         'he': 'בחר'
-    }
+    },
+    String.PAGE_X_OF_Y: {
+        'en': 'Page {page} of {pages}',
+        'he': 'עמוד {page} מתוך {pages}'
+    },
+    String.X_RESULTS_FOR_S: {
+        'en': '{results} results for: {query}',
+        'he': '{results} תוצאות עבור: {query}'
+    },
 }
 
 

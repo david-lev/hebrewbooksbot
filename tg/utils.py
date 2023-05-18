@@ -22,7 +22,7 @@ def start(_: Client, mb: Message | CallbackQuery):
                     InlineKeyboardButton(gs(mb, s.BROWSE), callback_data="browse_menu"),
                 ],
                 [
-                    InlineKeyboardButton(text=gs(mb, s.LIGHT_A_CANDLE).format(candle_pressed_count),
+                    InlineKeyboardButton(text=gs(mb, s.LIGHT_A_CANDLE).format(count=candle_pressed_count),
                                          callback_data="start_stats"),
                     InlineKeyboardButton("📤", switch_inline_query=""),
                 ],
@@ -47,7 +47,8 @@ def start(_: Client, mb: Message | CallbackQuery):
                     users_count=users_count,
                     candle_pressed_count=candle_pressed_count,
                     books_read=stats.books_read, pages_read=stats.pages_read,
-                    searches=stats.searches),
+                    searches=stats.searches
+                ),
                 show_alert=True,
                 cache_time=300
             )
@@ -66,7 +67,7 @@ def show_book(_: Client, clb: CallbackQuery):
             [
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=clb, string=s.BOOKS_READ),
+                        text=gs(mqc=clb, string=s.INSTANT_READ),
                         callback_data=ReadBook(id=book.id, page=1, total=book.pages).join_to_callback(
                             ShowBook(id=book.id), *others
                         )
@@ -148,7 +149,7 @@ def jump_to_page(client: Client, msg: Message):
     jump_clb = JumpToPage.from_callback(msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data)
     jump_to = int(msg.text)
     if jump_to > jump_clb.total:
-        msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(jump_clb.total))
+        msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(total=jump_clb.total))
         return
 
     book = api.get_book(jump_clb.id)

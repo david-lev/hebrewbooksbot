@@ -40,7 +40,7 @@ def _get_book_article(book: Book, query: InlineQuery) -> InlineQueryResultArticl
             [
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.BOOKS_READ),
+                        text=gs(mqc=query, string=s.INSTANT_READ),
                         callback_data=ReadBook(id=book.id, page=1, total=book.pages).join_to_callback(ShowBook(id=book.id))
                     ),
                 ],
@@ -82,7 +82,7 @@ def search_books_inline(_: Client, query: InlineQuery):
             return
         query.answer(
             results=[_get_book_article(book, query)],
-            switch_pm_text=gs(mqc=query, string=s.PRESS_TO_SHARE).format(book.title),
+            switch_pm_text=gs(mqc=query, string=s.PRESS_TO_SHARE).format(title=book.title),
             switch_pm_parameter="search"
         )
         repository.increase_books_read_count()
@@ -96,7 +96,9 @@ def search_books_inline(_: Client, query: InlineQuery):
         limit=5
     )
     query.answer(
-        switch_pm_text="{}{} תוצאות עבור {}".format(helpers.RTL, total, f"{title}:{author}" if author else title),
+        switch_pm_text=gs(query, s.X_RESULTS_FOR_S).format(
+            results=total, query=f"{title}:{author}" if author else title
+        ),
         switch_pm_parameter="search",
         results=[_get_book_article(book, query=query) for book in (api.get_book(b.id) for b in results)],
         next_offset=str(helpers.get_offset(int(query.offset or 1), total, increase=5))
@@ -119,7 +121,7 @@ def search_books_message(_: Client, msg: Message):
     )
     if total == 0:
         msg.reply_text(
-            text=gs(mqc=msg, string=s.NO_RESULTS_FOR_S).format(msg.text),
+            text=gs(mqc=msg, string=s.NO_RESULTS_FOR_S).format(query=msg.text),
             quote=True
         )
         return
@@ -133,7 +135,9 @@ def search_books_message(_: Client, msg: Message):
             )
         )
     msg.reply(
-        text="{}{} תוצאות עבור: {}".format(helpers.RTL, total, f"{title}:{author}" if author else title),
+        text=gs(msg, s.X_RESULTS_FOR_S).format(
+            results=total, query=f"{title}:{author}" if author else title
+        ),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -189,7 +193,9 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
             )
         )
     clb.message.edit_text(
-        text="{}{} תוצאות עבור: {}".format(helpers.RTL, total, search),
+        text=gs(clb, s.X_RESULTS_FOR_S).format(
+            results=total, query=f"{title}:{author}" if author else title
+        ),
         reply_markup=InlineKeyboardMarkup(
             [
                 [

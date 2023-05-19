@@ -135,7 +135,7 @@ def browse(browse_type: BrowseType, browse_id: int | str, offset: int, limit: in
     Returns:
         tuple[list[SearchResults], int]: The search results and the total number of results
     """
-    if browse_type is BrowseType.SHAS:
+    if browse_type == BrowseType.SHAS:
         raise ValueError('Cannot browse Shas, use `api.get_masechtot()` instead')
     data = _make_request(
         endpoint='/api/api.ashx',

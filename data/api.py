@@ -115,6 +115,10 @@ def search(title: str, author: str, offset: int, limit: int) -> tuple[list[Searc
         )
     except ValueError:
         return [], 0
+    except requests.HTTPError as e:
+        if e.response.status_code == 500:
+            return [], 0
+        raise
     return [SearchResults(**b) for b in data['data']], data['total']
 
 
@@ -182,14 +186,14 @@ def get_masechtot() -> list[MasechetBase]:
 
 
 @lru_cache
-def get_masechet(masehet_id: int) -> Masechet:
+def get_masechet(read_masehet_id: int) -> Masechet:
     """
     Get a masechet from HebrewBooks.org
 
     Args:
-        masehet_id: The masechet to get
+        read_masehet_id: The masechet to get
     """
-    masechet = get_masechtot()[masehet_id - 1]
+    masechet = get_masechtot()[read_masehet_id - 1]
     html = _make_request(
         endpoint=f'/shas.aspx',
         params={'mesechta': masechet.id},
@@ -199,9 +203,15 @@ def get_masechet(masehet_id: int) -> Masechet:
     masechet_id = int(soup.find('div', {'id': 'shaspngcont'}).get('rel').split('_')[0])
     return Masechet(
         id=masechet_id,
+        read_id=read_masehet_id,
         name=masechet.name,
         pages=[
-            MasechetPage(str_id=p['value'], masechet_id=masechet_id, name=p.text)
+            MasechetPage(
+                read_id=p['value'],
+                masechet_id=masechet_id,
+                read_masechet_id=read_masehet_id,
+                name=p.text
+            )
             for p in soup.find('select', {'id': 'cpMstr_ddlDafim'}).find_all('option')
         ]
     )
@@ -222,7 +232,7 @@ def get_page(page: MasechetPage) -> MasechetPage:
     )
     soup = BeautifulSoup(html, 'html.parser')
     return MasechetPage(
-        str_id=page.str_id,
+        read_id=page.read_id,
         masechet_id=page.masechet_id,
         name=page.name,
         content=PageContent(

@@ -46,6 +46,10 @@ class String(Enum):
     IMAGE = auto()
     DOCUMENT = auto()
     TEXT = auto()
+    NOT_REGISTERED = auto()  # V
+    CHOOSE_LANGUAGE = auto()  # V
+    CHANGE_LANGUAGE = auto()  # V
+    LANGUAGE_CHANGED = auto()  # V
 
 
 _STRINGS = {
@@ -236,43 +240,45 @@ _STRINGS = {
         'en': '📄 Document',
         'he': '📄 מסמך'
     },
+    String.NOT_REGISTERED: {
+        'en': 'You are not registered in the bot. Please send /start to the bot in order to register.',
+        'he': 'אתם לא רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.'
+    },
+    String.CHOOSE_LANGUAGE: {
+        'en': 'Choose a language',
+        'he': 'בחרו שפה'
+    },
+    String.CHANGE_LANGUAGE: {
+        'en': '🇮🇱',
+        'he': '🇺🇸'
+    },
+    String.LANGUAGE_CHANGED: {
+        'en': 'Language changed to English',
+        'he': 'השפה שונתה לעברית'
+    }
 }
 
-USERS_LANGUAGE_CACHE = {}
+
+class UserLanguageCache:
+    def __init__(self):
+        self.cache = {}
+
+    def get(self, user_id: int) -> str | None:
+        lang = self.cache.get(user_id)
+        if lang is None:
+            lang = repository.get_tg_user_lang(user_id)
+            self.set(user_id, lang)
+        return lang
+
+    def set(self, user_id: int, lang: str):
+        repository.set_tg_user_lang(user_id, lang)
+        self.cache[user_id] = lang
 
 
-def _get_or_put_lang(user_id: int, tg_lang: str) -> str:
-    """
-    Get the user's language from the cache or the database.
-
-    Args:
-        user_id: The user's id.
-    """
-
-    language = USERS_LANGUAGE_CACHE.get(user_id)
-    if language is None:
-        language = repository.get_tg_user_lang(user_id)
-        if language is None:
-            return tg_lang or 'he'
-        USERS_LANGUAGE_CACHE[user_id] = language
-    return language
-
-
-def update_language_cache(user_id: int, new_lang: str):
-    """
-    Update the cache with the new language.
-
-    Args:
-        user_id: The user's id.
-        new_lang: The new language.
-    """
-    USERS_LANGUAGE_CACHE.update({user_id: new_lang})
+USER_LANGUAGE_CACHE = UserLanguageCache()
 
 
 def get_string(mqc: Message | CallbackQuery | InlineQuery, string: String) -> str:
     """Get a string in the user's language."""
-    try:
-        lang = _get_or_put_lang(user_id=mqc.from_user.id, tg_lang=mqc.from_user.language_code)
-    except AttributeError:
-        lang = 'he'
-    return _STRINGS[string].get(lang, _STRINGS[string][lang])
+    lang = USER_LANGUAGE_CACHE.get(mqc.from_user.id) or mqc.from_user.language_code or 'he'
+    return _STRINGS[string].get(lang, _STRINGS[string]['he'])

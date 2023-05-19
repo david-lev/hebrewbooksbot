@@ -119,3 +119,9 @@ class JumpToPage(CallbackData):
     page: int
     total: int
     book_type: BookType
+
+
+@dataclass(frozen=True, slots=True)
+class ChangeLanguage(CallbackData):
+    __clbname__ = 'start_change_lang'
+    lang: str

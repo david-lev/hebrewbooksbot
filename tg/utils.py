@@ -3,8 +3,8 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from tg import helpers
 from tg.helpers import Menu
-from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType
-from tg.strings import String as s, get_string as gs
+from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, ChangeLanguage
+from strings import String as s, get_string as gs, USER_LANGUAGE_CACHE as ulc
 from data import api
 from db import repository
 
@@ -13,12 +13,17 @@ def start(_: Client, mb: Message | CallbackQuery):
     """Start message"""
     if isinstance(mb, Message):
         repository.add_tg_user(tg_id=mb.from_user.id, lang=mb.from_user.language_code)
-    elif isinstance(mb, CallbackQuery) and mb.data == Menu.STATS:
-        try:
-            repository.press_candle(tg_id=mb.from_user.id)
-        except ValueError:
-            mb.answer(text=gs(mb, s.NOT_REGISTERED), show_alert=True)
-            return
+    elif isinstance(mb, CallbackQuery):
+        if mb.data == Menu.STATS:
+            try:
+                repository.press_candle(tg_id=mb.from_user.id)
+            except ValueError:
+                mb.answer(text=gs(mb, s.NOT_REGISTERED), show_alert=True)
+                return
+        elif helpers.callback_matcher(mb, ChangeLanguage):
+            new_lang = ChangeLanguage.from_callback(mb.data).lang
+            ulc.set(mb.from_user.id, new_lang)
+    current_lang = ulc.get(mb.from_user.id)
     candle_pressed_count = repository.get_candle_pressed_count()
     kwargs = dict(
         text=gs(mb, s.WELCOME),
@@ -26,6 +31,12 @@ def start(_: Client, mb: Message | CallbackQuery):
             [
                 [
                     InlineKeyboardButton(gs(mb, s.SEARCH), switch_inline_query_current_chat=""),
+                    InlineKeyboardButton(
+                        text=gs(mb, s.CHANGE_LANGUAGE),
+                        callback_data=ChangeLanguage(
+                            "en" if current_lang == "he" else "he"
+                        ).to_callback()
+                    ),
                     InlineKeyboardButton(gs(mb, s.BROWSE), callback_data=Menu.BROWSE),
                 ],
                 [
@@ -42,7 +53,6 @@ def start(_: Client, mb: Message | CallbackQuery):
     )
     if isinstance(mb, Message):
         mb.reply_text(**kwargs)
-        repository.add_tg_user(mb.from_user.id, mb.from_user.language_code)
     else:
         try:
             mb.edit_message_text(**kwargs)

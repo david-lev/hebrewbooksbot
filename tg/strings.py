@@ -43,6 +43,9 @@ class String(Enum):
     NO_RESULTS_FOR_S = auto()  # V
     SEARCH_INLINE = auto()  # V
     ORIGINAL_SEARCH_DELETED = auto()  # V
+    IMAGE = auto()
+    DOCUMENT = auto()
+    TEXT = auto()
 
 
 _STRINGS = {
@@ -142,8 +145,8 @@ _STRINGS = {
              \nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.'
     },
     String.PAGE_NOT_EXIST: {
-        'en': 'The page does not exist! (Number of pages: {total})',
-        'he': 'העמוד לא קיים! (כמות עמודים: {total})'
+        'en': 'The page does not exist! (Choose a page between {start} and {total})',
+        'he': 'העמוד לא קיים! (בחרו עמוד בין {start} ל-{total})'
     },
     String.SEARCH_INLINE_TIP: {
         'en': "Tip: You can search in the 'Title:Author' format in order to get more accurate results",
@@ -221,15 +224,55 @@ _STRINGS = {
         'en': '{results} results for: {query}',
         'he': '{results} תוצאות עבור: {query}'
     },
+    String.IMAGE: {
+        'en': '🖼 Image',
+        'he': '🖼 תמונה'
+    },
+    String.TEXT: {
+        'en': '📜 Text',
+        'he': '📜 טקסט'
+    },
+    String.DOCUMENT: {
+        'en': '📄 Document',
+        'he': '📄 מסמך'
+    },
 }
+
+USERS_LANGUAGE_CACHE = {}
+
+
+def _get_or_put_lang(user_id: int, tg_lang: str) -> str:
+    """
+    Get the user's language from the cache or the database.
+
+    Args:
+        user_id: The user's id.
+    """
+
+    language = USERS_LANGUAGE_CACHE.get(user_id)
+    if language is None:
+        language = repository.get_tg_user_lang(user_id)
+        if language is None:
+            return tg_lang or 'he'
+        USERS_LANGUAGE_CACHE[user_id] = language
+    return language
+
+
+def update_language_cache(user_id: int, new_lang: str):
+    """
+    Update the cache with the new language.
+
+    Args:
+        user_id: The user's id.
+        new_lang: The new language.
+    """
+    USERS_LANGUAGE_CACHE.update({user_id: new_lang})
 
 
 def get_string(mqc: Message | CallbackQuery | InlineQuery, string: String) -> str:
     """Get a string in the user's language."""
     try:
-        lang = repository.get_tg_user_lang(mqc.from_user.id) \
-               or mqc.from_user.language_code \
-               or 'en'
+        lang = _get_or_put_lang(user_id=mqc.from_user.id, tg_lang=mqc.from_user.language_code)
     except AttributeError:
-        lang = 'en'
-    return _STRINGS[string].get(lang, _STRINGS[string]['en'])
+        lang = 'he'
+    return _STRINGS[string].get(lang, _STRINGS[string][lang])

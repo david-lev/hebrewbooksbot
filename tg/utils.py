@@ -3,7 +3,7 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from tg import helpers
 from tg.helpers import Menu
-from tg.callbacks import ShowBook, ReadBook, JumpToPage
+from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType
 from tg.strings import String as s, get_string as gs
 from data import api
 from db import repository
@@ -71,9 +71,13 @@ def show_book(_: Client, clb: CallbackQuery):
                 [
                     InlineKeyboardButton(
                         text=gs(mqc=clb, string=s.INSTANT_READ),
-                        callback_data=ReadBook(id=book.id, page=1, total=book.pages).join_to_callback(
-                            ShowBook(id=book.id), *others
-                        )
+                        callback_data=ReadBook(
+                            id=book.id,
+                            page=1,
+                            total=book.pages,
+                            read_mode=ReadMode.IMAGE,
+                            book_type=BookType.BOOK
+                        ).join_to_callback(ShowBook(id=book.id), *others)
                     )
                 ], [
                     InlineKeyboardButton(
@@ -102,18 +106,13 @@ def read_book(_: Client, clb: CallbackQuery):
     """
     _read_book, *others = clb.data.split(',')
     read_clb = ReadBook.from_callback(_read_book)
-    book = api.get_book(read_clb.id)
-    next_previous_buttons = []
-    if read_clb.page < read_clb.total:
-        next_previous_buttons.append(InlineKeyboardButton(
-            text=gs(mqc=clb, string=s.NEXT),
-            callback_data=ReadBook(id=read_clb.id, page=read_clb.page + 1, total=read_clb.total).join_to_callback(*others)
-        ))
-    if read_clb.page > 1:
-        next_previous_buttons.append(InlineKeyboardButton(
-            text=gs(mqc=clb, string=s.PREVIOUS),
-            callback_data=ReadBook(id=read_clb.id, page=read_clb.page - 1, total=read_clb.total).join_to_callback(*others)
-        ))
+    is_book = read_clb.book_type == BookType.BOOK
+    if is_book:
+        book = api.get_book(read_clb.id)
+        total = book.pages
+    else:
+        masechet = api.get_masechet(read_clb.id)
+        total = masechet.total
     clb.answer(
         text=gs(mqc=clb, string=s.WAIT_FOR_PREVIEW),
         show_alert=False
@@ -123,16 +122,19 @@ def read_book(_: Client, clb: CallbackQuery):
             text="".join((
                 gs(mqc=clb, string=s.INSTANT_READ),
                 "\n\n",
-                helpers.get_book_text(book, page=read_clb.page),
+                helpers.get_book_text(book=book, page=read_clb.page, read_mode=read_clb.read_mode) if is_book
+                else helpers.get_masechet_page_text(masechet=masechet, page=read_clb.page, read_mode=read_clb.read_mode)
             )),
             reply_markup=InlineKeyboardMarkup(
                 [
+                    helpers.read_mode_chooser(cm=clb, read_clb=read_clb, page=read_clb.page, others=others),
+                    helpers.current_page_status(book_id=read_clb.id, page=read_clb.page, total=total)
+                    if is_book else helpers.current_masechet_page_status(masechet.read_id, page=read_clb.page),
+                    helpers.next_previous_buttons(cm=clb, read_clb=read_clb, total=total, page=read_clb.page, others=others),
                     [InlineKeyboardButton(
-                        text=f"📄 {read_clb.page}/{read_clb.total} 📄",
-                        callback_data=JumpToPage(read_clb.id, read_clb.page, read_clb.total).to_callback()
+                        text=gs(mqc=clb, string=s.READ_ON_SITE),
+                        url=book.get_page_url(read_clb.page) if is_book else masechet.pages[read_clb.page - 1].get_page_url()
                     )],
-                    [InlineKeyboardButton(text=gs(mqc=clb, string=s.READ_ON_SITE), url=book.get_page_url(read_clb.page))],
-                    next_previous_buttons,  # TODO reverse in RTL
                     [InlineKeyboardButton(text=gs(mqc=clb, string=s.BACK), callback_data=",".join(others))],
                 ]
             ),
@@ -144,54 +146,50 @@ def read_book(_: Client, clb: CallbackQuery):
         )
 
 
-def jump_to_page(client: Client, msg: Message):
+def jump_to_page(_: Client, msg: Message):
     """
     Jump to a page.
 
     msg.text: number
     """
-    jump_clb = JumpToPage.from_callback(msg.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data)
-    jump_to = int(msg.text)
-    if jump_to > jump_clb.total or jump_to < 1:
-        msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(total=jump_clb.total))
-        return
+    jump_clb = JumpToPage.from_callback(msg.reply_to_message.reply_markup.inline_keyboard[1][0].callback_data)
+    is_book = jump_clb.book_type == BookType.BOOK
+    if not is_book:
+        masechet = api.get_masechet(jump_clb.id)
+        try:
+            jump_to = masechet.pages.index(next(filter(lambda p: p.name == msg.text, masechet.pages))) + 1
+        except (StopIteration, ValueError):
+            msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(
+                start=masechet.pages[0].name,
+                total=masechet.pages[-1].name
+            ))
+            return
+    else:
+        jump_to = int(msg.text)
+        if jump_to > jump_clb.total or jump_to < 1:
+            msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(start=1, total=jump_clb.total))
+            return
+        book = api.get_book(jump_clb.id)
 
-    book = api.get_book(jump_clb.id)
-    new_next_previous_buttons = []
     _next_or_previous, *nop_others = msg.reply_to_message.reply_markup.inline_keyboard[2:-1][0][0].callback_data.split(',')
     nop_clb = ReadBook.from_callback(_next_or_previous)
-    if jump_to < jump_clb.total:
-        new_next_previous_buttons.append(InlineKeyboardButton(
-            text=gs(mqc=msg, string=s.NEXT),
-            callback_data=ReadBook(
-                id=nop_clb.id,
-                page=jump_to + 1,
-                total=nop_clb.total
-            ).join_to_callback(*nop_others)
-        ))
-    if jump_to > 1:
-        new_next_previous_buttons.append(InlineKeyboardButton(
-            text=gs(mqc=msg, string=s.PREVIOUS),
-            callback_data=ReadBook(
-                id=nop_clb.id,
-                page=jump_to - 1,
-                total=nop_clb.total
-            ).join_to_callback(*nop_others)
-        ))
     kwargs = dict(
         text="".join((
             gs(mqc=msg, string=s.INSTANT_READ),
             "\n\n",
-            helpers.get_book_text(book, page=jump_to),
+            helpers.get_book_text(book=book, page=jump_to, read_mode=nop_clb.read_mode)
+            if is_book else helpers.get_masechet_page_text(masechet=masechet, page=jump_to, read_mode=nop_clb.read_mode)
         )),
         reply_markup=InlineKeyboardMarkup(
             [
+                helpers.read_mode_chooser(cm=msg, read_clb=nop_clb, page=jump_to, others=nop_others),
+                helpers.current_page_status(book_id=jump_clb.id, page=jump_to, total=jump_clb.total)
+                if is_book else helpers.current_masechet_page_status(masechet.read_id, page=jump_to),
+                helpers.next_previous_buttons(cm=msg, read_clb=nop_clb, total=jump_clb.total, page=jump_to, others=nop_others),
                 [InlineKeyboardButton(
-                    text=f"📄 {jump_to}/{jump_clb.total} 📄",
-                    callback_data=JumpToPage(id=jump_clb.id, page=jump_to, total=jump_clb.total).to_callback()
+                    text=gs(mqc=msg, string=s.READ_ON_SITE),
+                    url=book.get_page_url(jump_clb.page) if is_book else masechet.pages[jump_clb.page - 1].get_page_url()
                 )],
-                [InlineKeyboardButton(text=gs(mqc=msg, string=s.READ_ON_SITE), url=book.get_page_url(jump_to))],
-                new_next_previous_buttons,  # TODO reverse in RTL
                 [msg.reply_to_message.reply_markup.inline_keyboard[-1][-1]]
             ]
         )
@@ -207,8 +205,6 @@ def jump_to_page(client: Client, msg: Message):
 def jump_tip(_: Client, clb: CallbackQuery):
     """
     Jump to a page tip.
-
-    clb.data: "jump:*"
     """
     clb.answer(
         text=gs(mqc=clb, string=s.JUMP_TIP),

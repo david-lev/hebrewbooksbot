@@ -62,7 +62,7 @@ app.add_handler(
 app.add_handler(
     MessageHandler(
         search.search_books_message, filters=(
-                filters.text & ~filters.via_bot &
+                filters.text & ~filters.via_bot & ~filters.reply &
                 ~filters.create(lambda _, __, msg: msg.text.isdigit())
                 & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
         )
@@ -91,17 +91,13 @@ app.add_handler(
 
 app.add_handler(
     MessageHandler(
-        utils.jump_to_page, filters=filters.create(
-            lambda _, __, msg: msg.text.isdigit()
-        ) & filters.create(jump_to_page_filter)
+        utils.jump_to_page, filters=filters.reply & filters.create(jump_to_page_filter)
     )
 )
 
 app.add_handler(
     EditedMessageHandler(
-        utils.jump_to_page, filters=filters.create(
-            lambda _, __, msg: msg.text.isdigit()
-        ) & filters.create(jump_to_page_filter)
+        utils.jump_to_page, filters=filters.create(jump_to_page_filter)
     )
 )
 

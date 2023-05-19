@@ -5,7 +5,7 @@ from data import api
 from data.models import Book
 from db import repository
 from tg import helpers
-from tg.callbacks import SearchNavigation, ShowBook, ReadBook
+from tg.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
 from tg.strings import String as s, get_string as gs
 
 
@@ -41,7 +41,13 @@ def _get_book_article(book: Book, query: InlineQuery) -> InlineQueryResultArticl
                 [
                     InlineKeyboardButton(
                         text=gs(mqc=query, string=s.INSTANT_READ),
-                        callback_data=ReadBook(id=book.id, page=1, total=book.pages).join_to_callback(ShowBook(id=book.id))
+                        callback_data=ReadBook(
+                            id=book.id,
+                            page=1,
+                            total=book.pages,
+                            read_mode=ReadMode.IMAGE,
+                            book_type=BookType.BOOK
+                        ).join_to_callback(ShowBook(id=book.id))
                     ),
                 ],
                 [
@@ -143,7 +149,7 @@ def search_books_message(_: Client, msg: Message):
                 [
                     InlineKeyboardButton(
                         text=book.title,
-                        callback_data=ShowBook(book.id).join_to_callback(SearchNavigation(offset=1, total=total))
+                        callback_data=ShowBook(id=book.id).join_to_callback(SearchNavigation(offset=1, total=total))
                     )
                 ] for book in results
             ] + [
@@ -201,7 +207,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
                 [
                     InlineKeyboardButton(
                         text=book.title,
-                        callback_data=ShowBook(book.id).join_to_callback(search_nav)
+                        callback_data=ShowBook(id=book.id).join_to_callback(search_nav)
                     )
                 ] for book in results
             ] + [

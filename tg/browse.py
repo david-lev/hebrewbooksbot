@@ -5,7 +5,7 @@ from data.enums import BrowseType as BrowseTypeEnum
 from tg import helpers
 from tg.helpers import Menu
 from tg.strings import String as s, get_string as gs
-from tg.callbacks import BrowseNavigation, BrowseType, ShowBook
+from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, BookType, ReadBook, ReadMode
 
 
 def browse_menu(_: Client, query: CallbackQuery):
@@ -58,6 +58,14 @@ def browse_types(_: Client, clb: CallbackQuery):
                             offset=1,
                             total=res.total or 0
                         ).to_callback()
+                        if browse_type.type is not BrowseTypeEnum.SHAS
+                        else ReadBook(
+                            id=res.id,
+                            page=1,
+                            total=-1,  # There is no `total` yet
+                            read_mode=ReadMode.IMAGE,
+                            book_type=BookType.MASECHET
+                        ).join_to_callback(browse_type)
                     ) for res in results
                 ][i:i + buttons_in_row][::-1] for i in range(0, len(results), buttons_in_row)
             ] + [[

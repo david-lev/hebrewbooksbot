@@ -2,7 +2,7 @@ from sqlalchemy.exc import IntegrityError
 from db.tables import TgUser, Stats, get_session
 
 
-def add_tg_user(tg_id: int, lang: str):
+def add_tg_user(tg_id: int, lang: str) -> TgUser | None:
     """Add new tg user to db"""
     session = get_session()
     try:
@@ -11,12 +11,16 @@ def add_tg_user(tg_id: int, lang: str):
         session.commit()
     except IntegrityError:
         session.rollback()
+        tg_user = None
+    return tg_user
 
 
 def press_candle(tg_id: int):
     """Press candle"""
     session = get_session()
     tg_user = session.query(TgUser).filter(TgUser.tg_id == tg_id).first()
+    if not tg_user:
+        raise ValueError(f'Tg user {tg_id} not found')
     tg_user.candle_pressed = True
     session.commit()
 

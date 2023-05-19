@@ -38,24 +38,44 @@ class PageContent:
 
 @dataclass(frozen=True, slots=True)
 class MasechetPage:
-    str_id: str
+    read_id: str
     masechet_id: int
+    read_masechet_id: int
     name: str
     content: PageContent | None = None
 
     @property
     def id(self):
         """Get the page ID"""
-        if self.str_id.endswith('b'):
-            num = int(self.str_id[:-1]) + 1
+        if self.read_id.endswith('b'):
+            num = int(self.read_id[:-1]) + 1
             return (num - 2) + (num - 2)
         else:
-            return (int(self.str_id) - 2) + (int(self.str_id) - 1)
+            return (int(self.read_id) - 2) + (int(self.read_id) - 1)
 
     @property
     def pdf_url(self) -> str:
         """Get the page's PDF URL"""
         return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.masechet_id}_{self.id}.pdf'
+
+    def get_page_img(self, width: int, height: int) -> str:
+        """
+        Get the page's image URL
+
+        Args:
+            width: The width of the image.
+            height: The height of the image.
+        """
+        return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.masechet_id}_{self.id}_{width}_{height}.png'
+
+    def get_page_url(self, fmt: str = 'pdf') -> str:
+        """
+        Get the masechet page's url
+
+        Args:
+            fmt: The format of the page (pdf, or text)
+        """
+        return f'https://hebrewbooks.org/shas.aspx?mesechta={self.read_masechet_id}&daf={self.read_id}&format={fmt}'
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,6 +93,7 @@ class MasechetBase:
 @dataclass(frozen=True, slots=True)
 class Masechet:
     id: int
+    read_id: int
     name: str
     pages: list[MasechetPage]
 

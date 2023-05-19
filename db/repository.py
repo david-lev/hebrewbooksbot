@@ -33,11 +33,11 @@ def get_tg_users_count() -> int:
     return session.query(TgUser).count()
 
 
-def get_tg_user_lang(tg_id: int) -> str:
+def get_tg_user_lang(tg_id: int) -> str | None:
     """Get tg user lang"""
     session = get_session()
     tg_user = session.query(TgUser).filter(TgUser.tg_id == tg_id).first()
-    return tg_user.lang
+    return tg_user.lang if tg_user else None
 
 
 def set_tg_user_lang(tg_id: int, lang: str):

@@ -11,8 +11,14 @@ from db import repository
 
 def start(_: Client, mb: Message | CallbackQuery):
     """Start message"""
-    if isinstance(mb, CallbackQuery) and mb.data == Menu.STATS:
-        repository.press_candle(mb.from_user.id)
+    if isinstance(mb, Message):
+        repository.add_tg_user(tg_id=mb.from_user.id, lang=mb.from_user.language_code)
+    elif isinstance(mb, CallbackQuery) and mb.data == Menu.STATS:
+        try:
+            repository.press_candle(tg_id=mb.from_user.id)
+        except ValueError:
+            mb.answer(text=gs(mb, s.NOT_REGISTERED), show_alert=True)
+            return
     candle_pressed_count = repository.get_candle_pressed_count()
     kwargs = dict(
         text=gs(mb, s.WELCOME),
@@ -200,6 +206,7 @@ def jump_to_page(_: Client, msg: Message):
         msg.reply_to_message.edit(
             **kwargs
         )
+    repository.increase_pages_read_count()
 
 
 def jump_tip(_: Client, clb: CallbackQuery):

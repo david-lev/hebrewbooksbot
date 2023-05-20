@@ -2,17 +2,14 @@ from sqlalchemy.exc import IntegrityError
 from db.tables import TgUser, Stats, get_session
 
 
-def add_tg_user(tg_id: int, lang: str) -> TgUser | None:
+def add_tg_user(tg_id: int, lang: str):
     """Add new tg user to db"""
     session = get_session()
     try:
-        tg_user = TgUser(tg_id=tg_id, lang=lang)
-        session.add(tg_user)
+        session.add(TgUser(tg_id=tg_id, lang=lang))
         session.commit()
     except IntegrityError:
         session.rollback()
-        tg_user = None
-    return tg_user
 
 
 def press_candle(tg_id: int):
@@ -52,13 +49,13 @@ def set_tg_user_lang(tg_id: int, lang: str):
     session.commit()
 
 
-def get_active_tg_users() -> list[TgUser]:
+def get_active_tg_users() -> list[type[TgUser]]:
     """Get active tg users"""
     session = get_session()
     return session.query(TgUser).filter(TgUser.active == True).all()
 
 
-def get_stats() -> Stats:
+def get_stats() -> type[Stats]:
     """Get stats"""
     session = get_session()
     stats = session.query(Stats).first()

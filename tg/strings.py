@@ -1,6 +1,8 @@
 from enum import Enum, auto
 from pyrogram.types import Message, CallbackQuery, InlineQuery
-from db import repository
+
+
+DEFAULT_LANGUAGE = "en"
 
 
 class String(Enum):
@@ -243,42 +245,20 @@ _STRINGS = {
     String.NOT_REGISTERED: {
         'en': 'You are not registered in the bot. Please send /start to the bot in order to register.',
         'he': 'אתם לא רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.'
-    },
-    String.CHOOSE_LANGUAGE: {
-        'en': 'Choose a language',
-        'he': 'בחרו שפה'
-    },
-    String.CHANGE_LANGUAGE: {
-        'en': '🇮🇱',
-        'he': '🇺🇸'
-    },
-    String.LANGUAGE_CHANGED: {
-        'en': 'Language changed to English',
-        'he': 'השפה שונתה לעברית'
     }
 }
 
 
-class UserLanguageCache:
-    def __init__(self):
-        self.cache = {}
-
-    def get(self, user_id: int) -> str | None:
-        lang = self.cache.get(user_id)
-        if lang is None:
-            lang = repository.get_tg_user_lang(user_id)
-            self.set(user_id, lang)
-        return lang
-
-    def set(self, user_id: int, lang: str):
-        repository.set_tg_user_lang(user_id, lang)
-        self.cache[user_id] = lang
-
-
-USER_LANGUAGE_CACHE = UserLanguageCache()
+def get_lang_code(mqc: Message | CallbackQuery | InlineQuery) -> str:
+    """Get the user's language code."""
+    try:
+        lang = mqc.from_user.language_code or DEFAULT_LANGUAGE
+    except AttributeError:
+        lang = DEFAULT_LANGUAGE
+    return lang
 
 
 def get_string(mqc: Message | CallbackQuery | InlineQuery, string: String) -> str:
     """Get a string in the user's language."""
-    lang = USER_LANGUAGE_CACHE.get(mqc.from_user.id) or mqc.from_user.language_code or 'he'
-    return _STRINGS[string].get(lang, _STRINGS[string]['he'])
+    lang = get_lang_code(mqc)
+    return _STRINGS[string].get(lang, _STRINGS[string][DEFAULT_LANGUAGE])

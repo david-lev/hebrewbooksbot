@@ -5,7 +5,7 @@ from data import api
 from data.models import Book, Masechet
 from data.enums import BrowseType as BrowseTypeEnum
 from tg.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
-from tg.strings import String as s, get_string as gs
+from tg.strings import String as s, get_string as gs, get_lang_code as glc
 
 RTL = '\u200f'
 LTR = '\u200e'
@@ -96,15 +96,17 @@ def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
 def jump_to_page_filter(_, __, msg: Message) -> bool:
     """Filter for jump_to_page_handler."""
     try:
-        return callback_matcher(
-            clb=msg.reply_to_message.reply_markup.inline_keyboard[1][0].callback_data,
-            data=JumpToPage
+        return any(
+            callback_matcher(
+                clb=clb,
+                data=JumpToPage
+            ) for clb in msg.reply_to_message.reply_markup.inline_keyboard[1]
         )
     except (AttributeError, IndexError):
         return False
 
 
-def callback_matcher(clb: CallbackQuery | str, data: type[CallbackData]) -> bool:
+def callback_matcher(clb: CallbackQuery | InlineKeyboardButton | str, data: type[CallbackData]) -> bool:
     """
     Check if the callback query matches the callback data.
 
@@ -112,7 +114,11 @@ def callback_matcher(clb: CallbackQuery | str, data: type[CallbackData]) -> bool
         clb: The callback query.
         data: The callback data.
     """
-    return (clb.data if isinstance(clb, CallbackQuery) else clb).startswith(data.__clbname__)
+    return (
+        clb.data if isinstance(clb, CallbackQuery)
+        else clb.callback_data if isinstance(clb, InlineKeyboardButton)
+        else clb
+    ).startswith(data.__clbname__)
 
 
 @lru_cache
@@ -175,7 +181,8 @@ def next_previous_buttons(
         read_clb: ReadBook,
         page: int,
         total: int,
-        others: list[str]
+        others: list[str],
+        is_book: bool,
 ) -> list[InlineKeyboardButton]:
     """
     Get the next and previous buttons.
@@ -186,6 +193,7 @@ def next_previous_buttons(
         page: The current page.
         total: The total number of pages.
         others: The other callback data to join to the callback data.
+        is_book: Whether the book is a book or a masechet.
     """
     buttons = []
     if page < total:
@@ -199,6 +207,30 @@ def next_previous_buttons(
                 book_type=read_clb.book_type
             ).join_to_callback(*others)
         ))
+
+    if is_book:
+        buttons.append(
+            InlineKeyboardButton(
+                text=f"< {page}/{total} >",
+                callback_data=JumpToPage(id=read_clb.id, page=page, total=total, book_type=BookType.BOOK).to_callback()
+            )
+        )
+    else:
+        masechet = api.get_masechet(read_clb.id)
+        current_page = masechet.pages[page - 1]
+        last_page = masechet.pages[-1]
+        buttons.append(
+            InlineKeyboardButton(
+                text=f"< {current_page.name} / {last_page.name} >",
+                callback_data=JumpToPage(
+                    id=read_clb.id,
+                    page=page,
+                    total=masechet.total,
+                    book_type=BookType.MASECHET
+                ).to_callback()
+            )
+        )
+
     if page > 1:
         buttons.append(InlineKeyboardButton(
             text=gs(mqc=cm, string=s.PREVIOUS),
@@ -210,45 +242,4 @@ def next_previous_buttons(
                 book_type=read_clb.book_type
             ).join_to_callback(*others)
         ))
-    return buttons  # TODO reverse buttons if RTL
-
-
-def current_page_status(book_id: int, page: int, total: int) -> list[InlineKeyboardButton]:
-    """
-    Get the current page status button.
-
-    Args:
-        book_id: The book id.
-        page: The current page.
-        total: The total number of pages.
-    """
-    return [
-        InlineKeyboardButton(
-            text=f"< {page}/{total} >",
-            callback_data=JumpToPage(id=book_id, page=page, total=total, book_type=BookType.BOOK).to_callback()
-        )
-    ]
-
-
-def current_masechet_page_status(masechet_read_id: int, page: int) -> list[InlineKeyboardButton]:
-    """
-    Get the current page status button.
-
-    Args:
-        masechet_read_id: The masechet read id.
-        page: The current page.
-    """
-    masechet = api.get_masechet(masechet_read_id)
-    current_page = masechet.pages[page - 1]
-    last_page = masechet.pages[-1]
-    return [
-        InlineKeyboardButton(
-            text=f"< {current_page.name} / {last_page.name} >",
-            callback_data=JumpToPage(
-                id=masechet_read_id,
-                page=page,
-                total=masechet.total,
-                book_type=BookType.MASECHET
-            ).to_callback()
-        )
-    ]
+    return buttons if glc(cm) == "he" else buttons[::-1]

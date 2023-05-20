@@ -123,11 +123,11 @@ _STRINGS = {
         'he': '⬇️ הורדה ⬇️'
     },
     String.NEXT: {
-        'en': '⏪ Next',
+        'en': 'Next ⏩',
         'he': 'הבא ⏪'
     },
     String.PREVIOUS: {
-        'en': 'Previous ⏩',
+        'en': '⏪ Previous',
         'he': '⏩ הקודם'
     },
     String.WAIT_FOR_PREVIEW: {

@@ -1,6 +1,8 @@
 from pyrogram import Client
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+
+from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu
 from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, ChangeLanguage
@@ -113,7 +115,7 @@ def show_book(_: Client, clb: CallbackQuery):
             ],
         )
     )
-    repository.increase_books_read_count()
+    repository.increase_stats(StatsType.BOOKS_READ)
 
 
 def read_book(_: Client, clb: CallbackQuery):
@@ -155,7 +157,7 @@ def read_book(_: Client, clb: CallbackQuery):
                 ]
             ),
         )
-        repository.increase_pages_read_count()
+        repository.increase_stats(StatsType.PAGES_READ)
     except MessageNotModified:
         clb.answer(
             text=gs(mqc=clb, string=s.SLOW_DOWN)
@@ -216,7 +218,8 @@ def jump_to_page(_: Client, msg: Message):
         msg.reply_to_message.edit(
             **kwargs
         )
-    repository.increase_pages_read_count()
+    repository.increase_stats(StatsType.PAGES_READ)
+    repository.increase_stats(StatsType.JUMPS)
 
 
 def jump_tip(_: Client, clb: CallbackQuery):

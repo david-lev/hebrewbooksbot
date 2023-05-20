@@ -3,6 +3,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQ
 from data import api
 from data.enums import BrowseType as BrowseTypeEnum
 from db import repository
+from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu
 from tg.strings import String as s, get_string as gs
@@ -78,7 +79,7 @@ def browse_types(_: Client, clb: CallbackQuery):
         )
     )
     if browse_type.type == BrowseTypeEnum.SHAS:
-        repository.increase_books_read_count()
+        repository.increase_stats(StatsType.BOOKS_READ)
 
 
 def browse_books_navigator(_: Client, clb: CallbackQuery):

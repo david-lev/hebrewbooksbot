@@ -4,6 +4,7 @@ from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessa
 from data import api
 from data.models import Book
 from db import repository
+from db.repository import StatsType
 from tg import helpers
 from tg.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
 from tg.strings import String as s, get_string as gs
@@ -91,7 +92,7 @@ def search_books_inline(_: Client, query: InlineQuery):
             switch_pm_text=gs(mqc=query, string=s.PRESS_TO_SHARE).format(title=book.title),
             switch_pm_parameter="search"
         )
-        repository.increase_books_read_count()
+        repository.increase_stats(StatsType.BOOKS_READ)
         return
 
     title, author = helpers.get_title_author(query.query)
@@ -109,7 +110,7 @@ def search_books_inline(_: Client, query: InlineQuery):
         results=[_get_book_article(book, query=query) for book in (api.get_book(b.id) for b in results)],
         next_offset=str(helpers.get_offset(int(query.offset or 1), total, increase=5))
     )
-    repository.increase_search_count()
+    repository.increase_stats(StatsType.INLINE_SEARCHES)
 
 
 def search_books_message(_: Client, msg: Message):
@@ -159,7 +160,7 @@ def search_books_message(_: Client, msg: Message):
         ),
         quote=True
     )
-    repository.increase_search_count()
+    repository.increase_stats(StatsType.MSG_SEARCHES)
 
 
 def search_books_navigator(_: Client, clb: CallbackQuery):

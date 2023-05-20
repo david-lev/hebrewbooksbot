@@ -7,7 +7,7 @@ from db import repository
 from db.repository import StatsType
 from tg import helpers
 from tg.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
-from tg.strings import String as s, get_string as gs
+from tg.strings import String as s, get_string as gs, get_lang_code as glc
 
 
 def empty_search(_: Client, query: InlineQuery):
@@ -212,7 +212,7 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
                     )
                 ] for book in results
             ] + [
-                next_previous_buttons,
+                next_previous_buttons if glc(clb) == "he" else next_previous_buttons[::-1],
                 [InlineKeyboardButton(gs(mqc=clb, string=s.SEARCH_INLINE), switch_inline_query_current_chat=search)]
             ]
         )

@@ -1,3 +1,5 @@
+from enum import Enum
+
 from sqlalchemy.exc import IntegrityError
 from db.tables import TgUser, Stats, get_session
 
@@ -62,25 +64,26 @@ def get_stats() -> type[Stats]:
     return stats
 
 
-def increase_search_count():
-    """Increase search count"""
+class StatsType(Enum):
+    INLINE_SEARCHES = 'inline_searches'
+    MSG_SEARCHES = 'msg_searches'
+    BOOKS_READ = 'books_read'
+    PAGES_READ = 'pages_read'
+    JUMPS = 'jumps'
+
+
+def increase_stats(stats_type: StatsType):
+    """Increase stats"""
     session = get_session()
     stats = session.query(Stats).first()
-    stats.searches += 1
-    session.commit()
-
-
-def increase_books_read_count():
-    """Increase books read count"""
-    session = get_session()
-    stats = session.query(Stats).first()
-    stats.books_read += 1
-    session.commit()
-
-
-def increase_pages_read_count():
-    """Increase pages read count"""
-    session = get_session()
-    stats = session.query(Stats).first()
-    stats.pages_read += 1
+    if stats_type == StatsType.INLINE_SEARCHES:
+        stats.inline_searches += 1
+    elif stats_type == StatsType.MSG_SEARCHES:
+        stats.msg_searches += 1
+    elif stats_type == StatsType.BOOKS_READ:
+        stats.books_read += 1
+    elif stats_type == StatsType.PAGES_READ:
+        stats.pages_read += 1
+    elif stats_type == StatsType.JUMPS:
+        stats.jumps += 1
     session.commit()

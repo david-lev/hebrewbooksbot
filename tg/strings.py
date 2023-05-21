@@ -44,6 +44,8 @@ class String(Enum):
     BOOK_NOT_FOUND = auto()  # V
     PRESS_TO_SHARE = auto()  # V
     X_RESULTS_FOR_S = auto()  # RTL ⚠️
+    X_TO_Y_OF_TOTAL_FOR_S = auto()  # RTL ⚠️
+    X_TO_Y_OF_TOTAL = auto()  # RTL ⚠️
     NO_RESULTS_FOR_S = auto()  # V
     SEARCH_INLINE = auto()  # V
     ORIGINAL_SEARCH_DELETED = auto()  # V
@@ -282,8 +284,16 @@ _STRINGS = {
         'he': 'עמוד {page} מתוך {pages}'
     },
     String.X_RESULTS_FOR_S: {
-        'en': '{results:,} results for: {query}',
-        'he': '%s{results:,} תוצאות עבור: {query}' % RTL
+        'en': '{x:,} results for: {s}',
+        'he': '%s{x:,} תוצאות עבור: {s}' % RTL
+    },
+    String.X_TO_Y_OF_TOTAL_FOR_S: {
+        'en': '{x:,} - {y:,} from {total:,} results for: {s}',
+        'he': '%s{x:,} - {y:,} מתוך {total:,} תוצאות עבור: {s}' % RTL
+    },
+    String.X_TO_Y_OF_TOTAL: {
+        'en': '{x:,} - {y:,} from {total:,} results',
+        'he': '%s{x:,} - {y:,} מתוך {total:,} תוצאות' % RTL
     },
     String.IMAGE: {
         'en': '🖼 Image',

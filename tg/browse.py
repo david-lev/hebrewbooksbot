@@ -96,11 +96,10 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
     buttons = [
         [
             InlineKeyboardButton(
-                text=f"{book.title} • {book.author}{f' • {book.year}' if book.year else ''}"
-                     f"{f' • {book.city}' if book.city else ''}",
-                callback_data=ShowBook(id=book.id).join_to_callback(browse_nav)
+                text=res.title,
+                callback_data=ShowBook(id=res.id).join_to_callback(browse_nav)
             )
-        ] for book in (api.get_book(result.id) for result in results)
+        ] for res in results
     ]
     next_offset = helpers.get_offset(browse_nav.offset, int(total), increase=5)
 
@@ -141,7 +140,8 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
         ]
     )
     clb.edit_message_text(
-        text=gs(mqc=clb, string=s.CHOOSE),
+        text=gs(mqc=clb, string=s.X_TO_Y_OF_TOTAL).format(
+            x=browse_nav.offset, y=next_offset - 1 if next_offset else total, total=total),
         reply_markup=InlineKeyboardMarkup(
             buttons
         )

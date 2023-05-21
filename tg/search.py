@@ -104,7 +104,7 @@ def search_books_inline(_: Client, query: InlineQuery):
     )
     query.answer(
         switch_pm_text=gs(query, s.X_RESULTS_FOR_S).format(
-            results=total, query=f"{title}:{author}" if author else title
+            x=total, s=f"{title}:{author}" if author else title
         ),
         switch_pm_parameter="search",
         results=[_get_book_article(book, query=query) for book in (api.get_book(b.id) for b in results)],
@@ -142,8 +142,8 @@ def search_books_message(_: Client, msg: Message):
             )
         )
     msg.reply(
-        text=gs(msg, s.X_RESULTS_FOR_S).format(
-            results=total, query=f"{title}:{author}" if author else title
+        text=gs(msg, s.X_TO_Y_OF_TOTAL_FOR_S).format(
+            x=1, y=(next_offset - 1) if next_offset else total, total=total, s=msg.text
         ),
         reply_markup=InlineKeyboardMarkup(
             [
@@ -200,8 +200,8 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
             )
         )
     clb.message.edit_text(
-        text=gs(clb, s.X_RESULTS_FOR_S).format(
-            results=total, query=f"{title}:{author}" if author else title
+        text=gs(clb, s.X_TO_Y_OF_TOTAL_FOR_S).format(
+            x=search_nav.offset, y=(next_offset - 1) if next_offset else total, total=total, s=search
         ),
         reply_markup=InlineKeyboardMarkup(
             [

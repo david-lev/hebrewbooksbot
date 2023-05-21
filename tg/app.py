@@ -25,7 +25,13 @@ app.add_handler(
 
 app.add_handler(
     CallbackQueryHandler(
-        utils.start, filters=filters.create(lambda _, __, query: query.data.startswith(Menu.START))
+        utils.start, filters=filters.create(lambda _, __, query: query.data == Menu.START)
+    )
+)
+
+app.add_handler(
+    CallbackQueryHandler(
+        utils.show_stats, filters=filters.create(lambda _, __, query: query.data == Menu.STATS)
     )
 )
 

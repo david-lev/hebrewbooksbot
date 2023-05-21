@@ -1,7 +1,6 @@
 from pyrogram import Client
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
-
 from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu
@@ -11,57 +10,65 @@ from data import api
 from db import repository
 
 
-def start(_: Client, mb: Message | CallbackQuery):
+def start(_: Client, mc: Message | CallbackQuery):
     """Start message"""
-    if isinstance(mb, Message):
-        repository.add_tg_user(tg_id=mb.from_user.id, lang=mb.from_user.language_code)
-    elif isinstance(mb, CallbackQuery):
-        try:
-            repository.press_candle(tg_id=mb.from_user.id)
-        except ValueError:
-            mb.answer(text=gs(mb, s.NOT_REGISTERED), show_alert=True)
-            return
-    candle_pressed_count = repository.get_candle_pressed_count()
+    if isinstance(mc, Message):
+        repository.add_tg_user(tg_id=mc.from_user.id, lang=mc.from_user.language_code)
     kwargs = dict(
-        text=gs(mb, s.WELCOME),
+        text=gs(mc, s.WELCOME),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(gs(mb, s.SEARCH), switch_inline_query_current_chat=""),
-                    InlineKeyboardButton(gs(mb, s.BROWSE), callback_data=Menu.BROWSE),
+                    InlineKeyboardButton(gs(mc, s.SEARCH), switch_inline_query_current_chat=""),
+                    InlineKeyboardButton(gs(mc, s.BROWSE), callback_data=Menu.BROWSE),
                 ],
                 [
-                    InlineKeyboardButton(
-                        text=gs(mb, s.LIGHT_A_CANDLE).format(count=candle_pressed_count),
-                        callback_data=Menu.STATS
-                    ),
                     InlineKeyboardButton("📤", switch_inline_query=""),
+                    InlineKeyboardButton(text=gs(mc, s.STATS), callback_data=Menu.STATS),
+                    InlineKeyboardButton("📮", url=Menu.CONTACT_URL),
                 ],
-                [InlineKeyboardButton(text=gs(mb, s.GITHUB), url=Menu.GITHUB_URL)],
-                [InlineKeyboardButton(text=gs(mb, s.HEBREWBOOKS_SITE), url=Menu.HEBREWBOOKS_SITE_URL)],
+                [InlineKeyboardButton(text=gs(mc, s.GITHUB), url=Menu.GITHUB_URL)],
+                [InlineKeyboardButton(text=gs(mc, s.HEBREWBOOKS_SITE), url=Menu.HEBREWBOOKS_SITE_URL)],
             ]
         )
     )
-    if isinstance(mb, Message):
-        mb.reply_text(**kwargs)
+    if isinstance(mc, Message):
+        mc.reply_text(**kwargs)
     else:
         try:
-            mb.edit_message_text(**kwargs)
+            mc.edit_message_text(**kwargs)
         except MessageNotModified:
             pass
-        if mb.data == Menu.STATS:
-            users_count = repository.get_tg_users_count()
-            stats = repository.get_stats()
-            mb.answer(
-                text="".join(gs(mb, s.STATS)).format(
-                    users_count=users_count,
-                    candle_pressed_count=candle_pressed_count,
-                    books_read=stats.books_read, pages_read=stats.pages_read,
-                    searches=stats.searches
-                ),
-                show_alert=True,
-                cache_time=300
-            )
+
+
+def show_stats(_: Client, clb: CallbackQuery):
+    """
+    Show stats.
+    """
+    stats = repository.get_stats()
+    if helpers.is_admin(clb):
+        users_count = repository.get_tg_users_count()
+        clb.answer(
+            text="".join(gs(clb, s.SHOW_STATS_ADMIN)).format(
+                users_count=users_count,
+                books_read=stats.books_read,
+                pages_read=stats.pages_read,
+                inline_searches=stats.inline_searches,
+                msg_searches=stats.msg_searches,
+                jumps=stats.jumps,
+            ),
+            show_alert=True
+        )
+    else:
+        clb.answer(
+            text="".join(gs(clb, s.SHOW_STATS)).format(
+                books_read=stats.books_read,
+                pages_read=stats.pages_read,
+                searches=stats.searches
+            ),
+            show_alert=True,
+            cache_time=100
+        )
 
 
 def show_book(_: Client, clb: CallbackQuery):

@@ -2,7 +2,7 @@ from functools import lru_cache
 from data import config
 from sqlalchemy import create_engine, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from sqlalchemy.orm import Session, scoped_session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 engine = create_engine(f'sqlite:///{config.get_settings().sqlite_file_path}')  # , echo=True)
 
@@ -22,8 +22,7 @@ class TgUser(BaseTable):
     tg_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     lang: Mapped[str] = mapped_column(String(5))
     active: Mapped[bool] = mapped_column(default=True)
-    candle_pressed: Mapped[bool] = mapped_column(default=False)
-    
+
 
 class Stats(BaseTable):
     __tablename__ = 'stats'

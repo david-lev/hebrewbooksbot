@@ -12,11 +12,11 @@ class String(Enum):
     BROWSE = auto()  # V
     INSTANT_READ = auto()  # V
     BACK = auto()  # V
-    LIGHT_A_CANDLE = auto()  # V
     GITHUB = auto()  # V
     HEBREWBOOKS_SITE = auto()  # V
     STATS = auto()  # V
-    CANDLE_LIGHTING = auto()
+    SHOW_STATS = auto()  # V
+    SHOW_STATS_ADMIN = auto()  # V
     SHARE = auto()  # V
     DOWNLOAD = auto()  # V
     NEXT = auto()  # V
@@ -82,10 +82,6 @@ _STRINGS = {
         'en': '🔙 Back',
         'he': '🔙 חזרה'
     },
-    String.LIGHT_A_CANDLE: {
-        'en': '🕯 Light a candle ({count})',
-        'he': '🕯 הדליקו נר ({count})'
-    },
     String.GITHUB: {
         'en': '⭐️ GitHub ⭐️',
         'he': '⭐️ גיטהאב ⭐️'
@@ -95,21 +91,41 @@ _STRINGS = {
         'he': '🌍 אתר היברובוקס 🌍'
     },
     String.STATS: {
+        'en': '📊 Stats',
+        'he': '📊 סטטיסטיקות'
+    },
+    String.SHOW_STATS: {
         'en': (
             "📊 Bot Stats 📊\n\n",
-            "👥 Registered users: {users_count}\n",
-            "🕯 Candles: {candle_pressed_count}\n"
             "📚 Books read: {books_read}\n",
             "📖 Pages read: {pages_read}\n",
-            "🔎 Searches: {searches}\n",
+            "🔎 Searches: {searches}\n"
+        ),
+        'he': (
+            "📊 סטטיסטיקות הבוט 📊\n\n",
+            "📚 ספרים נקראו: {books_read}\n",
+            "📖 דפים נקראו: {pages_read}\n",
+            "🔎 חיפושים: {searches}\n"
+        )
+    },
+    String.SHOW_STATS_ADMIN: {
+        'en': (
+            "📊 Bot Stats 📊\n\n",
+            "👥 Registered users: {users_count:,}\n",
+            "📚 Books read: {books_read:,}\n",
+            "📖 Pages read: {pages_read:,}\n",
+            "🔎 Inline Searches: {inline_searches:,}\n"
+            "💬 Message Searches: {msg_searches:,}\n"
+            "⏭ Jumps to page: {jumps:,}\n"
         ),
         'he': (
             "📊 סטטיסטיקות הבוט 📊\n\n",
             "👥 משתמשים רשומים: {users_count}\n",
-            "🕯 נרות הודלקו: {candle_pressed_count}\n"
             "📚 ספרים נקראו: {books_read}\n",
-            "📖 עמודים נקראו: {pages_read}\n",
-            "🔎 חיפושים: {searches}\n",
+            "📖 דפים נקראו: {pages_read}\n",
+            "🔎 חיפושים באינליין: {inline_searches}\n"
+            "💬 חיפושים בהודעות: {msg_searches}\n"
+            "⏭ קפיצות לדף: {jumps}\n"
         )
     },
     String.INSTANT_READ: {
@@ -244,7 +260,7 @@ _STRINGS = {
     },
     String.NOT_REGISTERED: {
         'en': 'You are not registered in the bot. Please send /start to the bot in order to register.',
-        'he': 'אתם לא רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.'
+        'he': 'אינכם רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.'
     }
 }
 

@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Callable, Any
-from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton
-from data import api
+from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineQuery
+from data import api, config
 from data.models import Book, Masechet
 from data.enums import BrowseType as BrowseTypeEnum
 from tg.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
@@ -14,9 +14,17 @@ LTR = '\u200e'
 class Menu:
     START = 'start'
     BROWSE = 'browse_menu'
-    STATS = 'start_stats'
+    STATS = 'stats'
+    CONTACT_URL = 'https://t.me/davidlev'
     GITHUB_URL = 'https://github.com/david-lev/hebrewbooksbot'
     HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
+
+
+def is_admin(mqc: Message | CallbackQuery | InlineQuery) -> bool:
+    """
+    Check if the user is an admin.
+    """
+    return mqc.from_user.id in config.get_settings().tg_admins
 
 
 def get_book_text(book: Book, page: int | None = None, read_mode: ReadMode | None = None) -> str:

@@ -1,5 +1,4 @@
 from enum import Enum
-
 from sqlalchemy.exc import IntegrityError
 from db.tables import TgUser, Stats, get_session
 
@@ -14,20 +13,10 @@ def add_tg_user(tg_id: int, lang: str):
         session.rollback()
 
 
-def press_candle(tg_id: int):
-    """Press candle"""
+def get_tg_user(tg_id: int) -> type[TgUser]:
+    """Get tg user"""
     session = get_session()
-    tg_user = session.query(TgUser).filter(TgUser.tg_id == tg_id).first()
-    if not tg_user:
-        raise ValueError(f'Tg user {tg_id} not found')
-    tg_user.candle_pressed = True
-    session.commit()
-
-
-def get_candle_pressed_count() -> int:
-    """Get candle pressed count"""
-    session = get_session()
-    return session.query(TgUser).filter(TgUser.candle_pressed == True).count()
+    return session.query(TgUser).filter(TgUser.tg_id == tg_id).first()
 
 
 def get_tg_users_count() -> int:

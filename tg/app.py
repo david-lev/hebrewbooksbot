@@ -1,11 +1,11 @@
 from pyrogram import Client, filters
 from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler, EditedMessageHandler
 from data import config
-from tg import search, helpers
+from tg import search, helpers, admin
 from tg import browse
 from tg import utils
 from tg.helpers import jump_to_page_filter, Menu
-from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage
+from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage, Broadcast
 
 cfg = config.get_settings()
 
@@ -112,6 +112,22 @@ app.add_handler(
         utils.jump_tip, filters=filters.create(
             lambda _, __, query: helpers.callback_matcher(query, JumpToPage)
         )
+    )
+)
+
+app.add_handler(
+    MessageHandler(
+        admin.prompt_for_broadcast_msg, filters=(
+            (filters.command(Menu.BROADCAST) | filters.reply)
+            & filters.private & filters.create(lambda _, __, msg: helpers.is_admin(msg))
+        )
+    )
+)
+
+app.add_handler(
+    CallbackQueryHandler(
+        admin.broadcast, filters=filters.create(lambda _, __, query: helpers.callback_matcher(query, Broadcast))
+        & filters.create(lambda _, __, msg: helpers.is_admin(msg))
     )
 )
 

@@ -13,6 +13,7 @@ LTR = '\u200e'
 
 class Menu:
     START = 'start'
+    BROADCAST = 'broadcast'
     BROWSE = 'browse_menu'
     STATS = 'stats'
     CONTACT_URL = 'https://t.me/davidlev'

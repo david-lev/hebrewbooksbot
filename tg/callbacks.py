@@ -122,6 +122,7 @@ class JumpToPage(CallbackData):
 
 
 @dataclass(frozen=True, slots=True)
-class ChangeLanguage(CallbackData):
-    __clbname__ = 'start_change_lang'
-    lang: str
+class Broadcast(CallbackData):
+    __clbname__ = 'broadcast'
+    send: bool
+    lang_code: str

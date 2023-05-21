@@ -4,7 +4,7 @@ import time
 from pyrogram import Client, types
 from pyrogram.errors import (PeerIdInvalid, FloodWait, UserIsBlocked, BadRequest,
                              InputUserDeactivated)
-
+from db import repository as db_filters
 # TODO add filter admin and command send and filter msg is force reply (line 18)
 
 
@@ -35,8 +35,7 @@ def send_message(c: Client, query: types.CallbackQuery):
     elif query.data == 'un_send_broadcast':
 
         log_file = open('logger.txt', 'a+')
-        # TODO get list the users
-        users = db_filters.get_users_active()
+        users = [i.tg_id for i in db_filters.get_active_tg_users()]
         sent = 0
         failed = 0
 
@@ -44,17 +43,17 @@ def send_message(c: Client, query: types.CallbackQuery):
                                            f"`{len(users)} users`\nPlease Wait...")
         progress = c.send_message(chat_id=tg_id, text=f'**Message Sent To:** `{sent} users`')
 
-        for chat in users:
+        for tg_id in users:
 
             try:
-                c.copy_message(chat_id=int(chat), from_chat_id=tg_id,
+                c.copy_message(chat_id=int(tg_id), from_chat_id=tg_id,
                                message_id=reply_msg_id)
                 sent += 1
 
                 c.edit_message_text(chat_id=tg_id, message_id=progress.id,
                                     text=f'**Message Sent To:** `{sent}` users')
 
-                log_file.write(f"sent to {chat} \n")
+                log_file.write(f"sent to {tg_id} \n")
                 time.sleep(.05)  # 20 messages per second (Limit: 30 messages per second)
 
             except FloodWait as e:
@@ -62,30 +61,26 @@ def send_message(c: Client, query: types.CallbackQuery):
                 time.sleep(e.value)
 
             except InputUserDeactivated:
-                # TODO change user not active
-                db_filters.change_active(tg_id=chat, active=False)
-                log_file.write(f"user {chat} is Deactivated\n")
+                db_filters.set_tg_user_active(tg_id=tg_id, active=False)
+                log_file.write(f"user {tg_id} is Deactivated\n")
                 failed += 1
                 continue
 
             except UserIsBlocked:
-                # TODO change user not active
-                db_filters.change_active(tg_id=chat, active=False)
-                log_file.write(f"user {chat} Blocked your bot\n")
+                db_filters.set_tg_user_active(tg_id=tg_id, active=False)
+                log_file.write(f"user {tg_id} Blocked your bot\n")
                 failed += 1
                 continue
 
             except PeerIdInvalid:
-                # TODO chane user not active
-                db_filters.change_active(tg_id=chat, active=False)
-                log_file.write(f"user {chat} IdInvalid\n")
+                db_filters.set_tg_user_active(tg_id=tg_id, active=False)
+                log_file.write(f"user {tg_id} IdInvalid\n")
                 failed += 1
                 continue
 
             except BadRequest as e:
-                # TODO change user not active
-                db_filters.change_active(tg_id=chat, active=False)
-                log_file.write(f"BadRequest: {e} :{chat}")
+                db_filters.set_tg_user_active(tg_id=tg_id, active=False)
+                log_file.write(f"BadRequest: {e} :{tg_id}")
                 failed += 1
                 continue
 

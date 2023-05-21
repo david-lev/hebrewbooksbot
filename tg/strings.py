@@ -1,7 +1,8 @@
 from enum import Enum, auto
 from pyrogram.types import Message, CallbackQuery, InlineQuery
 
-
+RTL = '\u200f'
+LTR = '\u200e'
 DEFAULT_LANGUAGE = "en"
 
 
@@ -97,15 +98,15 @@ _STRINGS = {
     String.SHOW_STATS: {
         'en': (
             "📊 Bot Stats 📊\n\n",
-            "📚 Books read: {books_read}\n",
-            "📖 Pages read: {pages_read}\n",
-            "🔎 Searches: {searches}\n"
+            "📚 Books read: {books_read:,}\n",
+            "📖 Pages read: {pages_read:,}\n",
+            "🔎 Searches: {searches:,}\n"
         ),
         'he': (
             "📊 סטטיסטיקות הבוט 📊\n\n",
-            "📚 ספרים נקראו: {books_read}\n",
-            "📖 דפים נקראו: {pages_read}\n",
-            "🔎 חיפושים: {searches}\n"
+            "📚 ספרים נקראו: {books_read:,}\n",
+            "📖 דפים נקראו: {pages_read:,}\n",
+            "🔎 חיפושים: {searches:,}\n"
         )
     },
     String.SHOW_STATS_ADMIN: {
@@ -120,12 +121,12 @@ _STRINGS = {
         ),
         'he': (
             "📊 סטטיסטיקות הבוט 📊\n\n",
-            "👥 משתמשים רשומים: {users_count}\n",
-            "📚 ספרים נקראו: {books_read}\n",
-            "📖 דפים נקראו: {pages_read}\n",
-            "🔎 חיפושים באינליין: {inline_searches}\n"
-            "💬 חיפושים בהודעות: {msg_searches}\n"
-            "⏭ קפיצות לדף: {jumps}\n"
+            "👥 משתמשים רשומים: {users_count:,}\n",
+            "📚 ספרים נקראו: {books_read:,}\n",
+            "📖 דפים נקראו: {pages_read:,}\n",
+            "🔎 חיפושים באינליין: {inline_searches:,}\n"
+            "💬 חיפושים בהודעות: {msg_searches:,}\n"
+            "⏭ קפיצות לדף: {jumps:,}\n"
         )
     },
     String.INSTANT_READ: {
@@ -243,8 +244,8 @@ _STRINGS = {
         'he': 'עמוד {page} מתוך {pages}'
     },
     String.X_RESULTS_FOR_S: {
-        'en': '{results} results for: {query}',
-        'he': '{results} תוצאות עבור: {query}'
+        'en': '{results:,} results for: {query}',
+        'he': '%s{results:,} תוצאות עבור: {query}' % RTL
     },
     String.IMAGE: {
         'en': '🖼 Image',

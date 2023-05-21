@@ -11,7 +11,7 @@ cfg = config.get_settings()
 
 app = Client(
     name="hebrewbooksbot",
-    # workdir="../",
+    workdir="../",
     api_id=cfg.tg_api_id,
     api_hash=cfg.tg_api_hash,
     bot_token=cfg.tg_bot_token

@@ -27,6 +27,7 @@ class String(Enum):
     READ_ON_SITE = auto()  # V
     SLOW_DOWN = auto()  # V
     PAGE_NOT_EXIST = auto()  # V
+    JUMP_NUMBERS_ONLY = auto()  # V
     JUMP_TIP = auto()  # V
     CHOOSE_BROWSE_TYPE = auto()  # V
     SHAS = auto()  # V
@@ -160,6 +161,10 @@ _STRINGS = {
     String.SLOW_DOWN: {
         'en': "Slow down...",
         'he': "אני לא מלאך.. לאט יותר"
+    },
+    String.JUMP_NUMBERS_ONLY: {
+        'en': 'Please enter numbers only',
+        'he': 'יש לשלוח מספרים בלבד'
     },
     String.JUMP_TIP: {
         'en': 'Tip: instead of browsing, reply to this message with the page number you want to read.\

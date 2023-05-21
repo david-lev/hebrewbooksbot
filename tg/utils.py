@@ -188,9 +188,12 @@ def jump_to_page(_: Client, msg: Message):
             ))
             return
     else:
-        jump_to = int(msg.text)
-        if jump_to > jump_clb.total or jump_to < 1:
-            msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(start=1, total=jump_clb.total))
+        try:
+            jump_to = int(msg.text)
+            if jump_to > jump_clb.total or jump_to < 1:
+                msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(start=1, total=jump_clb.total))
+        except ValueError:
+            msg.reply_text(text=gs(mqc=msg, string=s.JUMP_NUMBERS_ONLY))
             return
         book = api.get_book(jump_clb.id)
     _next_or_previous = next(filter(

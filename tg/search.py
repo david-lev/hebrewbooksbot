@@ -80,7 +80,6 @@ def search_books_inline(_: Client, query: InlineQuery):
 
     query.query format: "{title}" / "{title}:{author}"
     """
-    print(query.query)
     if query.offset is not None and query.offset == '0':
         return  # No more results
 

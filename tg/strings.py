@@ -58,15 +58,48 @@ class String(Enum):
 
 _STRINGS = {
     String.WELCOME: {
-        'en': "**📚 Welcome to HebrewBooksBot! 📚**\n\n"
-              "This bot allows you to search for books on HebrewBooks.org and read them quickly.\n\n"
-              "To get started, press the \"Search\" button below or send a search query.\n\n"
-              "__🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l 🕯__\n\n",
-        'he': "**📚 ברוכים הבאים להיברו-בוקס בטלגרם! 📚**\n\n"
-              "🔎 בוט זה מאפשר חיפוש ועיון ספרים באתר hebrewbooks.org\n"
-              "**📜 הוראות שימוש:** לחצו על חיפוש או על עיון או שלחו מילת חיפוש.\n"
-              "**💡 טיפ:** ניתן לחפש בפורמט `כותר:מחבר` כדי לקבל תוצאות מדוייקות יותר.\n\n"
-              "__🕯 לעילוי נשמת סבי הרב אהרן יצחק בן שמואל זנוויל זצ״ל 🕯__\n\n"
+        'en': "\n".join([
+            "**📚 Welcome to the HebrewBook bot on Telegram! 📚**\n",
+            "This bot allows searching and browsing books on hebrewbooks.org\n",
+            "**⚡️ Features:**",
+            "\t🔎 Searching for books in inline mode or by sending a message",
+            "\t📓 Browsing through the Shas masechtot",
+            "\t📚 Browse the library by category, date or letter",
+            "\t📖 Reading mode as an image or as a PDF (text coming soon)",
+            "\t⏩ Jump to page",
+            "\t♻️ Sharing books with friends\n",
+            "**💡 Tips:**",
+            "\t• To search for a book by title or author, use the format `title:author`",
+            "\t• In Read Mode, you can jump to a page by replying to the message with the page number\n",
+            "**🔜 Coming soon:**",
+            "\t• A bot for WhatsApp",
+            "\t• Search the contents of the books",
+            "\t• Saving favorite books and bookmarks",
+            "\t• Change language manually\n",
+            "📮 For feedback and comments - @davidlev\n",
+            "__🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l 🕯__"
+        ]),
+        'he': "\n".join([
+            "**📚 ברוכים הבאים לבוט היברובוקס בטלגרם! 📚**\n",
+            "בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org\n",
+            "**⚡️ פיצ'רים:**",
+            "\t🔎 חיפוש ספרים במצב אינליין או על ידי שליחת הודעה",
+            "\t📓 עיון במסכתות הש\"ס",
+            "\t📚 עיון בספריה לפי קטגוריה, תאריך או אות",
+            "\t📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)",
+            "\t⏪ קפיצה לעמוד",
+            "\t♻️ שיתוף ספרים עם חברים\n",
+            "**💡 טיפים:**",
+            "\t• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט `כותרת:מחבר`",
+            "\t• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר העמוד\n",
+            "**🔜 בקרוב:**",
+            "\t• בוט לוואטסאפ",
+            "\t• חיפוש בתוכן הספרים",
+            "\t• שמירת ספרים מועדפים וסימניות",
+            "\t• שינוי שפה באופן ידני\n",
+            "📮 למשוב והערות - @davidlev\n",
+            "__🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל 🕯__"
+        ])
     },
     String.SEARCH: {
         'en': '🔎 Search',

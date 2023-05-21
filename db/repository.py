@@ -57,6 +57,14 @@ def get_active_tg_users() -> list[type[TgUser]]:
     return session.query(TgUser).filter(TgUser.active == True).all()
 
 
+def set_tg_user_active(tg_id: int, active: bool):
+    """Set tg user active"""
+    session = get_session()
+    tg_user = session.query(TgUser).filter(TgUser.tg_id == tg_id).first()
+    tg_user.active = active
+    session.commit()
+
+
 def get_stats() -> type[Stats]:
     """Get stats"""
     session = get_session()

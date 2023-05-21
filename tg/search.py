@@ -26,9 +26,14 @@ def empty_search(_: Client, query: InlineQuery):
     )
 
 
-def _get_book_article(book: Book, query: InlineQuery) -> InlineQueryResultArticle:
+def _get_book_article(book: Book, query: InlineQuery, read_at_page: int) -> InlineQueryResultArticle:
     """
     Internal function to get an article for a book
+
+    Args:
+        book: The book
+        query: The inline query
+        read_at_page: The page to show when the user clicks on the "Read" button
     """
     return InlineQueryResultArticle(
         id=str(book.id),
@@ -44,7 +49,7 @@ def _get_book_article(book: Book, query: InlineQuery) -> InlineQueryResultArticl
                         text=gs(mqc=query, string=s.INSTANT_READ),
                         callback_data=ReadBook(
                             id=book.id,
-                            page=1,
+                            page=read_at_page,
                             total=book.pages,
                             read_mode=ReadMode.IMAGE,
                             book_type=BookType.BOOK
@@ -75,11 +80,17 @@ def search_books_inline(_: Client, query: InlineQuery):
 
     query.query format: "{title}" / "{title}:{author}"
     """
+    print(query.query)
     if query.offset is not None and query.offset == '0':
         return  # No more results
 
-    if query.query.isdigit():  # The user searched for a book id
-        book = api.get_book(int(query.query))
+    if all(part.isdigit() for part in query.query.split(':')):  # The user searched for a book id or a book id:page
+        if ':' in query.query:
+            book_id, page = map(int, query.query.split(':'))
+            page = page or 1
+        else:
+            book_id, page = int(query.query), 1
+        book = api.get_book(book_id)
         if book is None:
             query.answer(
                 results=[],
@@ -87,8 +98,15 @@ def search_books_inline(_: Client, query: InlineQuery):
                 switch_pm_parameter="search"
             )
             return
+        if page > book.pages:
+            query.answer(
+                results=[],
+                switch_pm_text=gs(mqc=query, string=s.PAGE_NOT_EXIST).format(start=1, total=book.pages),
+                switch_pm_parameter="search"
+            )
+            return
         query.answer(
-            results=[_get_book_article(book, query)],
+            results=[_get_book_article(book=book, query=query, read_at_page=page)],
             switch_pm_text=gs(mqc=query, string=s.PRESS_TO_SHARE).format(title=book.title),
             switch_pm_parameter="search"
         )
@@ -107,7 +125,7 @@ def search_books_inline(_: Client, query: InlineQuery):
             x=total, s=f"{title}:{author}" if author else title
         ),
         switch_pm_parameter="search",
-        results=[_get_book_article(book, query=query) for book in (api.get_book(b.id) for b in results)],
+        results=[_get_book_article(book=book, query=query, read_at_page=1) for book in (api.get_book(b.id) for b in results)],
         next_offset=str(helpers.get_offset(int(query.offset or 1), total, increase=5))
     )
     repository.increase_stats(StatsType.INLINE_SEARCHES)

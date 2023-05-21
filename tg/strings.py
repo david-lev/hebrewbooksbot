@@ -209,7 +209,7 @@ _STRINGS = {
     },
     String.PAGE_NOT_EXIST: {
         'en': 'The page does not exist! (Choose a page between {start} and {total})',
-        'he': 'העמוד לא קיים! (בחרו עמוד בין {start} ל-{total})'
+        'he': 'הדף אינו קיים! (בחרו עמוד בין {start} ל-{total})'
     },
     String.SEARCH_INLINE_TIP: {
         'en': "Tip: You can search in the 'Title:Author' format in order to get more accurate results",

@@ -11,7 +11,7 @@ cfg = config.get_settings()
 
 app = Client(
     name="hebrewbooksbot",
-    workdir="../",
+    # workdir="../",
     api_id=cfg.tg_api_id,
     api_hash=cfg.tg_api_hash,
     bot_token=cfg.tg_bot_token
@@ -68,7 +68,7 @@ app.add_handler(
 app.add_handler(
     MessageHandler(
         search.search_books_message, filters=(
-                filters.text & ~filters.via_bot & ~filters.reply &
+                filters.text & ~filters.via_bot & ~filters.reply & ~filters.command([Menu.START, Menu.BROADCAST]) &
                 ~filters.create(lambda _, __, msg: msg.text.isdigit())
                 & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
         )

@@ -192,6 +192,7 @@ def jump_to_page(_: Client, msg: Message):
             jump_to = int(msg.text)
             if jump_to > jump_clb.total or jump_to < 1:
                 msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(start=1, total=jump_clb.total))
+                return
         except ValueError:
             msg.reply_text(text=gs(mqc=msg, string=s.JUMP_NUMBERS_ONLY))
             return

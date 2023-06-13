@@ -2,7 +2,7 @@ from functools import lru_cache
 from typing import Callable, Any
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineQuery
 from data import api, config
-from data.models import Book, Masechet
+from data.models import Book, Masechet, Tursa
 from data.enums import BrowseType as BrowseTypeEnum
 from tg.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
 from tg.strings import String as s, get_string as gs, get_lang_code as glc
@@ -78,6 +78,17 @@ def get_masechet_page_text(masechet: Masechet, page: int, read_mode: ReadMode) -
     ))
 
 
+def get_tursa_text(tursa: Tursa, previous_tursa: Tursa) -> str:
+    """
+    Get the text for a tursa.
+
+    Args:
+        tursa: The tursa.
+        previous_tursa: The previous tursa.
+    """
+    return f"{RTL}[📚]({tursa.pdf_url}) {tursa.name} • {previous_tursa.name}"
+
+
 def get_title_author(text: str) -> tuple[str, str]:
     """
     Get the title and author from a text.
@@ -131,7 +142,9 @@ def callback_matcher(clb: CallbackQuery | InlineKeyboardButton | str, data: type
 
 
 @lru_cache
-def get_browse_type_data(browse_type: BrowseTypeEnum) -> tuple[Callable[[], list[Any]], s, s, int]:
+def get_browse_type_data(
+        browse_type: BrowseTypeEnum
+) -> tuple[Callable[[str | None], list[Any]] | Callable[[], list[Any]], s, int]:
     """
     Helper function to get the data for a browse type.
 
@@ -139,16 +152,18 @@ def get_browse_type_data(browse_type: BrowseTypeEnum) -> tuple[Callable[[], list
         browse_type: The browse type.
 
     Returns:
-        ``Callable`` to get results, ``String`` for the browse type, ``String`` for the choose message, ``int`` for the number of columns.
+        ``Callable`` to get results, ``String`` for the choose message, ``int`` for the number of columns.
     """
     if browse_type == BrowseTypeEnum.SUBJECT:
-        return api.get_subjects, s.SUBJECTS, s.CHOOSE_SUBJECT, 2
+        return api.get_subjects, s.CHOOSE_SUBJECT, 2
     elif browse_type == BrowseTypeEnum.LETTER:
-        return api.get_letters, s.LETTERS, s.CHOOSE_LETTER, 3
+        return api.get_letters, s.CHOOSE_LETTER, 3
     elif browse_type == BrowseTypeEnum.DATERANGE:
-        return api.get_date_ranges, s.DATE_RANGES, s.CHOOSE_DATE_RANGE, 2
+        return api.get_date_ranges, s.CHOOSE_DATE_RANGE, 2
     elif browse_type == BrowseTypeEnum.SHAS:
-        return api.get_masechtot, s.SHAS, s.CHOOSE_MASECHET, 3
+        return api.get_masechtot, s.CHOOSE_MASECHET, 3
+    elif browse_type == BrowseTypeEnum.TURSA:
+        return api.get_tursa, s.TUR_AND_SA, 1
     raise ValueError(f"Invalid browse type: {browse_type}")
 
 
@@ -157,6 +172,7 @@ def read_mode_chooser(
         read_clb: ReadBook,
         page: int,
         others: list[str],
+        read_modes: list[ReadMode] = (ReadMode.PDF, ReadMode.IMAGE),
 ) -> list[InlineKeyboardButton]:
     """
     Get the read mode chooser buttons.
@@ -166,7 +182,17 @@ def read_mode_chooser(
         read_clb: The read book callback data.
         page: The current page.
         others: The other callback data to join to the callback data.
+        read_modes: The read modes to choose from. (default: (ReadMode.PDF, ReadMode.IMAGE))
     """
+    modes = list(filter(
+        lambda rm: rm[0] in read_modes, (
+            (ReadMode.PDF, "📄", s.DOCUMENT),
+            (ReadMode.IMAGE, "🖼", s.IMAGE),
+            (ReadMode.TEXT, "📝", s.TEXT)
+        )
+    ))
+    if not modes:
+        return []
     return [
         InlineKeyboardButton(
             text=gs(cm, string) if new_read_mode is read_clb.read_mode else emoji,
@@ -177,11 +203,7 @@ def read_mode_chooser(
                 read_mode=new_read_mode,
                 book_type=read_clb.book_type
             ).join_to_callback(*others)
-        ) for new_read_mode, emoji, string in (
-            (ReadMode.PDF, "📄", s.DOCUMENT),
-            (ReadMode.IMAGE, "🖼", s.IMAGE),
-            # (ReadMode.TEXT, "📝", s.TEXT) TODO text mode
-        )
+        ) for new_read_mode, emoji, string in modes
     ]
 
 
@@ -191,7 +213,6 @@ def next_previous_buttons(
         page: int,
         total: int,
         others: list[str],
-        is_book: bool,
 ) -> list[InlineKeyboardButton]:
     """
     Get the next and previous buttons.
@@ -202,9 +223,10 @@ def next_previous_buttons(
         page: The current page.
         total: The total number of pages.
         others: The other callback data to join to the callback data.
-        is_book: Whether the book is a book or a masechet.
     """
     buttons = []
+    if not total:
+        return buttons
     if page < total:
         buttons.append(InlineKeyboardButton(
             text=gs(mqc=cm, string=s.NEXT),
@@ -217,22 +239,27 @@ def next_previous_buttons(
             ).join_to_callback(*others)
         ))
 
-    if is_book:
+    if read_clb.book_type == BookType.BOOK:
         buttons.append(
             InlineKeyboardButton(
                 text=f"< {page}/{total} >",
-                callback_data=JumpToPage(id=read_clb.id, page=page, total=total, book_type=BookType.BOOK).to_callback()
+                callback_data=JumpToPage(
+                    id=int(read_clb.id),
+                    page=page,
+                    total=total,
+                    book_type=BookType.BOOK
+                ).to_callback()
             )
         )
-    else:
-        masechet = api.get_masechet(read_clb.id)
+    elif read_clb.book_type == BookType.MASECHET:
+        masechet = api.get_masechet(int(read_clb.id))
         current_page = masechet.pages[page - 1]
         last_page = masechet.pages[-1]
         buttons.append(
             InlineKeyboardButton(
                 text=f"< {current_page.name} / {last_page.name} >",
                 callback_data=JumpToPage(
-                    id=read_clb.id,
+                    id=int(read_clb.id),
                     page=page,
                     total=masechet.total,
                     book_type=BookType.MASECHET

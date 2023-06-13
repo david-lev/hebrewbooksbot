@@ -18,7 +18,8 @@ def browse_menu(_: Client, query: CallbackQuery):
     """
     menu = [
         [(BrowseTypeEnum.SHAS, s.SHAS), (BrowseTypeEnum.SUBJECT, s.SUBJECTS)],
-        [(BrowseTypeEnum.LETTER, s.LETTERS), (BrowseTypeEnum.DATERANGE, s.DATE_RANGES)]
+        [(BrowseTypeEnum.LETTER, s.LETTERS), (BrowseTypeEnum.DATERANGE, s.DATE_RANGES)],
+        [(BrowseTypeEnum.TURSA, s.TUR_AND_SA)],
     ]
     query.edit_message_text(
         text=gs(mqc=query, string=s.CHOOSE_BROWSE_TYPE),
@@ -27,7 +28,7 @@ def browse_menu(_: Client, query: CallbackQuery):
                 [
                     InlineKeyboardButton(
                         text=gs(mqc=query, string=string),
-                        callback_data=BrowseType(browse_type).to_callback()
+                        callback_data=BrowseType(type=browse_type, id="").to_callback()
                     ) for browse_type, string in item
                 ] for item in menu
             ] + [[
@@ -44,19 +45,34 @@ def browse_types(_: Client, clb: CallbackQuery):
     """
     Browse types
     """
-    browse_type = BrowseType.from_callback(clb.data)
-    _results, _, choose, buttons_in_row = helpers.get_browse_type_data(browse_type.type)
-    results = _results()
+    _browse_type, *others = clb.data.split(",")
+    browse_type = BrowseType.from_callback(_browse_type)
+    func, choose_msg, buttons_in_row = helpers.get_browse_type_data(browse_type.type)
+    results = func(browse_type.id) if browse_type.id else func()
+
     clb.edit_message_text(
-        text=gs(mqc=clb, string=choose),
+        text=gs(mqc=clb, string=choose_msg),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
                         text=f"{res.name}{f' ({res.total})' if res.total else ''}",
-                        callback_data=BrowseNavigation(
-                            type=browse_type.type,
+                        callback_data=BrowseType(
                             id=str(res.id),
+                            type=browse_type.type
+                        ).join_to_callback(browse_type, *others)
+                        if browse_type.type == BrowseTypeEnum.TURSA and res.has_children
+                        else ReadBook(
+                            id=str(res.id),
+                            page=1,
+                            total=-1,  # There is no `total`
+                            read_mode=ReadMode.PDF,
+                            book_type=BookType.TURSA
+                        ).join_to_callback(browse_type, *others)
+                        if browse_type.type == BrowseTypeEnum.TURSA and not res.has_children
+                        else BrowseNavigation(
+                            type=browse_type.type,
+                            id=res.id,
                             offset=1,
                             total=res.total or 0
                         ).to_callback()
@@ -73,7 +89,7 @@ def browse_types(_: Client, clb: CallbackQuery):
             ] + [[
                 InlineKeyboardButton(
                     text=gs(mqc=clb, string=s.BACK),
-                    callback_data=Menu.BROWSE
+                    callback_data=",".join(others) or Menu.BROWSE
                 )
             ]]
         )
@@ -135,7 +151,7 @@ def browse_books_navigator(_: Client, clb: CallbackQuery):
         [
             InlineKeyboardButton(
                 text=gs(mqc=clb, string=s.BACK),
-                callback_data=BrowseType(browse_nav.type).to_callback()
+                callback_data=BrowseType(id="", type=browse_nav.type).to_callback()
             )
         ]
     )

@@ -31,6 +31,7 @@ class String(Enum):
     JUMP_TIP = auto()  # V
     CHOOSE_BROWSE_TYPE = auto()  # V
     SHAS = auto()  # V
+    TUR_AND_SA = auto()  # V
     SUBJECTS = auto()  # V
     LETTERS = auto()  # V
     DATE_RANGES = auto()  # V
@@ -246,6 +247,10 @@ _STRINGS = {
     String.SHAS: {
         'en': '📚 Shas',
         'he': '📚 ש"ס'
+    },
+    String.TUR_AND_SA: {
+        'en': '📓 Tur & Shulchan Aruch',
+        'he': '📓 טור ושולחן ערוך'
     },
     String.SUBJECTS: {
         'en': '🗂 Subjects',

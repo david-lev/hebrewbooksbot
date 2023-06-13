@@ -4,7 +4,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu
-from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType
+from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
 from strings import String as s, get_string as gs
 from data import api
 from db import repository
@@ -86,7 +86,7 @@ def show_book(_: Client, clb: CallbackQuery):
                     InlineKeyboardButton(
                         text=gs(mqc=clb, string=s.INSTANT_READ),
                         callback_data=ReadBook(
-                            id=book.id,
+                            id=str(book.id),
                             page=1,
                             total=book.pages,
                             read_mode=ReadMode.IMAGE,
@@ -118,15 +118,22 @@ def read_book(_: Client, clb: CallbackQuery):
     """
     Read a book.
     """
+    book, masechet, tursa, previous_tursa, total = None, None, None, None, None
     _read_book, *others = clb.data.split(',')
     read_clb = ReadBook.from_callback(_read_book)
-    is_book = read_clb.book_type == BookType.BOOK
-    if is_book:
-        book = api.get_book(read_clb.id)
+    if read_clb.book_type == BookType.BOOK:
+        book = api.get_book(int(read_clb.id))
         total = book.pages
-    else:
-        masechet = api.get_masechet(read_clb.id)
+    elif read_clb.book_type == BookType.MASECHET:
+        masechet = api.get_masechet(int(read_clb.id))
         total = masechet.total
+    elif read_clb.book_type == BookType.TURSA:
+        _previous_tursa = BrowseType.from_callback(others[0])
+        _previous_previous_tursa = BrowseType.from_callback(others[1])
+        tursa = next(filter(lambda x: x.id == read_clb.id, api.get_tursa(_previous_tursa.id)))
+        previous_tursa = next(filter(lambda x: x.id == _previous_tursa.id, api.get_tursa(_previous_previous_tursa.id)))
+    else:
+        raise ValueError("Invalid book type")
     clb.answer(
         text=gs(mqc=clb, string=s.WAIT_FOR_PREVIEW),
         show_alert=False
@@ -136,23 +143,35 @@ def read_book(_: Client, clb: CallbackQuery):
             text="".join((
                 gs(mqc=clb, string=s.INSTANT_READ),
                 "\n\n",
-                helpers.get_book_text(book=book, page=read_clb.page, read_mode=read_clb.read_mode) if is_book
+                helpers.get_book_text(book=book, page=read_clb.page, read_mode=read_clb.read_mode)
+                if read_clb.book_type == BookType.BOOK
                 else helpers.get_masechet_page_text(masechet=masechet, page=read_clb.page, read_mode=read_clb.read_mode)
+                if read_clb.book_type == BookType.MASECHET
+                else helpers.get_tursa_text(tursa=tursa, previous_tursa=previous_tursa)
             )),
             reply_markup=InlineKeyboardMarkup(
                 [
-                    helpers.read_mode_chooser(cm=clb, read_clb=read_clb, page=read_clb.page, others=others),
+                    helpers.read_mode_chooser(
+                        cm=clb,
+                        read_clb=read_clb,
+                        page=read_clb.page,
+                        others=others,
+                        read_modes=[ReadMode.PDF, ReadMode.IMAGE] if read_clb.book_type != BookType.TURSA else [],
+                    ),
                     helpers.next_previous_buttons(
                         cm=clb,
                         read_clb=read_clb,
                         total=total,
                         page=read_clb.page,
                         others=others,
-                        is_book=is_book
                     ),
                     [InlineKeyboardButton(
                         text=gs(mqc=clb, string=s.READ_ON_SITE),
-                        url=book.get_page_url(read_clb.page) if is_book else masechet.pages[read_clb.page - 1].get_page_url()
+                        url=book.get_page_url(read_clb.page)
+                        if read_clb.book_type == BookType.BOOK
+                        else masechet.pages[read_clb.page - 1].get_page_url()
+                        if read_clb.book_type == BookType.MASECHET
+                        else tursa.url
                     )],
                     [InlineKeyboardButton(text=gs(mqc=clb, string=s.BACK), callback_data=",".join(others))],
                 ]
@@ -171,10 +190,13 @@ def jump_to_page(_: Client, msg: Message):
 
     msg.text: number
     """
-    jump_button = next(filter(
-        lambda b: helpers.callback_matcher(b.callback_data, JumpToPage),
-        msg.reply_to_message.reply_markup.inline_keyboard[1]
-    ))
+    try:
+        jump_button = next(filter(
+            lambda b: helpers.callback_matcher(b.callback_data, JumpToPage),
+            msg.reply_to_message.reply_markup.inline_keyboard[1]
+        ))
+    except (StopIteration, IndexError):
+        return
     jump_clb = JumpToPage.from_callback(jump_button.callback_data)
     is_book = jump_clb.book_type == BookType.BOOK
     if not is_book:
@@ -220,7 +242,6 @@ def jump_to_page(_: Client, msg: Message):
                     total=jump_clb.total,
                     page=jump_to,
                     others=nop_others,
-                    is_book=is_book
                 ),
                 [InlineKeyboardButton(
                     text=gs(mqc=msg, string=s.READ_ON_SITE),

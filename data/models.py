@@ -7,6 +7,10 @@ class Letter:
     name: str
     total: int
 
+    @property
+    def has_children(self) -> bool:
+        return False
+
 
 @dataclass(frozen=True, slots=True)
 class DateRange:
@@ -14,13 +18,43 @@ class DateRange:
     name: str
     total: int
 
+    @property
+    def has_children(self) -> bool:
+        return False
 
-@dataclass(frozen=True, slots=True)
+
+@dataclass(slots=True)
 class Subject:
     id: int
     name: str
     total: int
-    has_children: str  # y/n
+    has_children: bool
+
+    def __post_init__(self):
+        self.has_children = False
+
+
+@dataclass(frozen=True, slots=True)
+class Tursa:
+    id: str
+    name: str
+    has_children: bool
+
+    @property
+    def total(self) -> int:
+        """Only for compatibility with BrowseType"""
+        return 0
+
+    @property
+    def pdf_url(self):
+        """Get the page PDF url
+        """
+        return f"https://beta.hebrewbooks.org/tursa/{self.id}.pdf"
+
+    @property
+    def url(self):
+        """Get the read page url"""
+        return f"https://beta.hebrewbooks.org/tursa.aspx?a={self.id}"
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,7 +74,7 @@ class PageContent:
 class MasechetPage:
     read_id: str
     masechet_id: int
-    read_masechet_id: int
+    masechet_read_id: int
     name: str
     content: PageContent | None = None
 
@@ -75,19 +109,19 @@ class MasechetPage:
         Args:
             fmt: The format of the page (pdf, or text)
         """
-        return f'https://hebrewbooks.org/shas.aspx?mesechta={self.read_masechet_id}&daf={self.read_id}&format={fmt}'
+        return f'https://hebrewbooks.org/shas.aspx?mesechta={self.masechet_read_id}&daf={self.read_id}&format={fmt}'
 
 
 @dataclass(frozen=True, slots=True)
 class MasechetBase:
-    """Masechet with id using gor requests, not the book id"""
+    """Masechet with id using for read request, not the book id"""
     id: int
     name: str
 
     @property
-    def total(self) -> None:
+    def total(self) -> int:
         """Only for compatibility with BrowseType"""
-        return None
+        return 0
 
 
 @dataclass(frozen=True, slots=True)

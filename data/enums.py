@@ -10,4 +10,5 @@ class BrowseType(BaseEnum):
     SUBJECT = "subject"
     LETTER = "letter"
     DATERANGE = "daterange"
-    SHAS = "shas"
+    SHAS = "s"
+    TURSA = "t"

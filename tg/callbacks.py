@@ -27,7 +27,7 @@ class CallbackData:
             sep: The separator between the fields in the callback string (default: ':')
         """
         if not callback_data.startswith(cls.__clbname__):
-            raise ValueError(f"Invalid callback data: {callback_data}")
+            raise ValueError(f"Invalid callback data for {cls.__name__}: {callback_data}")
         try:
             return cls(*(
                 annotation(value) for annotation, value in zip(
@@ -37,7 +37,7 @@ class CallbackData:
                 )
             ))
         except ValueError as e:
-            raise ValueError(f"Invalid callback data: {callback_data}") from e
+            raise ValueError(f"Invalid callback data for {cls.__name__}: {callback_data}") from e
 
     def to_callback(self, sep: str = ':') -> str:
         """
@@ -65,7 +65,7 @@ class CallbackData:
 
 @dataclass(frozen=True, slots=True)
 class BrowseNavigation(CallbackData):
-    __clbname__ = 'browse_nav'
+    __clbname__ = 'bn'
     type: BrowseTypeEnum
     id: str
     offset: int
@@ -74,20 +74,21 @@ class BrowseNavigation(CallbackData):
 
 @dataclass(frozen=True, slots=True)
 class BrowseType(CallbackData):
-    __clbname__ = 'browse_type'
+    __clbname__ = 'bt'
+    id: str  # empty if no children
     type: BrowseTypeEnum
 
 
 @dataclass(frozen=True, slots=True)
 class SearchNavigation(CallbackData):
-    __clbname__ = 'search_nav'
+    __clbname__ = 'sn'
     offset: int
     total: int
 
 
 @dataclass(frozen=True, slots=True)
 class ShowBook(CallbackData):
-    __clbname__ = 'show'
+    __clbname__ = 'sh'
     id: int
 
 
@@ -100,12 +101,13 @@ class ReadMode(BaseEnum):
 class BookType(BaseEnum):
     BOOK = 'b'
     MASECHET = 'm'
+    TURSA = 't'
 
 
 @dataclass(frozen=True, slots=True)
 class ReadBook(CallbackData):
-    __clbname__ = 'read'
-    id: int
+    __clbname__ = 're'
+    id: str
     page: int
     total: int
     read_mode: ReadMode
@@ -114,7 +116,7 @@ class ReadBook(CallbackData):
 
 @dataclass(frozen=True, slots=True)
 class JumpToPage(CallbackData):
-    __clbname__ = 'jump'
+    __clbname__ = 'ju'
     id: int
     page: int
     total: int

@@ -3,7 +3,7 @@ import requests
 from functools import lru_cache
 from data.enums import BrowseType
 from data.models import Letter, DateRange, Subject, Book, SearchResults, MasechetBase, Masechet, MasechetPage, \
-    PageContent
+    PageContent, Tursa
 from data import helpers
 from bs4 import BeautifulSoup
 
@@ -135,8 +135,8 @@ def browse(browse_type: BrowseType, browse_id: int | str, offset: int, limit: in
     Returns:
         tuple[list[SearchResults], int]: The search results and the total number of results
     """
-    if browse_type == BrowseType.SHAS:
-        raise ValueError('Cannot browse Shas, use `api.get_masechtot()` instead')
+    if browse_type not in (BrowseType.LETTER, BrowseType.DATERANGE, BrowseType.SUBJECT):
+        raise ValueError(f'Cannot browse by {browse_type}')
     data = _make_request(
         endpoint='/api/api.ashx',
         params={'req': 'title_list_for_subject', 'list_type': browse_type.value, 'id': browse_id,
@@ -186,14 +186,14 @@ def get_masechtot() -> list[MasechetBase]:
 
 
 @lru_cache
-def get_masechet(read_masehet_id: int) -> Masechet:
+def get_masechet(masehet_read_id: int) -> Masechet:
     """
     Get a masechet from HebrewBooks.org
 
     Args:
-        read_masehet_id: The masechet to get
+        masehet_read_id: The masechet to get
     """
-    masechet = get_masechtot()[read_masehet_id - 1]
+    masechet = get_masechtot()[masehet_read_id - 1]
     html = _make_request(
         endpoint=f'/shas.aspx',
         params={'mesechta': masechet.id},
@@ -203,13 +203,13 @@ def get_masechet(read_masehet_id: int) -> Masechet:
     masechet_id = int(soup.find('div', {'id': 'shaspngcont'}).get('rel').split('_')[0])
     return Masechet(
         id=masechet_id,
-        read_id=read_masehet_id,
+        read_id=masehet_read_id,
         name=masechet.name,
         pages=[
             MasechetPage(
                 read_id=p['value'],
                 masechet_id=masechet_id,
-                read_masechet_id=read_masehet_id,
+                masechet_read_id=masehet_read_id,
                 name=p.text
             )
             for p in soup.find('select', {'id': 'cpMstr_ddlDafim'}).find_all('option')
@@ -259,6 +259,33 @@ def get_page(page: MasechetPage) -> MasechetPage:
             ) if soup.find('div', class_='shastext4') else None
         )
     )
+
+
+@lru_cache
+def get_tursa(tursa_id: str | None = None) -> list[Tursa]:
+    """Get a tursa from HebrewBooks.org"""
+    if tursa_id is None:
+        html = _make_request(
+            endpoint='/tursa',
+            convert_to='html'
+        )
+        return [
+            Tursa(
+                id=li['id'],
+                name=li.text.strip(),
+                has_children=True
+            )
+            for li in BeautifulSoup(html, 'html.parser').find('div', {'id': 'menu0'}).find_all('li')
+        ]
+    results: list[dict] = _make_request(endpoint=f'/generic.aspx?tursa={tursa_id}')
+    return [
+        Tursa(
+            id=i['id'],
+            name=f"{i['text']} ({i['prefix']})" if i['prefix'] else i['text'],
+            has_children=i['prefix'] != ''
+        )
+        for i in results
+    ]
 
 
 if __name__ == '__main__':

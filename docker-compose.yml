@@ -10,4 +10,6 @@ services:
 
   whatsapp:
     <<: *base_service
-    command: ["uvicorn", "wa.app:fastapi_app", "--reload", "--port", "8000", "--no-access-log"]
+    command: ["uvicorn", "wa.app:fastapi_app", "--reload", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    ports:
+      - "8000:8000"

@@ -1,9 +1,7 @@
 from enum import Enum, auto
-from pyrogram.types import Message, CallbackQuery, InlineQuery
 
 RTL = '\u200f'
 LTR = '\u200e'
-DEFAULT_LANGUAGE = "en"
 
 
 class String(Enum):
@@ -44,10 +42,11 @@ class String(Enum):
     SEARCH_INLINE_TIP = auto()  # V
     BOOK_NOT_FOUND = auto()  # V
     PRESS_TO_SHARE = auto()  # V
+    SEARCH_RESULTS = auto()  # V
     X_RESULTS_FOR_S = auto()  # RTL ⚠️
     X_TO_Y_OF_TOTAL_FOR_S = auto()  # RTL ⚠️
     X_TO_Y_OF_TOTAL = auto()  # RTL ⚠️
-    NO_RESULTS_FOR_S = auto()  # V
+    NO_RESULTS_FOR_Q = auto()  # V
     SEARCH_INLINE = auto()  # V
     ORIGINAL_SEARCH_DELETED = auto()  # V
     IMAGE = auto()
@@ -57,9 +56,11 @@ class String(Enum):
     CHOOSE_LANGUAGE = auto()  # V
     CHANGE_LANGUAGE = auto()  # V
     LANGUAGE_CHANGED = auto()  # V
+    SEARCHING_FOR_Q = auto()  # V
+    NAVIGATE_BETWEEN_RESULTS = auto()  # V
 
 
-_STRINGS = {
+STRINGS = {
     String.WELCOME: {
         'en': "\n".join([
             "**📚 Welcome to the HebrewBook bot on Telegram! 📚**\n",
@@ -228,9 +229,9 @@ _STRINGS = {
         'en': 'Click on the result to share {title}',
         'he': 'לחצו על התוצאה כדי לשתף את {title}'
     },
-    String.NO_RESULTS_FOR_S: {
-        'en': 'No results found for: {query}',
-        'he': 'לא נמצאו תוצאות עבור: {query}'
+    String.NO_RESULTS_FOR_Q: {
+        'en': 'No results found for: {q}',
+        'he': 'לא נמצאו תוצאות עבור: {q}'
     },
     String.SEARCH_INLINE: {
         'en': '🔎 Inline Search',
@@ -288,6 +289,10 @@ _STRINGS = {
         'en': 'Page {page} of {pages}',
         'he': 'עמוד {page} מתוך {pages}'
     },
+    String.SEARCH_RESULTS: {
+        'en': '📚 Results 📚',
+        'he': '📚 תוצאות חיפוש 📚'
+    },
     String.X_RESULTS_FOR_S: {
         'en': '{x:,} results for: {s}',
         'he': '%s{x:,} תוצאות עבור: {s}' % RTL
@@ -315,20 +320,13 @@ _STRINGS = {
     String.NOT_REGISTERED: {
         'en': 'You are not registered in the bot. Please send /start to the bot in order to register.',
         'he': 'אינכם רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.'
-    }
+    },
+    String.SEARCHING_FOR_Q: {
+        'en': '🔎 Searching for: {q}',
+        'he': '🔍 מתבצע חיפוש עבור: "{q}"'
+    },
+    String.NAVIGATE_BETWEEN_RESULTS: {
+        'en': 'Navigate between results',
+        'he': 'נווטו בין התוצאות'
+    },
 }
-
-
-def get_lang_code(mqc: Message | CallbackQuery | InlineQuery) -> str:
-    """Get the user's language code."""
-    try:
-        lang = mqc.from_user.language_code or DEFAULT_LANGUAGE
-    except AttributeError:
-        lang = DEFAULT_LANGUAGE
-    return lang
-
-
-def get_string(mqc: Message | CallbackQuery | InlineQuery, string: String) -> str:
-    """Get a string in the user's language."""
-    lang = get_lang_code(mqc)
-    return _STRINGS[string].get(lang, _STRINGS[string][DEFAULT_LANGUAGE])

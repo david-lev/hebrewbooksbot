@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     tg_admins: list[int]
     wa_token: str
     wa_verify_token: str
+    wa_phone_number: int
     wa_phone_id: str
     wa_admins: list[str]
 

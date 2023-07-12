@@ -88,7 +88,7 @@ class SearchNavigation(CallbackData):
 
 @dataclass(frozen=True, slots=True)
 class ShowBook(CallbackData):
-    __clbname__ = 'sh'
+    __clbname__ = '!book'
     id: int
 
 
@@ -124,7 +124,6 @@ class JumpToPage(CallbackData):
 
 
 @dataclass(frozen=True, slots=True)
-class Broadcast(CallbackData):
-    __clbname__ = 'broadcast'
-    send: bool
-    lang_code: str
+class ShareBook(CallbackData):
+    __clbname__ = 'share'
+    id: int

@@ -3,9 +3,9 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from db.repository import StatsType
 from tg import helpers
-from tg.helpers import Menu
-from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
-from strings import String as s, get_string as gs
+from tg.helpers import Menu, get_string as gs
+from data.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
+from data.strings import String as s
 from data import api
 from db import repository
 

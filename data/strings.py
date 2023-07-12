@@ -34,10 +34,15 @@ class String(Enum):
     JUMP_TIP = auto()  # V
     CHOOSE_BROWSE_TYPE = auto()  # V
     SHAS = auto()  # V
+    SHAS_CMD = auto()  # V
     TUR_AND_SA = auto()  # V
+    TUR_AND_SA_CMD = auto()  # V
     SUBJECTS = auto()  # V
+    SUBJECTS_CMD = auto()  # V
     LETTERS = auto()  # V
+    LETTERS_CMD = auto()  # V
     DATE_RANGES = auto()  # V
+    DATE_RANGES_CMD = auto()  # V
     CHOOSE = auto()  # V
     CHOOSE_LETTER = auto()  # V
     CHOOSE_SUBJECT = auto()  # V
@@ -151,8 +156,8 @@ STRINGS = {
         ])
     },
     String.WA_WELCOME_FOOTER: {
-        'en': "🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l",
-        'he': "🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל"
+        'en': "🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l",
+        'he': "🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז\"ל"
     },
     String.WA_ABOUT_MSG: {  # TODO: update this
         'en': 'x',
@@ -302,21 +307,41 @@ STRINGS = {
         'en': '📚 Shas',
         'he': '📚 ש"ס'
     },
+    String.SHAS_CMD: {
+        'en': '!shas, ברכות, יז:',
+        'he': '!שס, ברכות, יז:'
+    },
     String.TUR_AND_SA: {
         'en': '📓 Tur & Shulchan Aruch',
         'he': '📓 טור ושולחן ערוך'
+    },
+    String.TUR_AND_SA_CMD: {
+        'en': '!tur, טור יורה דעה קכז ג',
+        'he': '!טור, טור יורה דעה קכז ג'
     },
     String.SUBJECTS: {
         'en': '🗂 Subjects',
         'he': '🗂 נושאים'
     },
+    String.SUBJECTS_CMD: {
+        'en': '!sub, מוסר',
+        'he': '!נושא, מוסר'
+    },
     String.LETTERS: {
         'en': '🔠 Letters',
         'he': '🔠 אותיות'
     },
+    String.LETTERS_CMD: {
+        'en': '!let, א',
+        'he': '!אות, א'
+    },
     String.DATE_RANGES: {
         'en': '📅 Date Ranges',
         'he': '📅 תאריכים'
+    },
+    String.DATE_RANGES_CMD: {
+        'en': '!date, 1945',
+        'he': '!תאריך, תר"נ'
     },
     String.CHOOSE: {
         'en': 'Choose',

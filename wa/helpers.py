@@ -7,6 +7,14 @@ conf = get_settings()
 DEFAULT_LANGUAGE = "he"
 
 
+class Commands:
+    SHAS = ('shas', 'שס')
+    SUBJECT = ('sub', 'נושא')
+    DATERANGE = ('date', 'תאריך')
+    LETTER = ('let', 'אות')
+    TURSA = ('tur', 'טור')
+
+
 def get_self_share(text: str) -> str:
     """
     Get the link to share a text on WhatsApp.

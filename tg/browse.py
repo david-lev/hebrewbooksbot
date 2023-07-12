@@ -1,7 +1,6 @@
+import data
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-
-import data
 from data import api
 from data.enums import BrowseType as BrowseTypeEnum
 from db import repository

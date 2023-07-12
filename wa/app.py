@@ -1,13 +1,14 @@
 import logging
 import wa.utils as utils
+from wa.helpers import Commands
+from wa.utils import Menu
+from wa import search, browse
 from fastapi import FastAPI
 from pywa import WhatsApp
-from pywa import filters as fil
 from pywa.filters import TextFilter, CallbackFilter
 from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
 from data.config import get_settings
-from data.callbacks import ShowBook, ShareBook, SearchNavigation
-from wa import search
+from data.callbacks import ShowBook, ShareBook, SearchNavigation, BrowseType
 
 conf = get_settings()
 fastapi_app = FastAPI()
@@ -53,6 +54,18 @@ wa.add_handlers(
     MessageHandler(
         utils.on_book,
         TextFilter.startswith(ShowBook.__clbname__)
+    ),
+    MessageHandler(
+        browse.browse_from_msg,
+        TextFilter.commands(*Commands.SHAS, *Commands.SUBJECT),
+    ),
+    ButtonCallbackHandler(
+        browse.browse_menu,
+        CallbackFilter.data_startswith(Menu.BROWSE)
+    ),
+    SelectionCallbackHandler(
+        browse.browse_help,
+        CallbackFilter.data_startswith(BrowseType.__clbname__)
     ),
     MessageHandler(
         search.on_search,

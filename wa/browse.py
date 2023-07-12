@@ -17,7 +17,6 @@ def browse_menu(_: WhatsApp, clb: CallbackButton):
         (BrowseTypeEnum.SUBJECT, s.SUBJECTS, s.SUBJECTS_CMD),
         (BrowseTypeEnum.DATERANGE, s.DATE_RANGES, s.DATE_RANGES_CMD),
         (BrowseTypeEnum.LETTER, s.LETTERS, s.LETTERS_CMD),
-        (BrowseTypeEnum.TURSA, s.TUR_AND_SA, s.TUR_AND_SA_CMD),
     ]
     clb.reply_text(
         text=gs(mqc=clb, string=s.CHOOSE_BROWSE_TYPE),
@@ -48,7 +47,6 @@ def browse_help(_: WhatsApp, clb: CallbackSelection):
         BrowseTypeEnum.SUBJECT: s.SUBJECTS_CMD,
         BrowseTypeEnum.DATERANGE: s.DATE_RANGES_CMD,
         BrowseTypeEnum.LETTER: s.LETTERS_CMD,
-        BrowseTypeEnum.TURSA: s.TUR_AND_SA_CMD,
     }
     clb.reply_text(text=gs(msg_map[BrowseType.from_callback(clb.data).type]))
 

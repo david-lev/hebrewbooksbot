@@ -364,8 +364,8 @@ STRINGS = {
         'he': 'בחרו מסכת'
     },
     String.PAGE_X_OF_Y: {
-        'en': 'Page {page} of {pages}',
-        'he': 'עמוד {page} מתוך {pages}'
+        'en': 'Page {x} of {y}',
+        'he': 'עמוד {x} מתוך {y}'
     },
     String.SEARCH_RESULTS: {
         'en': '📚 Results 📚',

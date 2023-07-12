@@ -1,3 +1,4 @@
+import dataclasses
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
 from data import api
@@ -17,7 +18,7 @@ class Menu:
     HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
 
 
-def on_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
+def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
     try:
         book = api.get_book(
             int((msg_or_cb.data if isinstance(msg_or_cb, CallbackSelection) else msg_or_cb.text).split(":")[1])
@@ -60,6 +61,48 @@ def on_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
             )
         ]
     )
+
+
+def read_book(_: WhatsApp, clb: CallbackButton):
+    read_clb = ReadBook.from_callback(clb.data)
+    if read_clb.book_type == BookType.BOOK:
+        book = api.get_book(int(read_clb.id))
+        url = book.get_page_img(page=read_clb.page, width=750, height=1334) if read_clb.read_mode == ReadMode.IMAGE \
+            else book.get_page_pdf(page=read_clb.page)
+    elif read_clb.book_type == BookType.MASECHET:
+        masechet = api.get_masechet(int(read_clb.id))
+        book = masechet.pages[read_clb.page - 1]
+        url = book.get_page_img(width=750, height=1334) if read_clb.read_mode == ReadMode.IMAGE else book.pdf_url
+    else:
+        raise NotImplementedError
+    buttons = [
+        InlineButton(
+            title=gs(s.DOCUMENT if read_clb.read_mode == ReadMode.IMAGE else s.IMAGE),
+            callback_data=dataclasses.replace(
+                read_clb,
+                read_mode=ReadMode.PDF if read_clb.read_mode == ReadMode.IMAGE else ReadMode.IMAGE
+            ).to_callback()
+        ),
+    ]
+    if read_clb.page < read_clb.total:
+        buttons.append(InlineButton(
+            title=gs(s.NEXT),
+            callback_data=dataclasses.replace(read_clb, page=read_clb.page + 1).to_callback()
+        ))
+    if 1 < read_clb.page < read_clb.total:
+        buttons.append(InlineButton(
+            title=gs(s.PREVIOUS),
+            callback_data=dataclasses.replace(read_clb, page=read_clb.page - 1).to_callback()
+        ))
+    if read_clb.read_mode == ReadMode.IMAGE:
+        print(read_clb)
+        clb.reply_image(image=url, buttons=buttons, caption=gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total))
+    elif read_clb.read_mode == ReadMode.PDF:
+        file_name = f"{book.title} • {book.author}.pdf" if read_clb.book_type == BookType.BOOK else f"{masechet.name}-{book.name}.pdf"
+        clb.reply_document(document=url, file_name=file_name,
+                           caption=gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total), buttons=buttons)
+    else:
+        raise NotImplementedError
 
 
 def on_share(_: WhatsApp, clb: CallbackButton):

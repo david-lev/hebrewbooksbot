@@ -8,7 +8,7 @@ from pywa import WhatsApp
 from pywa.filters import TextFilter, CallbackFilter
 from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
 from data.config import get_settings
-from data.callbacks import ShowBook, ShareBook, SearchNavigation, BrowseType
+from data.callbacks import ShowBook, ShareBook, SearchNavigation, BrowseType, ReadBook
 
 conf = get_settings()
 fastapi_app = FastAPI()
@@ -23,7 +23,6 @@ console_handler.setLevel(conf.log_level)
 file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * 1024 * 1024, backupCount=1, mode='D')
 file_handler.setLevel(logging.DEBUG)
 logging.basicConfig(
-    level=logging.INFO,
     format="Time: %(asctime)s | Level: %(levelname)s | Module: %(module)s | Message: %(message)s",
     handlers=[console_handler, file_handler],
 )
@@ -48,16 +47,20 @@ wa.add_handlers(
     #     )
     # ),
     SelectionCallbackHandler(
-        utils.on_book,
+        utils.show_book,
         CallbackFilter.data_startswith(ShowBook.__clbname__)
     ),
     MessageHandler(
-        utils.on_book,
+        utils.show_book,
         TextFilter.startswith(ShowBook.__clbname__)
     ),
     MessageHandler(
         browse.browse_from_msg,
         TextFilter.commands(*Commands.SHAS, *Commands.SUBJECT),
+    ),
+    ButtonCallbackHandler(
+        utils.read_book,
+        CallbackFilter.data_startswith(ReadBook.__clbname__)
     ),
     ButtonCallbackHandler(
         browse.browse_menu,
@@ -81,4 +84,3 @@ wa.add_handlers(
         CallbackFilter.data_startswith(ShareBook.__clbname__)
     ),
 )
-

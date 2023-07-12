@@ -1,4 +1,5 @@
 from data.config import get_settings
+from data.models import Book
 from data.strings import STRINGS, String
 
 conf = get_settings()
@@ -24,3 +25,13 @@ def get_string(string: String, **kwargs) -> str:
 def slice_long_string(string: str, max_length: int, suffix: str = "...") -> str:
     """Slice a long string."""
     return string[:max_length - len(suffix)] + suffix if len(string) > max_length else string
+
+
+def get_book_details(book: Book):
+    return "".join((
+        f"📚 {book.title}\n",
+        f"👤 {book.author}\n",
+        f"📅 {book.year}\n" if book.year else "",
+        f"🏙 {book.city}\n" if book.city else "",
+        f"📖 {book.pages}\n",
+    ))

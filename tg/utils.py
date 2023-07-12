@@ -15,7 +15,7 @@ def start(_: Client, mc: Message | CallbackQuery):
     if isinstance(mc, Message):
         repository.add_tg_user(tg_id=mc.from_user.id, lang=mc.from_user.language_code)
     kwargs = dict(
-        text=gs(mc, s.WELCOME),
+        text=gs(mc, s.TG_WELCOME),
         reply_markup=InlineKeyboardMarkup(
             [
                 [

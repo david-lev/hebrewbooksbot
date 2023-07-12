@@ -18,8 +18,7 @@ def on_search(_: WhatsApp, msg: Message | CallbackSelection):
         )
         offset = 1
     else:
-        search_nav = SearchNavigation.from_callback(msg.data)
-        offset = search_nav.offset
+        offset = SearchNavigation.from_callback(msg.data).offset
     title, author = data.helpers.get_title_author(query)
     results, total = api.search(title=title, author=author, offset=offset, limit=9 if offset == 1 else 8)
     if total == 0:
@@ -69,9 +68,8 @@ def on_search(_: WhatsApp, msg: Message | CallbackSelection):
         )
     msg.reply_text(
         text=gs(s.X_TO_Y_OF_TOTAL_FOR_S, x=offset, y=(offset + 8) if (offset + 8 < total) else total, total=total, s=query),
-        quote=True,
         keyboard=SectionList(
-            button_title=f"Search Results",
+            button_title=gs(s.SEARCH_RESULTS),
             sections=sections
         )
     )

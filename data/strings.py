@@ -5,13 +5,18 @@ LTR = '\u200e'
 
 
 class String(Enum):
-    WELCOME = auto()  # V
+    TG_WELCOME = auto()  # V
+    WA_WELCOME_HEADER = auto()  # V
+    WA_WELCOME_BODY = auto()  # V
+    WA_WELCOME_FOOTER = auto()  # V
     SEARCH = auto()  # V
     SEARCH_IN_CHATS = auto()  # V
     BROWSE = auto()  # V
     INSTANT_READ = auto()  # V
     BACK = auto()  # V
     GITHUB = auto()  # V
+    ABOUT = auto()  # V
+    WA_ABOUT_MSG = auto()  # V
     HEBREWBOOKS_SITE = auto()  # V
     STATS = auto()  # V
     SHOW_STATS = auto()  # V
@@ -61,7 +66,7 @@ class String(Enum):
 
 
 STRINGS = {
-    String.WELCOME: {
+    String.TG_WELCOME: {
         'en': "\n".join([
             "**📚 Welcome to the HebrewBook bot on Telegram! 📚**\n",
             "This bot allows searching and browsing books on hebrewbooks.org\n",
@@ -76,7 +81,6 @@ STRINGS = {
             "\t• To search for a book by title or author, use the format `title:author`",
             "\t• In Read Mode, you can jump to a page by replying to the message with the page number\n",
             "**🔜 Coming soon:**",
-            "\t• A bot for WhatsApp",
             "\t• Search the contents of the books",
             "\t• Saving favorite books and bookmarks",
             "\t• Change language manually\n",
@@ -97,13 +101,62 @@ STRINGS = {
             "\t• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט `כותרת:מחבר`",
             "\t• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר העמוד\n",
             "**🔜 בקרוב:**",
-            "\t• בוט לוואטסאפ",
             "\t• חיפוש בתוכן הספרים",
             "\t• שמירת ספרים מועדפים וסימניות",
             "\t• שינוי שפה באופן ידני\n",
             "📮 למשוב והערות - @davidlev\n",
             "__🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל 🕯__"
         ])
+    },
+    String.WA_WELCOME_HEADER: {
+        'en': "📚 Welcome to the HebrewBook bot on WhatsApp! 📚\n",
+        'he': "📚 ברוכים הבאים לבוט היברובוקס בוואטסאפ! 📚\n"
+    },
+    String.WA_WELCOME_BODY: {
+        'en': "\n".join([
+            "This bot allows searching and browsing books on hebrewbooks.org\n",
+            "*⚡️ Features:*",
+            "🔎 Searching for books by sending a message",
+            "📓 Browsing through the Shas masechtot",
+            "📚 Browse the library by category, date or letter",
+            "📖 Reading mode as an image or as a PDF (text coming soon)",
+            "⏩ Jump to page",
+            "♻️ Sharing books with friends\n",
+            "*💡 Tips:*",
+            "• To search for a book by title or author, use the format ```title:author```",
+            "• In Read Mode, you can jump to a page by replying to the message with the page number\n",
+            "*🔜 Coming soon:*",
+            "• Search the contents of the books",
+            "• Saving favorite books and bookmarks",
+            "• Change language manually\n",
+            "📮 For feedback and comments - t.me/davidlev\n"
+        ]),
+        'he': "\n".join([
+            "בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org\n",
+            "*⚡️ פיצ'רים:*",
+            "🔎 חיפוש ספרים על ידי שליחת הודעה",
+            "📓 עיון במסכתות הש\"ס",
+            "📚 עיון בספריה לפי קטגוריה, תאריך או אות",
+            "📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)",
+            "⏪ קפיצה לעמוד",
+            "♻️ שיתוף ספרים עם חברים\n",
+            "*💡 טיפים:*",
+            "• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט ```כותרת:מחבר```",
+            "• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר העמוד\n",
+            "*🔜 בקרוב:*",
+            "• חיפוש בתוכן הספרים",
+            "• שמירת ספרים מועדפים וסימניות",
+            "• שינוי שפה באופן ידני\n",
+            "📮 למשוב והערות - t.me/davidlev\n"
+        ])
+    },
+    String.WA_WELCOME_FOOTER: {
+        'en': "🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l",
+        'he': "🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל"
+    },
+    String.WA_ABOUT_MSG: {  # TODO: update this
+        'en': 'x',
+        'he': 'x'
     },
     String.SEARCH: {
         'en': '🔎 Search',
@@ -329,4 +382,8 @@ STRINGS = {
         'en': 'Navigate between results',
         'he': 'נווטו בין התוצאות'
     },
+    String.ABOUT: {
+        'en': 'ℹ️ About',
+        'he': f'{RTL}ℹ️ אודות'
+    }
 }

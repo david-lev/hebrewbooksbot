@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     sqlite_file_path: str
+    log_level: str
     tg_api_id: int
     tg_api_hash: str
     tg_bot_token: str

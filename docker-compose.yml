@@ -1,9 +1,13 @@
 version: '3'
 services:
-  telegram:
+  telegram: &base_service
     build:
       context: .
       dockerfile: Dockerfile
     command: ["python3", "tg/app.py"]
     volumes:
       - .:/app
+
+  whatsapp:
+    <<: *base_service
+    command: ["uvicorn", "wa.app:fastapi_app", "--reload", "--port", "8000", "--no-access-log"]

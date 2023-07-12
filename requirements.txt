@@ -15,4 +15,5 @@ TgCrypto~=1.2.5
 typing_extensions==4.7.1
 urllib3==2.0.3
 fastapi==0.100.0
-pywa>=0.0.1rc17
+uvicorn==0.22.0
+pywa>=0.0.1rc23

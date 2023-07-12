@@ -1,6 +1,6 @@
 from data.config import get_settings
 from data.models import Book
-from data.strings import STRINGS, String
+from data.strings import STRINGS, String, RTL
 
 conf = get_settings()
 
@@ -33,5 +33,5 @@ def get_book_details(book: Book):
         f"👤 {book.author}\n",
         f"📅 {book.year}\n" if book.year else "",
         f"🏙 {book.city}\n" if book.city else "",
-        f"📖 {book.pages}\n",
+        f"{RTL}📖 {book.pages}\n",
     ))

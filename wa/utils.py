@@ -1,7 +1,7 @@
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
 from data import api
-from data.callbacks import ShareBook, ReadBook
+from data.callbacks import ShareBook, ReadBook, ReadMode, BookType
 from data.strings import String as s
 from wa import helpers
 from wa.helpers import get_string as gs
@@ -50,7 +50,13 @@ def on_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
             ),
             InlineButton(
                 title=gs(s.INSTANT_READ),
-                callback_data=ReadBook(book.id).to_callback()
+                callback_data=ReadBook(
+                    id=str(book.id),
+                    page=1,
+                    total=book.pages,
+                    read_mode=ReadMode.IMAGE,
+                    book_type=BookType.BOOK
+                ).to_callback()
             )
         ]
     )

@@ -4,7 +4,7 @@ from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
 from data import api
 from db import repository
 from db.repository import StatsType
-from data.callbacks import ShareBook, ReadBook, ReadMode, BookType
+from data.callbacks import ShareBook, ReadBook, ReadMode, BookType, ShowBook
 from data.strings import String as s
 from wa import helpers
 from wa.helpers import get_string as gs
@@ -76,7 +76,7 @@ def read_book(_: WhatsApp, clb: CallbackButton):
     elif read_clb.book_type == BookType.MASECHET:
         masechet = api.get_masechet(int(read_clb.id))
         page = masechet.pages[read_clb.page - 1]
-        url = page.get_page_img(width=750, height=1334) if read_clb.read_mode == ReadMode.IMAGE else book.pdf_url
+        url = page.get_page_img(width=750, height=1334) if read_clb.read_mode == ReadMode.IMAGE else page.pdf_url
     else:
         raise NotImplementedError
     buttons = [
@@ -98,13 +98,15 @@ def read_book(_: WhatsApp, clb: CallbackButton):
             title=gs(s.PREVIOUS),
             callback_data=dataclasses.replace(read_clb, page=read_clb.page - 1).to_callback()
         ))
+    caption = helpers.get_book_details(book) \
+        if read_clb.book_type == BookType.BOOK else helpers.get_masechet_details(masechet)
+    caption += f"\n{gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total)}"
     if read_clb.read_mode == ReadMode.IMAGE:
-        clb.reply_image(image=url, buttons=buttons, caption=gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total))
+        clb.reply_image(image=url, buttons=buttons, caption=caption)
     elif read_clb.read_mode == ReadMode.PDF:
         file_name = f"{book.title} • {book.author} ({read_clb.page}).pdf" \
             if read_clb.book_type == BookType.BOOK else f"{masechet.name} ({page.name}).pdf"
-        clb.reply_document(document=url, file_name=file_name,
-                           caption=gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total), buttons=buttons)
+        clb.reply_document(document=url, file_name=file_name, caption=caption, buttons=buttons)
     else:
         raise NotImplementedError
 
@@ -112,12 +114,12 @@ def read_book(_: WhatsApp, clb: CallbackButton):
 
 
 def on_share(_: WhatsApp, clb: CallbackButton):
-    book_id = int(clb.data.split(":")[1])
+    book_id = ShareBook.from_callback(clb.data).id
     book = api.get_book(book_id)
     clb.reply_text(
         text="".join((
             helpers.get_book_details(book),
-            f"🔗 {helpers.get_self_share(f'!book:{book_id}')}"
+            f"🔗 {helpers.get_self_share(ShowBook(book_id).to_callback())}",
         )),
         quote=True,
     )

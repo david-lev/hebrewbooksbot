@@ -1,5 +1,5 @@
 from data.config import get_settings
-from data.models import Book
+from data.models import Book, Masechet
 from data.strings import STRINGS, String, RTL
 
 conf = get_settings()
@@ -42,4 +42,11 @@ def get_book_details(book: Book):
         f"📅 {book.year}\n" if book.year else "",
         f"🏙 {book.city}\n" if book.city else "",
         f"{RTL}📖 {book.pages}\n",
+    ))
+
+
+def get_masechet_details(masechet: Masechet):
+    return "".join((
+        f"📚 {masechet.name}\n",
+        f"{RTL}📖 {masechet.pages[0].name}- {masechet.pages[-1].name}\n"
     ))

@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    platform: linux/amd64
     command: ["python3", "tg/app.py"]
     volumes:
       - .:/app

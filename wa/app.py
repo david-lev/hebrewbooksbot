@@ -1,6 +1,6 @@
 import logging
 import wa.utils as utils
-from wa.helpers import Commands
+from wa.helpers import Commands, DEFAULT_LANGUAGE
 from wa.utils import Menu
 from wa import search, browse
 from fastapi import FastAPI
@@ -9,6 +9,7 @@ from pywa.filters import TextFilter, CallbackFilter
 from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
 from data.config import get_settings
 from data.callbacks import ShowBook, ShareBook, SearchNavigation, BrowseType, ReadBook
+from db import repository
 
 conf = get_settings()
 fastapi_app = FastAPI()
@@ -20,7 +21,8 @@ wa = WhatsApp(
 )
 console_handler = logging.StreamHandler()
 console_handler.setLevel(conf.log_level)
-file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * 1024 * 1024, backupCount=1, mode='D')
+file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * 1024 * 1024, backupCount=1,
+                                                    mode='D')
 file_handler.setLevel(logging.DEBUG)
 logging.basicConfig(
     format="Time: %(asctime)s | Level: %(levelname)s | Module: %(module)s | Message: %(message)s",
@@ -84,3 +86,5 @@ wa.add_handlers(
         CallbackFilter.data_startswith(ShareBook.__clbname__)
     ),
 )
+
+wa.add_handlers(MessageHandler(lambda _, msg: repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE)))

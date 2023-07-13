@@ -2,6 +2,8 @@ import data
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, SectionRow, SectionList
 from data import api
+from db import repository
+from db.repository import StatsType
 from pywa.types import Section
 from data.callbacks import SearchNavigation, ShowBook
 from data.strings import String as s
@@ -73,3 +75,4 @@ def on_search(_: WhatsApp, msg: Message | CallbackSelection):
             sections=sections
         )
     )
+    repository.increase_stats(StatsType.MSG_SEARCHES)

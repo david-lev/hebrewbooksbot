@@ -24,6 +24,13 @@ class TgUser(BaseTable):
     active: Mapped[bool] = mapped_column(default=True)
 
 
+class WaUser(BaseTable):
+    __tablename__ = 'wa_user'
+    wa_id: Mapped[str] = mapped_column(String(50), unique=True)
+    lang: Mapped[str] = mapped_column(String(5))
+    active: Mapped[bool] = mapped_column(default=True)
+
+
 class Stats(BaseTable):
     __tablename__ = 'stats'
     inline_searches: Mapped[int] = mapped_column(BigInteger, default=0)

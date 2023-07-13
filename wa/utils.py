@@ -2,6 +2,8 @@ import dataclasses
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
 from data import api
+from db import repository
+from db.repository import StatsType
 from data.callbacks import ShareBook, ReadBook, ReadMode, BookType
 from data.strings import String as s
 from wa import helpers
@@ -61,6 +63,7 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
             )
         ]
     )
+    repository.increase_stats(StatsType.BOOKS_READ)
 
 
 def read_book(_: WhatsApp, clb: CallbackButton):
@@ -104,6 +107,8 @@ def read_book(_: WhatsApp, clb: CallbackButton):
                            caption=gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total), buttons=buttons)
     else:
         raise NotImplementedError
+
+    repository.increase_stats(StatsType.PAGES_READ)
 
 
 def on_share(_: WhatsApp, clb: CallbackButton):

@@ -3,14 +3,16 @@ from sqlalchemy.exc import IntegrityError
 from db.tables import TgUser, Stats, get_session, WaUser
 
 
-def add_tg_user(tg_id: int, lang: str):
-    """Add new tg user to db"""
+def add_tg_user(tg_id: int, lang: str) -> bool:
+    """Add new tg user to db, return True if new user added"""
     session = get_session()
     try:
         session.add(TgUser(tg_id=tg_id, lang=lang))
         session.commit()
+        return True
     except IntegrityError:
         session.rollback()
+        return False
 
 
 def get_tg_user(tg_id: int) -> type[TgUser]:
@@ -60,14 +62,16 @@ def set_tg_user_active(tg_id: int, active: bool):
     session.commit()
 
 
-def add_wa_user(wa_id: str, lang: str):
-    """Add new wa user to db"""
+def add_wa_user(wa_id: str, lang: str) -> bool:
+    """Add new wa user to db, return True if new user added"""
     session = get_session()
     try:
         session.add(WaUser(wa_id=wa_id, lang=lang))
         session.commit()
+        return True
     except IntegrityError:
         session.rollback()
+        return False
 
 
 def get_wa_user(wa_id: str) -> type[WaUser]:

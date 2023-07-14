@@ -225,13 +225,13 @@ STRINGS = {
             "📊 Bot Stats 📊\n",
             "📚 Books read: {books_read:,}",
             "📖 Pages read: {pages_read:,}",
-            "🔎 Searches: {searches:,}"
+            "🔎 Searches: {searches:,}",
         )),
         'he': "\n".join((
             "📊 סטטיסטיקות הבוט 📊\n",
             "📚 ספרים נקראו: {books_read:,}",
             "📖 דפים נקראו: {pages_read:,}",
-            "🔎 חיפושים: {searches:,}"
+            "🔎 חיפושים: {searches:,}",
         ))
     },
     String.SHOW_STATS_ADMIN: {
@@ -240,18 +240,18 @@ STRINGS = {
             "👥 Registered users: {users_count:,}",
             "📚 Books read: {books_read:,}",
             "📖 Pages read: {pages_read:,}",
-            "🔎 Inline Searches: {inline_searches:,}"
-            "💬 Message Searches: {msg_searches:,}"
-            "⏭ Jumps to page: {jumps:,}"
+            "🔎 Inline Searches: {inline_searches:,}",
+            "💬 Message Searches: {msg_searches:,}",
+            "⏭ Jumps to page: {jumps:,}",
         )),
         'he': "\n".join((
             "📊 סטטיסטיקות הבוט 📊\n",
             "👥 משתמשים רשומים: {users_count:,}",
             "📚 ספרים נקראו: {books_read:,}",
             "📖 דפים נקראו: {pages_read:,}",
-            "🔎 חיפושים באינליין: {inline_searches:,}"
-            "💬 חיפושים בהודעות: {msg_searches:,}"
-            "⏭ קפיצות לדף: {jumps:,}"
+            "🔎 חיפושים באינליין: {inline_searches:,}",
+            "💬 חיפושים בהודעות: {msg_searches:,}",
+            "⏭ קפיצות לדף: {jumps:,}",
         ))
     },
     String.INSTANT_READ: {

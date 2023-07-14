@@ -2,7 +2,8 @@
 
 **A bot that allows you to search and browse books from [hebrewbooks.org](https://hebrewbooks.org).**
 
-Telegram: [@HeBooksBot](https://t.me/HeBooksBot)
+- Telegram: [@HeBooksBot](https://t.me/HeBooksBot)
+- WhatsApp: [+972 54-813-2440](https://wa.me/972548132440?text=!start)
 
 ---
 ### Features
@@ -16,7 +17,7 @@ Telegram: [@HeBooksBot](https://t.me/HeBooksBot)
 ---
 
 TODO:
-- [ ] Adding support for WhatsApp!
+- [x] Adding support for WhatsApp!
 - [ ] Add support for text in reading mode
 - [ ] Add support for search by OCR
 - [ ] Allows users to change their language

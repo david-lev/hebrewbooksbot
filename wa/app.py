@@ -32,60 +32,57 @@ logging.basicConfig(
 
 wa.add_handlers(
     MessageHandler(
-        utils.on_start,
-        TextFilter.command("start", "התחל", "התחלה", prefixes=("!", "/")),
-    ),
-    # MessageHandler(
-    #     utils.show_help,
-    #     fil.any_(
-    #         TextFilter.command("help", "עזרה", prefixes=("!", "/")),
-    #         TextFilter.match("?", "??"),
-    #     ),
-    # ),
-    # MessageHandler(
-    #     utils.show_commands,
-    #     fil.any_(
-    #         TextFilter.command("commands", "פקודות", prefixes=("!", "/")),
-    #         TextFilter.match("!", "!!"),
-    #     )
-    # ),
-    SelectionCallbackHandler(
-        utils.show_book,
-        CallbackFilter.data_startswith(ShowBook.__clbname__)
-    ),
-    MessageHandler(
-        utils.show_book,
-        TextFilter.startswith(ShowBook.__clbname__)
-    ),
-    MessageHandler(
-        browse.browse_from_msg,
-        TextFilter.commands(*Commands.SHAS, *Commands.SUBJECT),
-    ),
-    ButtonCallbackHandler(
-        utils.read_book,
-        CallbackFilter.data_startswith(ReadBook.__clbname__)
-    ),
-    ButtonCallbackHandler(
-        browse.browse_menu,
-        CallbackFilter.data_startswith(Menu.BROWSE)
-    ),
-    SelectionCallbackHandler(
-        browse.browse_help,
-        CallbackFilter.data_startswith(BrowseType.__clbname__)
-    ),
-    MessageHandler(
         search.on_search,
         TextFilter.ANY,
         TextFilter.length((3, 72)),
     ),
     SelectionCallbackHandler(
+        utils.show_book,
+        CallbackFilter.data_startswith(ShowBook.__clbname__)
+    ),
+    SelectionCallbackHandler(
         search.on_search,
         CallbackFilter.data_startswith(SearchNavigation.__clbname__)
     ),
+    MessageHandler(
+        utils.show_book,
+        TextFilter.startswith(ShowBook.__clbname__),
+        lambda _, m: len(m.text.split(':')) == 2
+    ),
     ButtonCallbackHandler(
-        utils.on_share,
+        utils.read_book,
+        CallbackFilter.data_startswith(ReadBook.__clbname__)
+    ),
+    MessageHandler(
+        utils.read_book,
+        TextFilter.startswith(ShowBook.__clbname__),
+        lambda _, m: len(m.text.split(':')) == 3
+    ),
+    MessageHandler(
+        utils.on_start,
+        TextFilter.command("start", "התחל", "התחלה", prefixes=("!", "/")),
+    ),
+    ButtonCallbackHandler(
+        utils.on_start,
+        CallbackFilter.data_match("start"),
+    ),
+    ButtonCallbackHandler(
+        utils.on_share_btn,
         CallbackFilter.data_startswith(ShareBook.__clbname__)
     ),
+    ButtonCallbackHandler(
+        utils.on_search_btn,
+        CallbackFilter.data_match(Menu.SEARCH)
+    ),
+    ButtonCallbackHandler(
+        utils.on_stats_btn,
+        CallbackFilter.data_match(Menu.STATS)
+    ),
+    ButtonCallbackHandler(
+        utils.on_about_btn,
+        CallbackFilter.data_match(Menu.ABOUT)
+    ),
+
 )
 
 wa.add_handlers(MessageHandler(lambda _, msg: repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE)))

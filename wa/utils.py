@@ -12,8 +12,8 @@ from wa.helpers import get_string as gs
 
 class Menu:
     START = 'start'
+    SEARCH = 'search'
     ABOUT = 'about'
-    BROWSE = 'browse_menu'
     STATS = 'stats'
     CONTACT_URL = 'https://t.me/davidlev'
     GITHUB_URL = 'https://github.com/david-lev/hebrewbooksbot'
@@ -22,17 +22,15 @@ class Menu:
 
 def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
     try:
-        book = api.get_book(
-            int((msg_or_cb.data if isinstance(msg_or_cb, CallbackSelection) else msg_or_cb.text).split(":")[1])
-        )
+        show = ShowBook.from_callback(msg_or_cb.text if isinstance(msg_or_cb, Message) else msg_or_cb.data)
     except ValueError:
         msg_or_cb.react("❌")
         msg_or_cb.reply_text(
-            text=gs(s.BOOK_NOT_FOUND),
+            text=gs(s.NUMBERS_ONLY),
             quote=True
         )
         return
-    if book is None:
+    if (book := api.get_book(show.id)) is None:
         msg_or_cb.react("❌")
         msg_or_cb.reply_text(
             text=gs(s.BOOK_NOT_FOUND),
@@ -44,7 +42,7 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
         document=book.pdf_url,
         file_name=f"{book.title} • {book.author}.pdf",
         caption=helpers.get_book_details(book),
-        footer=gs(s.WA_WELCOME_FOOTER),
+        footer=gs(s.IN_MEMORY_FOOTER),
         quote=True,
         buttons=[
             InlineButton(
@@ -66,20 +64,66 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
     repository.increase_stats(StatsType.BOOKS_READ)
 
 
-def read_book(_: WhatsApp, clb: CallbackButton):
+def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton):
     book, masechet, page = None, None, None
-    read = ReadBook.from_callback(clb.data)
+    if isinstance(msg_or_clb, Message):
+        try:
+            read = ReadBook.from_cmd(msg_or_clb.text)
+        except ValueError:
+            msg_or_clb.react("❌")
+            msg_or_clb.reply_text(
+                text=gs(s.NUMBERS_ONLY),
+                quote=True
+            )
+            return
+    else:
+        read = ReadBook.from_callback(msg_or_clb.data)
     is_book = read.book_type == BookType.BOOK
     is_image = read.read_mode == ReadMode.IMAGE
     if is_book:
-        book = api.get_book(int(read.id))
-        url = book.get_page_img(page=read.page, width=750, height=1334) if is_image \
-            else book.get_page_pdf(page=read.page)
+        try:
+            book = api.get_book(int(read.id))
+        except ValueError:
+            msg_or_clb.react("❌")
+            msg_or_clb.reply_text(text=gs(s.BOOK_NOT_FOUND), quote=True)
+            return
+        if book is None:
+            msg_or_clb.react("❌")
+            msg_or_clb.reply_text(
+                text=gs(s.BOOK_NOT_FOUND),
+                quote=True
+            )
+            return
+        try:
+            url = book.get_page_img(page=read.page, width=750, height=1334) if is_image \
+                else book.get_page_pdf(page=read.page)
+        except ValueError:
+            msg_or_clb.react("❌")
+            msg_or_clb.reply_text(
+                text=gs(s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=book.pages),
+                quote=True
+            )
+            return
     else:
-        masechet = api.get_masechet(int(read.id))
-        page = masechet.pages[read.page - 1]
+        try:
+            masechet = api.get_masechet(int(read.id))
+        except ValueError:
+            msg_or_clb.react("❌")
+            msg_or_clb.reply_text(text=gs(s.MASECHET_NOT_FOUND), quote=True)
+            return
+        try:
+            page = masechet.pages[read.page - 1]
+        except IndexError:
+            msg_or_clb.react("❌")
+            msg_or_clb.reply_text(
+                text=gs(s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=masechet.pages[0].name, y=masechet.pages[-1].name),
+                quote=True
+            )
+            return
         url = page.get_page_img(width=750, height=1334) if is_image else page.pdf_url
-    func = clb.reply_image if is_image else clb.reply_document
+
+    func = msg_or_clb.reply_image if is_image else msg_or_clb.reply_document
+    total = book.pages if is_book else len(masechet.pages)
     buttons = [
         InlineButton(
             title=gs(s.DOCUMENT if is_image else s.IMAGE),
@@ -89,7 +133,7 @@ def read_book(_: WhatsApp, clb: CallbackButton):
             ).to_callback()
         ),
     ]
-    if read.page < read.total:
+    if read.page < total:
         buttons.append(InlineButton(
             title=gs(s.NEXT),
             callback_data=dataclasses.replace(read, page=read.page + 1).to_callback()
@@ -99,20 +143,21 @@ def read_book(_: WhatsApp, clb: CallbackButton):
             title=gs(s.PREVIOUS),
             callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
         ))
-    caption = helpers.get_book_details(book) \
-        if is_book else helpers.get_masechet_details(masechet)
-    caption += f"\n{gs(s.PAGE_X_OF_Y, x=read.page, y=read.total)}"
     if is_image:
-        kwargs = dict(image=url, caption=caption, buttons=buttons)
+        kwargs = dict(image=url, buttons=buttons)
     else:
         file_name = f"{book.title} • {book.author} ({read.page}).pdf" \
             if is_book else f"{masechet.name} ({page.name}).pdf"
-        kwargs = dict(document=url, file_name=file_name, caption=caption, buttons=buttons)
-    func(**kwargs)
+        kwargs = dict(document=url, file_name=file_name, buttons=buttons)
+    if isinstance(msg_or_clb, Message):
+        msg_or_clb.react("⬆️")
+    caption = helpers.get_page_details(book, gs(s.PAGE_X_OF_Y, x=read.page, y=total)) \
+        if is_book else helpers.get_masechet_details(masechet)
+    func(**kwargs, footer=gs(s.IN_MEMORY_FOOTER), caption=caption)
     repository.increase_stats(StatsType.PAGES_READ)
 
 
-def on_share(_: WhatsApp, clb: CallbackButton):
+def on_share_btn(_: WhatsApp, clb: CallbackButton):
     book_id = ShareBook.from_callback(clb.data).id
     book = api.get_book(book_id)
     clb.reply_text(
@@ -124,14 +169,38 @@ def on_share(_: WhatsApp, clb: CallbackButton):
     )
 
 
-def on_start(_: WhatsApp, msg: Message):
-    msg.reply_text(
+def on_search_btn(_: WhatsApp, clb: CallbackButton):
+    clb.reply_text(
+        text=f"{gs(s.SEARCH_INSTRUCTIONS)}\n{gs(s.SEARCH_TIP)}",
+        keyboard=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+        footer=gs(s.PYWA_CREDIT),
+    )
+
+
+def on_stats_btn(_: WhatsApp, clb: CallbackButton):
+    clb.reply_text(
+        text=helpers.get_stats(clb.from_user),
+        footer=gs(s.PYWA_CREDIT),
+        keyboard=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+    )
+
+
+def on_about_btn(_: WhatsApp, clb: CallbackButton):
+    clb.reply_text(
+        text=gs(s.WA_ABOUT_MSG),
+        footer=gs(s.PYWA_CREDIT),
+        keyboard=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+    )
+
+
+def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton):
+    msg_or_clb.reply_text(
         header=gs(s.WA_WELCOME_HEADER),
         text=gs(s.WA_WELCOME_BODY),
         keyboard=[
             InlineButton(
-                title=gs(s.BROWSE),
-                callback_data=Menu.BROWSE
+                title=gs(s.SEARCH),
+                callback_data=Menu.SEARCH
             ),
             InlineButton(
                 title=gs(s.STATS),
@@ -142,5 +211,5 @@ def on_start(_: WhatsApp, msg: Message):
                 callback_data=Menu.ABOUT
             )
         ],
-        footer=gs(s.WA_WELCOME_FOOTER),
+        footer=gs(s.IN_MEMORY_FOOTER),
     )

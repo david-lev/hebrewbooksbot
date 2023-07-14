@@ -1,15 +1,16 @@
 import logging
 import wa.utils as utils
-from wa.helpers import Commands, DEFAULT_LANGUAGE
-from wa.utils import Menu
-from wa import search, browse
 from fastapi import FastAPI
-from pywa import WhatsApp
+from pywa import WhatsApp, filters as fil
 from pywa.filters import TextFilter, CallbackFilter
 from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
+from pywa.types import Message
+from data.callbacks import ShowBook, ShareBook, SearchNavigation, ReadBook
 from data.config import get_settings
-from data.callbacks import ShowBook, ShareBook, SearchNavigation, BrowseType, ReadBook
 from db import repository
+from wa import search
+from wa.helpers import DEFAULT_LANGUAGE
+from wa.utils import Menu
 
 conf = get_settings()
 fastapi_app = FastAPI()
@@ -29,6 +30,8 @@ logging.basicConfig(
     format="Time: %(asctime)s | Level: %(levelname)s | Module: %(module)s | Message: %(message)s",
     handlers=[console_handler, file_handler],
 )
+
+start_filter = TextFilter.command("start", "התחל", "התחלה", prefixes=("!", "/"))
 
 wa.add_handlers(
     MessageHandler(
@@ -59,8 +62,7 @@ wa.add_handlers(
         lambda _, m: len(m.text.split(':')) == 3
     ),
     MessageHandler(
-        utils.on_start,
-        TextFilter.command("start", "התחל", "התחלה", prefixes=("!", "/")),
+        utils.on_start, start_filter,
     ),
     ButtonCallbackHandler(
         utils.on_start,
@@ -85,4 +87,12 @@ wa.add_handlers(
 
 )
 
-wa.add_handlers(MessageHandler(lambda _, msg: repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE)))
+
+def on_new_user(client: WhatsApp, msg: Message):
+    if repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE):
+        if fil.not_(start_filter):
+            utils.on_start(client, msg)
+
+
+wa.add_handlers(MessageHandler(on_new_user))
+

@@ -46,7 +46,7 @@ def slice_long_string(string: str, max_length: int, suffix: str = "...") -> str:
     return string[:max_length - len(suffix)] + suffix if len(string) > max_length else string
 
 
-def get_book_details(book: Book):
+def get_book_details(book: Book) -> str:
     return "".join((
         f"📚 {book.title}\n",
         f"👤 {book.author}\n" if book.author else "",
@@ -56,7 +56,7 @@ def get_book_details(book: Book):
     ))
 
 
-def get_page_details(book: Book, page_status: str):
+def get_page_details(book: Book, page_status: str) -> str:
     return "".join((
         f"📚 {book.title}\n",
         f"👤 {book.author}\n" if book.author else "",

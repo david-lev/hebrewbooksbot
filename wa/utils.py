@@ -68,48 +68,47 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
 
 def read_book(_: WhatsApp, clb: CallbackButton):
     book, masechet, page = None, None, None
-    read_clb = ReadBook.from_callback(clb.data)
-    if read_clb.book_type == BookType.BOOK:
-        book = api.get_book(int(read_clb.id))
-        url = book.get_page_img(page=read_clb.page, width=750, height=1334) if read_clb.read_mode == ReadMode.IMAGE \
-            else book.get_page_pdf(page=read_clb.page)
-    elif read_clb.book_type == BookType.MASECHET:
-        masechet = api.get_masechet(int(read_clb.id))
-        page = masechet.pages[read_clb.page - 1]
-        url = page.get_page_img(width=750, height=1334) if read_clb.read_mode == ReadMode.IMAGE else page.pdf_url
+    read = ReadBook.from_callback(clb.data)
+    is_book = read.book_type == BookType.BOOK
+    is_image = read.read_mode == ReadMode.IMAGE
+    if is_book:
+        book = api.get_book(int(read.id))
+        url = book.get_page_img(page=read.page, width=750, height=1334) if is_image \
+            else book.get_page_pdf(page=read.page)
     else:
-        raise NotImplementedError
+        masechet = api.get_masechet(int(read.id))
+        page = masechet.pages[read.page - 1]
+        url = page.get_page_img(width=750, height=1334) if is_image else page.pdf_url
+    func = clb.reply_image if is_image else clb.reply_document
     buttons = [
         InlineButton(
-            title=gs(s.DOCUMENT if read_clb.read_mode == ReadMode.IMAGE else s.IMAGE),
+            title=gs(s.DOCUMENT if is_image else s.IMAGE),
             callback_data=dataclasses.replace(
-                read_clb,
-                read_mode=ReadMode.PDF if read_clb.read_mode == ReadMode.IMAGE else ReadMode.IMAGE
+                read,
+                read_mode=ReadMode.PDF if is_image else ReadMode.IMAGE
             ).to_callback()
         ),
     ]
-    if read_clb.page < read_clb.total:
+    if read.page < read.total:
         buttons.append(InlineButton(
             title=gs(s.NEXT),
-            callback_data=dataclasses.replace(read_clb, page=read_clb.page + 1).to_callback()
+            callback_data=dataclasses.replace(read, page=read.page + 1).to_callback()
         ))
-    if 1 < read_clb.page < read_clb.total:
+    if read.page > 1:
         buttons.append(InlineButton(
             title=gs(s.PREVIOUS),
-            callback_data=dataclasses.replace(read_clb, page=read_clb.page - 1).to_callback()
+            callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
         ))
     caption = helpers.get_book_details(book) \
-        if read_clb.book_type == BookType.BOOK else helpers.get_masechet_details(masechet)
-    caption += f"\n{gs(s.PAGE_X_OF_Y, x=read_clb.page, y=read_clb.total)}"
-    if read_clb.read_mode == ReadMode.IMAGE:
-        clb.reply_image(image=url, buttons=buttons, caption=caption)
-    elif read_clb.read_mode == ReadMode.PDF:
-        file_name = f"{book.title} • {book.author} ({read_clb.page}).pdf" \
-            if read_clb.book_type == BookType.BOOK else f"{masechet.name} ({page.name}).pdf"
-        clb.reply_document(document=url, file_name=file_name, caption=caption, buttons=buttons)
+        if is_book else helpers.get_masechet_details(masechet)
+    caption += f"\n{gs(s.PAGE_X_OF_Y, x=read.page, y=read.total)}"
+    if is_image:
+        kwargs = dict(image=url, caption=caption, buttons=buttons)
     else:
-        raise NotImplementedError
-
+        file_name = f"{book.title} • {book.author} ({read.page}).pdf" \
+            if is_book else f"{masechet.name} ({page.name}).pdf"
+        kwargs = dict(document=url, file_name=file_name, caption=caption, buttons=buttons)
+    func(**kwargs)
     repository.increase_stats(StatsType.PAGES_READ)
 
 

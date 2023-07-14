@@ -308,8 +308,8 @@ STRINGS = {
         'he': '📚 ש"ס'
     },
     String.SHAS_CMD: {
-        'en': '!shas, ברכות, יז:',
-        'he': '!שס, ברכות, יז:'
+        'en': '!shas ברכות, יז:',
+        'he': '!שס ברכות, יז:'
     },
     String.TUR_AND_SA: {
         'en': '📓 Tur & Shulchan Aruch',

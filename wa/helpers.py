@@ -1,6 +1,7 @@
 from data.config import get_settings
 from data.models import Book, Masechet
 from data.strings import STRINGS, String, RTL
+from urllib import parse
 
 conf = get_settings()
 
@@ -22,7 +23,7 @@ def get_self_share(text: str) -> str:
     Args:
         text: The text to share.
     """
-    return f"https://wa.me/{conf.wa_phone_number}?text={text}"
+    return f"https://wa.me/{conf.wa_phone_number}?text={parse.quote_plus(text)}"
 
 
 def get_string(string: String, **kwargs) -> str:

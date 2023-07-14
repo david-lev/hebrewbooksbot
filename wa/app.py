@@ -25,6 +25,7 @@ file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=
                                                     mode='D')
 file_handler.setLevel(logging.DEBUG)
 logging.basicConfig(
+    level=conf.log_level,
     format="Time: %(asctime)s | Level: %(levelname)s | Module: %(module)s | Message: %(message)s",
     handlers=[console_handler, file_handler],
 )

@@ -116,7 +116,7 @@ def search(title: str, author: str, offset: int, limit: int) -> tuple[list[Searc
     except ValueError:
         return [], 0
     except requests.HTTPError as e:
-        if e.response.status_code == 500:
+        if e.response.status_code in (400, 500):
             return [], 0
         raise
     return [SearchResults(**b) for b in data['data']], data['total']

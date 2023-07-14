@@ -19,7 +19,7 @@ def empty_search(_: Client, query: InlineQuery):
             InlineQueryResultArticle(
                 id="1",
                 title=gs(mqc=query, string=s.START_SEARCH_INLINE),
-                description=gs(mqc=query, string=s.SEARCH_INLINE_TIP),
+                description=gs(mqc=query, string=s.SEARCH_TIP),
                 input_message_content=InputTextMessageContent(
                     message_text="/start"
                 )
@@ -102,7 +102,7 @@ def search_books_inline(_: Client, query: InlineQuery):
         if page > book.pages:
             query.answer(
                 results=[],
-                switch_pm_text=gs(mqc=query, string=s.PAGE_NOT_EXIST).format(start=1, total=book.pages),
+                switch_pm_text=gs(mqc=query, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(x=1, y=book.pages),
                 switch_pm_parameter="search"
             )
             return

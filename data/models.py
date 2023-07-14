@@ -161,6 +161,10 @@ class Book:
         """Get the book's PDF URL"""
         return f'https://download.hebrewbooks.org/downloadhandler.ashx?req={self.id}'
 
+    def _validate_page(self, page: int) -> None:
+        if page < 1 or page > self.pages:
+            raise ValueError(f'Page number must be between 1 and {self.pages}')
+
     def get_page_img(self, page: int, width: int, height: int) -> str:
         """
         Get the book's page image URL
@@ -170,6 +174,7 @@ class Book:
             width: The width of the image.
             height: The height of the image.
         """
+        self._validate_page(page)
         return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png'
 
     def get_page_pdf(self, page: int) -> str:
@@ -179,6 +184,7 @@ class Book:
         Args:
             page: The page number.
         """
+        self._validate_page(page)
         return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.id}_{page}.pdf'
 
     def get_page_url(self, page: int) -> str:
@@ -188,4 +194,5 @@ class Book:
         Args:
             page: The page number.
         """
+        self._validate_page(page)
         return f'https://hebrewbooks.org/pdfpager.aspx?req={self.id}&pgnum={page}'

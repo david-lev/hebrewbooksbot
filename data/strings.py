@@ -8,8 +8,9 @@ class String(Enum):
     TG_WELCOME = auto()  # V
     WA_WELCOME_HEADER = auto()  # V
     WA_WELCOME_BODY = auto()  # V
-    WA_WELCOME_FOOTER = auto()  # V
+    IN_MEMORY_FOOTER = auto()  # V
     SEARCH = auto()  # V
+    SEARCH_INSTRUCTIONS = auto()  # V
     SEARCH_IN_CHATS = auto()  # V
     BROWSE = auto()  # V
     INSTANT_READ = auto()  # V
@@ -17,6 +18,7 @@ class String(Enum):
     GITHUB = auto()  # V
     ABOUT = auto()  # V
     WA_ABOUT_MSG = auto()  # V
+    PYWA_CREDIT = auto()  # V
     HEBREWBOOKS_SITE = auto()  # V
     STATS = auto()  # V
     SHOW_STATS = auto()  # V
@@ -29,8 +31,8 @@ class String(Enum):
     PAGE_X_OF_Y = auto()  # RTL ⚠️
     READ_ON_SITE = auto()  # V
     SLOW_DOWN = auto()  # V
-    PAGE_NOT_EXIST = auto()  # V
-    JUMP_NUMBERS_ONLY = auto()  # V
+    PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y = auto()  # V
+    NUMBERS_ONLY = auto()  # V
     JUMP_TIP = auto()  # V
     CHOOSE_BROWSE_TYPE = auto()  # V
     SHAS = auto()  # V
@@ -49,8 +51,9 @@ class String(Enum):
     CHOOSE_DATE_RANGE = auto()  # V
     CHOOSE_MASECHET = auto()  # V
     START_SEARCH_INLINE = auto()  # V
-    SEARCH_INLINE_TIP = auto()  # V
+    SEARCH_TIP = auto()  # V
     BOOK_NOT_FOUND = auto()  # V
+    MASECHET_NOT_FOUND = auto()  # V
     PRESS_TO_SHARE = auto()  # V
     SEARCH_RESULTS = auto()  # V
     X_RESULTS_FOR_S = auto()  # RTL ⚠️
@@ -122,15 +125,14 @@ STRINGS = {
             "This bot allows searching and browsing books on hebrewbooks.org\n",
             "*⚡️ Features:*",
             "🔎 Searching for books by sending a message",
-            "📓 Browsing through the Shas masechtot",
-            "📚 Browse the library by category, date or letter",
             "📖 Reading mode as an image or as a PDF (text coming soon)",
             "⏩ Jump to page",
             "♻️ Sharing books with friends\n",
             "*💡 Tips:*",
             "• To search for a book by title or author, use the format ```title:author```",
-            "• In Read Mode, you can jump to a page by replying to the message with the page number\n",
             "*🔜 Coming soon:*",
+            "• Browse the library by category, date or letter",
+            "• Browsing through the Shas masechtot",
             "• Search the contents of the books",
             "• Saving favorite books and bookmarks",
             "• Change language manually\n",
@@ -140,28 +142,55 @@ STRINGS = {
             "בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org\n",
             "*⚡️ פיצ'רים:*",
             "🔎 חיפוש ספרים על ידי שליחת הודעה",
-            "📓 עיון במסכתות הש\"ס",
-            "📚 עיון בספריה לפי קטגוריה, תאריך או אות",
             "📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)",
             "⏪ קפיצה לעמוד",
             "♻️ שיתוף ספרים עם חברים\n",
             "*💡 טיפים:*",
             "• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט ```כותרת:מחבר```",
-            "• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר העמוד\n",
             "*🔜 בקרוב:*",
+            "• עיון בספריה לפי קטגוריה, תאריך או אות",
+            "• עיון במסכתות הש\"ס",
             "• חיפוש בתוכן הספרים",
             "• שמירת ספרים מועדפים וסימניות",
             "• שינוי שפה באופן ידני\n",
             "📮 למשוב והערות - t.me/davidlev\n"
         ])
     },
-    String.WA_WELCOME_FOOTER: {
+    String.PYWA_CREDIT: {
+        'en': "⚡ Powered by PyWa",
+        'he': "⚡ נבנה באמצעות PyWa"
+    },
+    String.IN_MEMORY_FOOTER: {
         'en': "🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l",
         'he': "🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז\"ל"
     },
-    String.WA_ABOUT_MSG: {  # TODO: update this
-        'en': 'x',
-        'he': 'x'
+    String.WA_ABOUT_MSG: {
+        'en': "\n".join((
+            "This bot was built with the aim of making the content of the hebrewbooks.org website accessible via WhatsApp.",
+            "The use is completely free and In memory my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil zt'l",
+            "If you would like to donate to cover the costs (server + access to the WhatsApp API), you can do so using one of the following options",
+            "- PayPal paypal.me/davidlev",
+            "- GitHub github.com/sponsors/david-lev",
+            "- Contact us on Telegram t.me/davidlev",
+            "\nAn improved version of the bot is also available on Telegram: t.me/hebooksbot",
+            "\nThe bot source code is available on GitHub: github.com/david-lev/hebrewbooksbot"
+            "\nThe bot was built using the pywa library github.com/david-lev/pywa"
+        )),
+        'he': "\n".join((
+            "*בוט זה נבנה במטרה להנגיש את תוכן אתר hebrewbooks.org באמצעות וואטסאפ.*",
+            "\nהשימוש בבוט חינמי לחלוטין ולעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל",
+            "אם ברצונכם לתרום לצורך כיסוי העלויות (שרת + גישה ל-WhatsApp API), תוכלו לעשות זאת באמצעות אחת מהאפשרויות הבאות",
+            "- פייפאל paypal.me/davidlev",
+            "- גיטהאב github.com/sponsors/david-lev",
+            "- פנו בטלגרם t.me/davidlev",
+            "\nגרסה משופרת של הבוט קיימת גם בטלגרם: t.me/hebooksbot",
+            "\nקוד הבוט זמין בגיטהאב github.com/david-lev/hebrewbooksbot",
+            "\nהבוט נבנה באמצעות ספריית pywa github.com/david-lev/pywa",
+        ))
+    },
+    String.SEARCH_INSTRUCTIONS: {
+        'en': '🔎 To search for a book, send a message with your search query',
+        'he': '🔎 כדי לחפש ספר, שלחו הודעה עם מילות החיפוש'
     },
     String.SEARCH: {
         'en': '🔎 Search',
@@ -192,38 +221,38 @@ STRINGS = {
         'he': '📊 סטטיסטיקות'
     },
     String.SHOW_STATS: {
-        'en': (
-            "📊 Bot Stats 📊\n\n",
-            "📚 Books read: {books_read:,}\n",
-            "📖 Pages read: {pages_read:,}\n",
-            "🔎 Searches: {searches:,}\n"
-        ),
-        'he': (
-            "📊 סטטיסטיקות הבוט 📊\n\n",
-            "📚 ספרים נקראו: {books_read:,}\n",
-            "📖 דפים נקראו: {pages_read:,}\n",
-            "🔎 חיפושים: {searches:,}\n"
-        )
+        'en': "\n".join((
+            "📊 Bot Stats 📊\n",
+            "📚 Books read: {books_read:,}",
+            "📖 Pages read: {pages_read:,}",
+            "🔎 Searches: {searches:,}"
+        )),
+        'he': "\n".join((
+            "📊 סטטיסטיקות הבוט 📊\n",
+            "📚 ספרים נקראו: {books_read:,}",
+            "📖 דפים נקראו: {pages_read:,}",
+            "🔎 חיפושים: {searches:,}"
+        ))
     },
     String.SHOW_STATS_ADMIN: {
-        'en': (
-            "📊 Bot Stats 📊\n\n",
-            "👥 Registered users: {users_count:,}\n",
-            "📚 Books read: {books_read:,}\n",
-            "📖 Pages read: {pages_read:,}\n",
-            "🔎 Inline Searches: {inline_searches:,}\n"
-            "💬 Message Searches: {msg_searches:,}\n"
-            "⏭ Jumps to page: {jumps:,}\n"
-        ),
-        'he': (
-            "📊 סטטיסטיקות הבוט 📊\n\n",
-            "👥 משתמשים רשומים: {users_count:,}\n",
-            "📚 ספרים נקראו: {books_read:,}\n",
-            "📖 דפים נקראו: {pages_read:,}\n",
-            "🔎 חיפושים באינליין: {inline_searches:,}\n"
-            "💬 חיפושים בהודעות: {msg_searches:,}\n"
-            "⏭ קפיצות לדף: {jumps:,}\n"
-        )
+        'en': "\n".join((
+            "📊 Bot Stats 📊\n",
+            "👥 Registered users: {users_count:,}",
+            "📚 Books read: {books_read:,}",
+            "📖 Pages read: {pages_read:,}",
+            "🔎 Inline Searches: {inline_searches:,}"
+            "💬 Message Searches: {msg_searches:,}"
+            "⏭ Jumps to page: {jumps:,}"
+        )),
+        'he': "\n".join((
+            "📊 סטטיסטיקות הבוט 📊\n",
+            "👥 משתמשים רשומים: {users_count:,}",
+            "📚 ספרים נקראו: {books_read:,}",
+            "📖 דפים נקראו: {pages_read:,}",
+            "🔎 חיפושים באינליין: {inline_searches:,}"
+            "💬 חיפושים בהודעות: {msg_searches:,}"
+            "⏭ קפיצות לדף: {jumps:,}"
+        ))
     },
     String.INSTANT_READ: {
         'en': '📖 Instant Read 📖',
@@ -257,9 +286,9 @@ STRINGS = {
         'en': "Slow down...",
         'he': "אני לא מלאך.. לאט יותר"
     },
-    String.JUMP_NUMBERS_ONLY: {
-        'en': 'Please enter numbers only',
-        'he': 'יש לשלוח מספרים בלבד'
+    String.NUMBERS_ONLY: {
+        'en': 'Please use numbers only',
+        'he': 'יש להשתמש במספרים בלבד'
     },
     String.JUMP_TIP: {
         'en': 'Tip: instead of browsing, reply to this message with the page number you want to read.\
@@ -267,11 +296,11 @@ STRINGS = {
         'he': 'טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא.\
              \nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.'
     },
-    String.PAGE_NOT_EXIST: {
-        'en': 'The page does not exist! (Choose a page between {start} and {total})',
-        'he': 'הדף אינו קיים! (בחרו עמוד בין {start} ל-{total})'
+    String.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y: {
+        'en': 'The page does not exist! (Choose a page between {x} and {y})',
+        'he': 'הדף אינו קיים! (בחרו עמוד בין {x} ל-{y})'
     },
-    String.SEARCH_INLINE_TIP: {
+    String.SEARCH_TIP: {
         'en': "Tip: You can search in the 'Title:Author' format in order to get more accurate results",
         'he': "טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות"
     },
@@ -282,6 +311,10 @@ STRINGS = {
     String.BOOK_NOT_FOUND: {
         'en': 'Book not found',
         'he': 'ספר לא נמצא'
+    },
+    String.MASECHET_NOT_FOUND: {
+        'en': 'Masechet not found',
+        'he': 'מסכת לא נמצאה'
     },
     String.PRESS_TO_SHARE: {
         'en': 'Click on the result to share {title}',

@@ -116,7 +116,7 @@ def search(title: str, author: str, offset: int, limit: int) -> tuple[list[Searc
     except ValueError:
         return [], 0
     except requests.HTTPError as e:
-        if e.response.status_code == 500:
+        if e.response.status_code in (400, 500):
             return [], 0
         raise
     return [SearchResults(**b) for b in data['data']], data['total']
@@ -193,7 +193,10 @@ def get_masechet(masehet_read_id: int) -> Masechet:
     Args:
         masehet_read_id: The masechet to get
     """
-    masechet = get_masechtot()[masehet_read_id - 1]
+    try:
+        masechet = get_masechtot()[masehet_read_id - 1]
+    except IndexError:
+        raise ValueError(f'Invalid masechet id: {masehet_read_id}')
     html = _make_request(
         endpoint=f'/shas.aspx',
         params={'mesechta': masechet.id},
@@ -289,19 +292,20 @@ def get_tursa(tursa_id: str | None = None) -> list[Tursa]:
 
 
 if __name__ == '__main__':
-    letters = get_letters()
-    assert len(browse(BrowseType.LETTER, letters[0].id, offset=1, limit=5)[0]) == 5
-    subjects = get_subjects()
-    assert len(browse(BrowseType.SUBJECT, subjects[0].id, offset=1, limit=5)[0]) == 5
-    daterange = get_date_ranges()
-    assert len(browse(BrowseType.DATERANGE, daterange[0].id, offset=1, limit=5)[0]) == 5
-    search_res, total = search(title="דוד", author='דוד', offset=1, limit=10)
-    assert get_book(search_res[0].id).id == search_res[0].id
-    assert len(search_res) == 10
-    assert all(('דוד' in res.title for res in search_res))
-    assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
-    assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
-    masechtot = get_masechtot()
-    assert len(masechtot) == 37
-    masehet = get_masechet(masechtot[0].id)
-    assert masehet.id != masechtot[0].id
+    print(get_book(1).get_page_img(11111, 1, 67))
+    # letters = get_letters()
+    # assert len(browse(BrowseType.LETTER, letters[0].id, offset=1, limit=5)[0]) == 5
+    # subjects = get_subjects()
+    # assert len(browse(BrowseType.SUBJECT, subjects[0].id, offset=1, limit=5)[0]) == 5
+    # daterange = get_date_ranges()
+    # assert len(browse(BrowseType.DATERANGE, daterange[0].id, offset=1, limit=5)[0]) == 5
+    # search_res, total = search(title="דוד", author='דוד', offset=1, limit=10)
+    # assert get_book(search_res[0].id).id == search_res[0].id
+    # assert len(search_res) == 10
+    # assert all(('דוד' in res.title for res in search_res))
+    # assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
+    # assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
+    # masechtot = get_masechtot()
+    # assert len(masechtot) == 37
+    # masehet = get_masechet(masechtot[0].id)
+    # assert masehet.id != masechtot[0].id

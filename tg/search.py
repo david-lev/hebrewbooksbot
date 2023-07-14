@@ -1,13 +1,15 @@
 from pyrogram import Client
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, \
     InlineKeyboardButton, Message, CallbackQuery
+import data
 from data import api
 from data.models import Book
 from db import repository
 from db.repository import StatsType
 from tg import helpers
-from tg.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
-from tg.strings import String as s, get_string as gs, get_lang_code as glc
+from tg.helpers import get_string as gs, get_lang_code as glc
+from data.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
+from data.strings import String as s
 
 
 def empty_search(_: Client, query: InlineQuery):
@@ -17,7 +19,7 @@ def empty_search(_: Client, query: InlineQuery):
             InlineQueryResultArticle(
                 id="1",
                 title=gs(mqc=query, string=s.START_SEARCH_INLINE),
-                description=gs(mqc=query, string=s.SEARCH_INLINE_TIP),
+                description=gs(mqc=query, string=s.SEARCH_TIP),
                 input_message_content=InputTextMessageContent(
                     message_text="/start"
                 )
@@ -100,7 +102,7 @@ def search_books_inline(_: Client, query: InlineQuery):
         if page > book.pages:
             query.answer(
                 results=[],
-                switch_pm_text=gs(mqc=query, string=s.PAGE_NOT_EXIST).format(start=1, total=book.pages),
+                switch_pm_text=gs(mqc=query, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(x=1, y=book.pages),
                 switch_pm_parameter="search"
             )
             return
@@ -112,7 +114,7 @@ def search_books_inline(_: Client, query: InlineQuery):
         repository.increase_stats(StatsType.BOOKS_READ)
         return
 
-    title, author = helpers.get_title_author(query.query)
+    title, author = data.helpers.get_title_author(query.query)
     results, total = api.search(
         title=title.strip(),
         author=author.strip(),
@@ -125,7 +127,7 @@ def search_books_inline(_: Client, query: InlineQuery):
         ),
         switch_pm_parameter="search",
         results=[_get_book_article(book=book, query=query, read_at_page=1) for book in (api.get_book(b.id) for b in results)],
-        next_offset=str(helpers.get_offset(int(query.offset or 1), total, increase=5))
+        next_offset=str(data.helpers.get_offset(int(query.offset or 1), total, increase=5))
     )
     repository.increase_stats(StatsType.INLINE_SEARCHES)
 
@@ -136,7 +138,7 @@ def search_books_message(_: Client, msg: Message):
 
     msg.text format: "{title}" / "{title}:{author}"
     """
-    title, author = helpers.get_title_author(msg.text)
+    title, author = data.helpers.get_title_author(msg.text)
     results, total = api.search(
         title=title,
         author=author,
@@ -145,11 +147,11 @@ def search_books_message(_: Client, msg: Message):
     )
     if total == 0:
         msg.reply_text(
-            text=gs(mqc=msg, string=s.NO_RESULTS_FOR_S).format(query=msg.text),
+            text=gs(mqc=msg, string=s.NO_RESULTS_FOR_Q).format(q=msg.text),
             quote=True
         )
         return
-    next_offset = helpers.get_offset(1, total, increase=5)
+    next_offset = data.helpers.get_offset(1, total, increase=5)
     next_previous_buttons = []
     if next_offset:
         next_previous_buttons.append(
@@ -193,14 +195,14 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
         clb.answer(gs(mqc=clb, string=s.ORIGINAL_SEARCH_DELETED), show_alert=True)
         return
 
-    title, author = helpers.get_title_author(search)
+    title, author = data.helpers.get_title_author(search)
     results, total = api.search(
         title=title,
         author=author,
         offset=search_nav.offset,
         limit=5
     )
-    next_offset = helpers.get_offset(search_nav.offset, int(total), increase=5)
+    next_offset = data.helpers.get_offset(search_nav.offset, int(total), increase=5)
     next_previous_buttons = []
     if next_offset:
         next_previous_buttons.append(

@@ -5,7 +5,7 @@ from tg import search, helpers
 from tg import browse
 from tg import utils
 from tg.helpers import jump_to_page_filter, Menu
-from tg.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage, Broadcast
+from data.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage
 
 cfg = config.get_settings()
 

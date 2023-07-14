@@ -3,9 +3,9 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from db.repository import StatsType
 from tg import helpers
-from tg.helpers import Menu
-from tg.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
-from strings import String as s, get_string as gs
+from tg.helpers import Menu, get_string as gs
+from data.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
+from data.strings import String as s
 from data import api
 from db import repository
 
@@ -15,7 +15,7 @@ def start(_: Client, mc: Message | CallbackQuery):
     if isinstance(mc, Message):
         repository.add_tg_user(tg_id=mc.from_user.id, lang=mc.from_user.language_code)
     kwargs = dict(
-        text=gs(mc, s.WELCOME),
+        text=gs(mc, s.TG_WELCOME),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -49,7 +49,7 @@ def show_stats(_: Client, clb: CallbackQuery):
     if helpers.is_admin(clb):
         users_count = repository.get_tg_users_count()
         clb.answer(
-            text="".join(gs(clb, s.SHOW_STATS_ADMIN)).format(
+            text=gs(clb, s.SHOW_STATS_ADMIN).format(
                 users_count=users_count,
                 books_read=stats.books_read,
                 pages_read=stats.pages_read,
@@ -61,7 +61,7 @@ def show_stats(_: Client, clb: CallbackQuery):
         )
     else:
         clb.answer(
-            text="".join(gs(clb, s.SHOW_STATS)).format(
+            text=gs(clb, s.SHOW_STATS).format(
                 books_read=stats.books_read,
                 pages_read=stats.pages_read,
                 searches=stats.searches
@@ -204,19 +204,19 @@ def jump_to_page(_: Client, msg: Message):
         try:
             jump_to = masechet.pages.index(next(filter(lambda p: p.name == msg.text, masechet.pages))) + 1
         except (StopIteration, ValueError):
-            msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(
-                start=masechet.pages[0].name,
-                total=masechet.pages[-1].name
+            msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(
+                x=masechet.pages[0].name,
+                y=masechet.pages[-1].name
             ))
             return
     else:
         try:
             jump_to = int(msg.text)
             if jump_to > jump_clb.total or jump_to < 1:
-                msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST).format(start=1, total=jump_clb.total))
+                msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(x=1, y=jump_clb.total))
                 return
         except ValueError:
-            msg.reply_text(text=gs(mqc=msg, string=s.JUMP_NUMBERS_ONLY))
+            msg.reply_text(text=gs(mqc=msg, string=s.NUMBERS_ONLY))
             return
         book = api.get_book(jump_clb.id)
     _next_or_previous = next(filter(

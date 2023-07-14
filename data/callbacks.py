@@ -88,7 +88,7 @@ class SearchNavigation(CallbackData):
 
 @dataclass(frozen=True, slots=True)
 class ShowBook(CallbackData):
-    __clbname__ = 'sh'
+    __clbname__ = '!book'
     id: int
 
 
@@ -113,6 +113,20 @@ class ReadBook(CallbackData):
     read_mode: ReadMode
     book_type: BookType
 
+    @classmethod
+    def from_cmd(cls, cmd: str) -> 'ReadBook':
+        """
+        Convert a command string to a ReadBook object
+
+        Args:
+            cmd: The command string (e.g. "re:123:5:10:p:b")
+        """
+        try:
+            _, id_, page = cmd.split(':')
+            return cls(id_, int(page), 0, ReadMode.IMAGE, BookType.BOOK)
+        except ValueError as e:
+            raise ValueError(f"Invalid command for {cls.__name__}: {cmd}") from e
+
 
 @dataclass(frozen=True, slots=True)
 class JumpToPage(CallbackData):
@@ -124,7 +138,6 @@ class JumpToPage(CallbackData):
 
 
 @dataclass(frozen=True, slots=True)
-class Broadcast(CallbackData):
-    __clbname__ = 'broadcast'
-    send: bool
-    lang_code: str
+class ShareBook(CallbackData):
+    __clbname__ = 'share'
+    id: int

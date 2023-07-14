@@ -4,11 +4,25 @@ from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineQ
 from data import api, config
 from data.models import Book, Masechet, Tursa
 from data.enums import BrowseType as BrowseTypeEnum
-from tg.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
-from tg.strings import String as s, get_string as gs, get_lang_code as glc
+from data.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
+from data.strings import String as s, STRINGS, String, RTL, LTR
 
-RTL = '\u200f'
-LTR = '\u200e'
+DEFAULT_LANGUAGE = "en"
+
+
+def get_lang_code(mqc: Message | CallbackQuery | InlineQuery) -> str:
+    """Get the user's language code."""
+    try:
+        lang = mqc.from_user.language_code or DEFAULT_LANGUAGE
+    except AttributeError:
+        lang = DEFAULT_LANGUAGE
+    return lang
+
+
+def get_string(mqc: Message | CallbackQuery | InlineQuery, string: String) -> str:
+    """Get a string in the user's language."""
+    lang = get_lang_code(mqc)
+    return STRINGS[string].get(lang, STRINGS[string][DEFAULT_LANGUAGE])
 
 
 class Menu:
@@ -87,30 +101,6 @@ def get_tursa_text(tursa: Tursa, previous_tursa: Tursa) -> str:
         previous_tursa: The previous tursa.
     """
     return f"{RTL}[📚]({tursa.pdf_url}) {tursa.name} • {previous_tursa.name}"
-
-
-def get_title_author(text: str) -> tuple[str, str]:
-    """
-    Get the title and author from a text.
-    """
-    return (t.strip() for t in text.split(':', 1)) if ':' in text else (text.strip(), '')
-
-
-def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
-    """
-    Get the offset for thr next query results.
-
-    Args:
-        current_offset: The current offset.
-        total: The total number of results.
-        increase: The number of results to increase. (default: 5)
-    Returns:
-        The offset for the next query results (0 if there are no more results).
-    """
-    if (current_offset + increase) > total:
-        offset = total - current_offset
-        return 0 if offset < increase else offset
-    return current_offset + increase
 
 
 def jump_to_page_filter(_, __, msg: Message) -> bool:
@@ -195,7 +185,7 @@ def read_mode_chooser(
         return []
     return [
         InlineKeyboardButton(
-            text=gs(cm, string) if new_read_mode is read_clb.read_mode else emoji,
+            text=get_string(cm, string) if new_read_mode is read_clb.read_mode else emoji,
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page,
@@ -229,7 +219,7 @@ def next_previous_buttons(
         return buttons
     if page < total:
         buttons.append(InlineKeyboardButton(
-            text=gs(mqc=cm, string=s.NEXT),
+            text=get_string(mqc=cm, string=s.NEXT),
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page + 1,
@@ -269,7 +259,7 @@ def next_previous_buttons(
 
     if page > 1:
         buttons.append(InlineKeyboardButton(
-            text=gs(mqc=cm, string=s.PREVIOUS),
+            text=get_string(mqc=cm, string=s.PREVIOUS),
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page - 1,
@@ -278,4 +268,4 @@ def next_previous_buttons(
                 book_type=read_clb.book_type
             ).join_to_callback(*others)
         ))
-    return buttons if glc(cm) == "he" else buttons[::-1]
+    return buttons if get_lang_code(cm) == "he" else buttons[::-1]

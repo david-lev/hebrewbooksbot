@@ -84,6 +84,8 @@ def get_book(book_id: int) -> Book | None:
         if e.response.status_code == 400:
             return None
         raise
+    except ValueError:
+        return None
 
 
 @lru_cache(maxsize=10_000)

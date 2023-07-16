@@ -19,6 +19,7 @@ wa = WhatsApp(
     phone_id=conf.wa_phone_id,
     server=fastapi_app,
     verify_token=conf.wa_verify_token,
+    webhook_endpoint='/wa_webhook',
 )
 console_handler = logging.StreamHandler()
 console_handler.setLevel(conf.log_level)

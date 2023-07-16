@@ -181,6 +181,7 @@ def jump_to_page(client: WhatsApp, msg: Message):
     message_id = read_book(client, msg, dataclasses.replace(read, page=jump))
     if message_id is not None:
         MSG_TO_BOOK_CACHE[message_id] = read
+    repository.increase_stats(StatsType.JUMPS)
 
 
 def on_share_btn(_: WhatsApp, clb: CallbackButton):

@@ -69,10 +69,10 @@ def get_page_details(book: Book, page_status: str) -> str:
 def get_stats(wa_user: User):
     stats = repository.get_stats()
     if is_admin(wa_user):
-        users_count = repository.get_tg_users_count()
         return gs(
             string=s.SHOW_STATS_ADMIN,
-            users_count=users_count,
+            tg_users_count=repository.get_tg_users_count(),
+            wa_users_count=repository.get_wa_users_count(),
             books_read=stats.books_read,
             pages_read=stats.pages_read,
             inline_searches=stats.inline_searches,

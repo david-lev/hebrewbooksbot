@@ -47,10 +47,10 @@ def show_stats(_: Client, clb: CallbackQuery):
     """
     stats = repository.get_stats()
     if helpers.is_admin(clb):
-        users_count = repository.get_tg_users_count()
         clb.answer(
             text=gs(clb, s.SHOW_STATS_ADMIN).format(
-                users_count=users_count,
+                tg_users_count=repository.get_tg_users_count(),
+                wa_users_count=repository.get_wa_users_count(),
                 books_read=stats.books_read,
                 pages_read=stats.pages_read,
                 inline_searches=stats.inline_searches,

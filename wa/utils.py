@@ -1,13 +1,15 @@
 import dataclasses
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
-from data import api
+from data import api, config
 from db import repository
 from db.repository import StatsType
 from data.callbacks import ShareBook, ReadBook, ReadMode, BookType, ShowBook
 from data.strings import String as s
 from wa import helpers
 from wa.helpers import get_string as gs
+
+conf = config.get_settings()
 
 
 class Menu:
@@ -83,16 +85,11 @@ def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton):
     if is_book:
         try:
             book = api.get_book(int(read.id))
+            if book is None:
+                raise ValueError
         except ValueError:
             msg_or_clb.react("❌")
             msg_or_clb.reply_text(text=gs(s.BOOK_NOT_FOUND), quote=True)
-            return
-        if book is None:
-            msg_or_clb.react("❌")
-            msg_or_clb.reply_text(
-                text=gs(s.BOOK_NOT_FOUND),
-                quote=True
-            )
             return
         try:
             url = book.get_page_img(page=read.page, width=750, height=1334) if is_image \
@@ -186,17 +183,18 @@ def on_stats_btn(_: WhatsApp, clb: CallbackButton):
 
 
 def on_about_btn(_: WhatsApp, clb: CallbackButton):
-    clb.reply_text(
-        text=gs(s.WA_ABOUT_MSG),
+    clb.reply_image(
+        image='https://user-images.githubusercontent.com/42866208/253792713-07c75d45-4613-4ff8-a077-9d9b2f61f144.png',
+        body=gs(s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
         footer=gs(s.PYWA_CREDIT),
-        keyboard=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+        buttons=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
     )
 
 
 def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton):
     msg_or_clb.reply_text(
         header=gs(s.WA_WELCOME_HEADER),
-        text=gs(s.WA_WELCOME_BODY),
+        text=gs(s.WA_WELCOME_BODY, contact_phone_number=conf.contact_phone),
         keyboard=[
             InlineButton(
                 title=gs(s.SEARCH),

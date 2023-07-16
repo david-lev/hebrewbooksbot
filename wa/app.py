@@ -89,11 +89,8 @@ wa.add_handlers(
 )
 
 
+@wa.on_message()
 def on_new_user(client: WhatsApp, msg: Message):
     if repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE):
         if fil.not_(start_filter):
             utils.on_start(client, msg)
-
-
-wa.add_handlers(MessageHandler(on_new_user))
-

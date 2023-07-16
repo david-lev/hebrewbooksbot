@@ -12,6 +12,7 @@ def browse_menu(_: WhatsApp, clb: CallbackButton):
     """
     Browse menu
     """
+    raise NotImplementedError
     menu = [
         (BrowseTypeEnum.SHAS, s.SHAS, s.SHAS_CMD),
         (BrowseTypeEnum.SUBJECT, s.SUBJECTS, s.SUBJECTS_CMD),
@@ -42,6 +43,7 @@ def browse_help(_: WhatsApp, clb: CallbackSelection):
     """
     Browse help
     """
+    raise NotImplementedError
     msg_map = {
         BrowseTypeEnum.SHAS: s.SHAS_CMD,
         BrowseTypeEnum.SUBJECT: s.SUBJECTS_CMD,
@@ -55,6 +57,7 @@ def browse_from_msg(_: WhatsApp, msg: Message):
     """
     Browse query
     """
+    raise NotImplementedError
     cmd = msg.text
     if cmd.startswith(tuple(f"!{c}" for c in Commands.SHAS)):
         masechtot = api.get_masechtot()

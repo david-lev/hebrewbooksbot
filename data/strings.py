@@ -34,6 +34,8 @@ class String(Enum):
     PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y = auto()  # V
     NUMBERS_ONLY = auto()  # V
     JUMP_TIP = auto()  # V
+    JUMP_ALSO_BY_EDIT_TIP = auto()  # V
+    NO_BOOK_SELECTED = auto()  # V
     CHOOSE_BROWSE_TYPE = auto()  # V
     SHAS = auto()  # V
     SHAS_CMD = auto()  # V
@@ -293,14 +295,22 @@ STRINGS = {
         'he': 'יש להשתמש במספרים בלבד'
     },
     String.JUMP_TIP: {
-        'en': 'Tip: instead of browsing, reply to this message with the page number you want to read.\
-              \nYou can also edit the number you sent and the page will update accordingly.',
-        'he': 'טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא.\
-             \nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.'
+        'en': 'Tip: instead of browsing, reply to this message with the page number you want to read.',
+        'he': 'טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא.'
+    },
+    String.JUMP_ALSO_BY_EDIT_TIP: {
+        'en': 'Tip: instead of browsing, reply to this message with the page number you want to read.'
+              '\nYou can also edit the number you sent and the page will update accordingly.',
+        'he': 'טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא.'
+              '\nניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם.'
+    },
+    String.NO_BOOK_SELECTED: {
+        'en': 'No book selected or the message is too old',
+        'he': 'לא נבחר ספר או שההודעה ישנה מדי'
     },
     String.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y: {
         'en': 'The page does not exist! (Choose a page between {x} and {y})',
-        'he': 'הדף אינו קיים! (בחרו עמוד בין {x} ל-{y})'
+        'he': 'הדף אינו קיים! (בחרו דף בין {x} ל-{y})'
     },
     String.SEARCH_TIP: {
         'en': "Tip: You can search in the 'Title:Author' format in order to get more accurate results",

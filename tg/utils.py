@@ -266,6 +266,6 @@ def jump_tip(_: Client, clb: CallbackQuery):
     Jump to a page tip.
     """
     clb.answer(
-        text=gs(mqc=clb, string=s.JUMP_TIP),
+        text=gs(mqc=clb, string=s.JUMP_ALSO_BY_EDIT_TIP),
         show_alert=True
     )

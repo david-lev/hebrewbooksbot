@@ -11,6 +11,8 @@ from wa.helpers import get_string as gs
 
 conf = config.get_settings()
 
+MSG_TO_BOOK_CACHE: dict[str, ReadBook] = {}
+
 
 class Menu:
     START = 'start'
@@ -40,7 +42,14 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
         )
         return
     msg_or_cb.react("⬆️")
-    msg_or_cb.reply_document(
+    read_btn = ReadBook(
+        id=str(book.id),
+        page=1,
+        total=book.pages,
+        read_mode=ReadMode.IMAGE,
+        book_type=BookType.BOOK
+    )
+    message_id = msg_or_cb.reply_document(
         document=book.pdf_url,
         file_name=f"{book.title} • {book.author}.pdf",
         caption=helpers.get_book_details(book),
@@ -53,22 +62,21 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
             ),
             InlineButton(
                 title=gs(s.INSTANT_READ),
-                callback_data=ReadBook(
-                    id=str(book.id),
-                    page=1,
-                    total=book.pages,
-                    read_mode=ReadMode.IMAGE,
-                    book_type=BookType.BOOK
-                ).to_callback()
+                callback_data=read_btn.to_callback()
             )
         ]
     )
+    MSG_TO_BOOK_CACHE[message_id] = read_btn
     repository.increase_stats(StatsType.BOOKS_READ)
 
 
-def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton):
+def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton, data: ReadBook | None = None) -> str | None:
     book, masechet, page = None, None, None
-    if isinstance(msg_or_clb, Message):
+    if data is not None:
+        read = data
+    elif isinstance(msg_or_clb, CallbackButton):
+        read = ReadBook.from_callback(msg_or_clb.data)
+    else:
         try:
             read = ReadBook.from_cmd(msg_or_clb.text)
         except ValueError:
@@ -78,8 +86,6 @@ def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton):
                 quote=True
             )
             return
-    else:
-        read = ReadBook.from_callback(msg_or_clb.data)
     is_book = read.book_type == BookType.BOOK
     is_image = read.read_mode == ReadMode.IMAGE
     if is_book:
@@ -150,8 +156,31 @@ def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton):
         msg_or_clb.react("⬆️")
     caption = helpers.get_page_details(book, gs(s.PAGE_X_OF_Y, x=read.page, y=total)) \
         if is_book else helpers.get_masechet_details(masechet)
-    func(**kwargs, footer=gs(s.IN_MEMORY_FOOTER), caption=caption)
+    message_id = func(**kwargs, footer=gs(s.IN_MEMORY_FOOTER), caption=caption)
+    MSG_TO_BOOK_CACHE[message_id] = dataclasses.replace(read, total=total)
     repository.increase_stats(StatsType.PAGES_READ)
+    return message_id
+
+
+def jump_to_page(client: WhatsApp, msg: Message):
+    try:
+        jump = int(msg.text)
+    except ValueError:
+        msg.react("❌")
+        msg.reply_text(text=gs(s.NUMBERS_ONLY), quote=True)
+        return
+    if (read := MSG_TO_BOOK_CACHE.get(msg.reply_to_message.message_id)) is None:
+        msg.react("❌")
+        msg.reply_text(text=gs(s.NO_BOOK_SELECTED), quote=True)
+        return
+    if jump > read.total or jump < 1:
+        msg.react("❌")
+        msg.reply_text(text=gs(s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=read.total), quote=True)
+        return
+    msg.react("⬆️")
+    message_id = read_book(client, msg, dataclasses.replace(read, page=jump))
+    if message_id is not None:
+        MSG_TO_BOOK_CACHE[message_id] = read
 
 
 def on_share_btn(_: WhatsApp, clb: CallbackButton):

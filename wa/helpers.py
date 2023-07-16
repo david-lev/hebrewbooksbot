@@ -25,7 +25,7 @@ def get_self_share(text: str) -> str:
     Args:
         text: The text to share.
     """
-    return f"https://wa.me/{conf.wa_phone_number}?text={parse.quote_plus(text)}"
+    return f"wa.me/{conf.wa_phone_number}?text={parse.quote_plus(text)}"
 
 
 def is_admin(wa_user: User) -> bool:
@@ -63,6 +63,7 @@ def get_page_details(book: Book, page_status: str) -> str:
         f"📅 {book.year}\n" if book.year else "",
         f"🏙 {book.city}\n" if book.city else "",
         f"📖 {page_status}\n",
+        f"\n💡_{gs(s.JUMP_TIP)}_\n",
     ))
 
 

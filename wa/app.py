@@ -39,6 +39,8 @@ wa.add_handlers(
         search.on_search,
         TextFilter.ANY,
         TextFilter.length((3, 72)),
+        fil.not_(fil.REPLY),
+        lambda _, m: not m.text.isdigit()
     ),
     SelectionCallbackHandler(
         utils.show_book,
@@ -61,6 +63,9 @@ wa.add_handlers(
         utils.read_book,
         TextFilter.startswith(ShowBook.__clbname__),
         lambda _, m: len(m.text.split(':')) == 3
+    ),
+    MessageHandler(
+        utils.jump_to_page, fil.REPLY
     ),
     MessageHandler(
         utils.on_start, start_filter,
@@ -91,6 +96,5 @@ wa.add_handlers(
 
 @wa.on_message()
 def on_new_user(client: WhatsApp, msg: Message):
-    if repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE):
-        if fil.not_(start_filter):
-            utils.on_start(client, msg)
+    if repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE) and fil.not_(start_filter)(client, msg):
+        utils.on_start(client, msg)

@@ -153,7 +153,7 @@ STRINGS = {
             "• חיפוש בתוכן הספרים",
             "• שמירת ספרים מועדפים וסימניות",
             "• שינוי שפה באופן ידני\n",
-            "📮 למשוב והערות - t.me/davidlev\n"
+            "📮 למשוב והערות - wa.me/{contact_phone_number}\n"
         ])
     },
     String.PYWA_CREDIT: {
@@ -171,18 +171,18 @@ STRINGS = {
             "If you would like to donate to cover the costs (server + access to the WhatsApp API), you can do so using one of the following options",
             "- PayPal paypal.me/davidlev",
             "- GitHub github.com/sponsors/david-lev",
-            "- Contact us on Telegram t.me/davidlev",
+            "- Contact me on WhatsApp wa.me/{contact_phone_number}",
             "\nAn improved version of the bot is also available on Telegram: t.me/hebooksbot",
             "\nThe bot source code is available on GitHub: github.com/david-lev/hebrewbooksbot"
             "\nThe bot was built using the pywa library github.com/david-lev/pywa"
         )),
         'he': "\n".join((
-            "*בוט זה נבנה במטרה להנגיש את תוכן אתר hebrewbooks.org באמצעות וואטסאפ.*",
-            "\nהשימוש בבוט חינמי לחלוטין ולעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל",
-            "אם ברצונכם לתרום לצורך כיסוי העלויות (שרת + גישה ל-WhatsApp API), תוכלו לעשות זאת באמצעות אחת מהאפשרויות הבאות",
+            "*בוט זה נבנה במטרה להנגיש את תוכן אתר hebrewbooks.org באמצעות וואטסאפ.*\n",
+            "השימוש בבוט חינמי לחלוטין ולעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל",
+            "\nאם ברצונכם לתרום לצורך כיסוי העלויות (שרת + גישה ל-WhatsApp API), תוכלו לעשות זאת באמצעות אחת מהאפשרויות הבאות:",
             "- פייפאל paypal.me/davidlev",
             "- גיטהאב github.com/sponsors/david-lev",
-            "- פנו בטלגרם t.me/davidlev",
+            "- צרו קשר בוואטסאפ wa.me/{contact_phone_number}",
             "\nגרסה משופרת של הבוט קיימת גם בטלגרם: t.me/hebooksbot",
             "\nקוד הבוט זמין בגיטהאב github.com/david-lev/hebrewbooksbot",
             "\nהבוט נבנה באמצעות ספריית pywa github.com/david-lev/pywa",
@@ -237,7 +237,8 @@ STRINGS = {
     String.SHOW_STATS_ADMIN: {
         'en': "\n".join((
             "📊 Bot Stats 📊\n",
-            "👥 Registered users: {users_count:,}",
+            "👥 Telegram users: {tg_users_count:,}",
+            "👥 WhatsApp users: {wa_users_count:,}",
             "📚 Books read: {books_read:,}",
             "📖 Pages read: {pages_read:,}",
             "🔎 Inline Searches: {inline_searches:,}",
@@ -246,7 +247,8 @@ STRINGS = {
         )),
         'he': "\n".join((
             "📊 סטטיסטיקות הבוט 📊\n",
-            "👥 משתמשים רשומים: {users_count:,}",
+            "👥 משתמשי טלגרם: {tg_users_count:,}",
+            "👥 משתמשי וואטסאפ: {wa_users_count:,}",
             "📚 ספרים נקראו: {books_read:,}",
             "📖 דפים נקראו: {pages_read:,}",
             "🔎 חיפושים באינליין: {inline_searches:,}",

@@ -10,12 +10,6 @@ from bs4 import BeautifulSoup
 BASE_API = 'https://beta.hebrewbooks.org'
 
 
-def js_to_py(data: str, to: str) -> dict | list:
-    """Convert JavaScript to Python"""
-    start, end = ('[', ']') if to == 'list' else ('{', '}')
-    return json.loads(data[data.index(start):data.rindex(end) + 1])
-
-
 def _make_request(
         endpoint: str,
         params: dict[str, str | int] | None = None,
@@ -292,20 +286,19 @@ def get_tursa(tursa_id: str | None = None) -> list[Tursa]:
 
 
 if __name__ == '__main__':
-    print(get_book(1).get_page_img(11111, 1, 67))
-    # letters = get_letters()
-    # assert len(browse(BrowseType.LETTER, letters[0].id, offset=1, limit=5)[0]) == 5
-    # subjects = get_subjects()
-    # assert len(browse(BrowseType.SUBJECT, subjects[0].id, offset=1, limit=5)[0]) == 5
-    # daterange = get_date_ranges()
-    # assert len(browse(BrowseType.DATERANGE, daterange[0].id, offset=1, limit=5)[0]) == 5
-    # search_res, total = search(title="דוד", author='דוד', offset=1, limit=10)
-    # assert get_book(search_res[0].id).id == search_res[0].id
-    # assert len(search_res) == 10
-    # assert all(('דוד' in res.title for res in search_res))
-    # assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
-    # assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
-    # masechtot = get_masechtot()
-    # assert len(masechtot) == 37
-    # masehet = get_masechet(masechtot[0].id)
-    # assert masehet.id != masechtot[0].id
+    letters = get_letters()
+    assert len(browse(BrowseType.LETTER, letters[0].id, offset=1, limit=5)[0]) == 5
+    subjects = get_subjects()
+    assert len(browse(BrowseType.SUBJECT, subjects[0].id, offset=1, limit=5)[0]) == 5
+    daterange = get_date_ranges()
+    assert len(browse(BrowseType.DATERANGE, daterange[0].id, offset=1, limit=5)[0]) == 5
+    search_res, total = search(title="דוד", author='דוד', offset=1, limit=10)
+    assert get_book(search_res[0].id).id == search_res[0].id
+    assert len(search_res) == 10
+    assert all(('דוד' in res.title for res in search_res))
+    assert search(title='123456789', author='', offset=1, limit=5) == ([], 0)
+    assert len(get_suggestions(query='דוד', search_type='title', limit=10)) == 10
+    masechtot = get_masechtot()
+    assert len(masechtot) == 37
+    masehet = get_masechet(masechtot[0].id)
+    assert masehet.id != masechtot[0].id

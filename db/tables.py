@@ -1,16 +1,18 @@
 from functools import lru_cache
 from data import config
 from sqlalchemy import create_engine, BigInteger, String
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, scoped_session
 from sqlalchemy.orm import Session, sessionmaker
 
 engine = create_engine(f'sqlite:///{config.get_settings().sqlite_file_path}')  # , echo=True)
 
+session_factory = sessionmaker(bind=engine)
+Session = scoped_session(session_factory)
 
-@lru_cache
+
 def get_session() -> Session:
     """Get SQLAlchemy session"""
-    return sessionmaker(bind=engine)()
+    return Session()
 
 
 class BaseTable(DeclarativeBase):

@@ -38,7 +38,7 @@ wa.add_handlers(
         TextFilter.ANY,
         TextFilter.length((3, 72)),
         fil.not_(fil.REPLY),
-        lambda _, m: m.type == MessageType.TEXT and not m.text.isdigit()
+        lambda _, m: m.text is not None and not m.text.isdigit()
     ),
     SelectionCallbackHandler(
         utils.show_book,

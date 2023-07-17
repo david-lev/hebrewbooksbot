@@ -50,7 +50,7 @@ def get_book_details(book: Book) -> str:
     return "".join((
         f"📚 {book.title}\n",
         f"👤 {book.author}\n" if book.author else "",
-        f"📅 {book.year}\n" if book.year else "",
+        f"{RTL}📅 {book.year}\n" if book.year else "",
         f"🏙 {book.city}\n" if book.city else "",
         f"{RTL}📖 {book.pages}\n",
     ))
@@ -58,12 +58,13 @@ def get_book_details(book: Book) -> str:
 
 def get_page_details(book: Book, page_status: str) -> str:
     return "".join((
+        f"*{gs(s.INSTANT_READ)}*\n\n"
         f"📚 {book.title}\n",
         f"👤 {book.author}\n" if book.author else "",
-        f"📅 {book.year}\n" if book.year else "",
+        f"{RTL}📅 {book.year}\n" if book.year else "",
         f"🏙 {book.city}\n" if book.city else "",
         f"📖 {page_status}\n",
-        f"\n💡_{gs(s.JUMP_TIP)}_\n",
+        f"\n_💡{gs(s.JUMP_TIP)}_\n",
     ))
 
 

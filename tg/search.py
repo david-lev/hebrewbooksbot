@@ -40,7 +40,7 @@ def _get_book_article(book: Book, query: InlineQuery, read_at_page: int) -> Inli
     return InlineQueryResultArticle(
         id=str(book.id),
         title=book.title,
-        description=f"{book.author}{f' • {book.year}' if book.year else ''}{f' • {book.city}' if book.city else ''}",
+        description=book.description,
         input_message_content=InputTextMessageContent(
             message_text=helpers.get_book_text(book)
         ),

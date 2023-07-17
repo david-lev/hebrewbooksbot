@@ -62,7 +62,7 @@ def get_book_text(book: Book, page: int | None = None, read_mode: ReadMode | Non
             raise ValueError(f"Invalid read mode: {read_mode}")
     return "".join((
         f"{RTL}[📚]({url}) {book.title}\n",
-        f"{RTL}👤 {book.author}\n",
+        f"{RTL}👤 {book.author}\n" if book.author else "",
         f"{RTL}📅 {book.year}\n" if book.year else "",
         f"{RTL}🏙 {book.city}\n" if book.city else "",
         f"{RTL}📖 {book.pages}\n",

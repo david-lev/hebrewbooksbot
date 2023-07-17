@@ -37,7 +37,7 @@ def on_search(_: WhatsApp, msg: Message | CallbackSelection):
             rows=[
                 SectionRow(
                     title=sls(b.title, 24),
-                    description=sls(f"{b.author}{f' • {b.year}' if b.year else ''}{f' • {b.city}' if b.city else ''}", 72),
+                    description=sls(b.description, 72),
                     callback_data=ShowBook(b.id).to_callback()
                 ) for b in books
             ]

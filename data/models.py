@@ -157,6 +157,11 @@ class Book:
     new_reader_available: str  # true/false
 
     @property
+    def description(self) -> str:
+        """author • city • year"""
+        return " • ".join((f for f in (self.author, self.city, self.year) if f))
+
+    @property
     def pdf_url(self) -> str:
         """Get the book's PDF URL"""
         return f'https://download.hebrewbooks.org/downloadhandler.ashx?req={self.id}'

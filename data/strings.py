@@ -306,7 +306,7 @@ STRINGS = {
     },
     String.NO_BOOK_SELECTED: {
         'en': 'No book selected or the message is too old',
-        'he': 'לא נבחר ספר או שההודעה ישנה מדי'
+        'he': 'לא נבחר ספר או שההודעה נשלחה לפני זמן רב'
     },
     String.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y: {
         'en': 'The page does not exist! (Choose a page between {x} and {y})',

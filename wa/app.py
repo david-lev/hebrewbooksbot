@@ -51,7 +51,7 @@ wa.add_handlers(
     MessageHandler(
         utils.show_book,
         TextFilter.startswith(ShowBook.__clbname__),
-        lambda _, m: len(m.text.split(':')) == 2
+        lambda _, m: m.text is not None and len(m.text.split(':')) == 2
     ),
     ButtonCallbackHandler(
         utils.read_book,
@@ -60,7 +60,7 @@ wa.add_handlers(
     MessageHandler(
         utils.read_book,
         TextFilter.startswith(ShowBook.__clbname__),
-        lambda _, m: len(m.text.split(':')) == 3
+        lambda _, m: m.text is not None and len(m.text.split(':')) == 3
     ),
     MessageHandler(
         utils.jump_to_page, fil.REPLY

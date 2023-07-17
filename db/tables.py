@@ -4,10 +4,14 @@ from sqlalchemy import create_engine, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from sqlalchemy.orm import Session, sessionmaker
 
-engine = create_engine(f'sqlite:///{config.get_settings().sqlite_file_path}')  # , echo=True)
+
+engine = create_engine(
+    url=f'sqlite:///{config.get_settings().sqlite_file_path}',
+    pool_size=15,
+    max_overflow=10
+)
 
 
-@lru_cache
 def get_session() -> Session:
     """Get SQLAlchemy session"""
     return sessionmaker(bind=engine)()
@@ -45,8 +49,7 @@ class Stats(BaseTable):
 
 
 BaseTable.metadata.create_all(engine)
-session = get_session()
-session.bind = engine
-if not session.query(Stats).count():
-    session.add(Stats())
-    session.commit()
+with get_session() as session:
+    if not session.query(Stats).count():
+        session.add(Stats())
+        session.commit()

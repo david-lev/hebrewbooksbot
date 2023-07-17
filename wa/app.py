@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pywa import WhatsApp, filters as fil
 from pywa.filters import TextFilter, CallbackFilter
 from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
-from pywa.types import Message
+from pywa.types import Message, MessageType
 from data.callbacks import ShowBook, ShareBook, SearchNavigation, ReadBook
 from data.config import get_settings
 from db import repository
@@ -23,8 +23,7 @@ wa = WhatsApp(
 )
 console_handler = logging.StreamHandler()
 console_handler.setLevel(conf.log_level)
-file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * 1024 * 1024, backupCount=1,
-                                                    mode='D')
+file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * (2 ** 20), backupCount=1, mode='D')
 file_handler.setLevel(logging.DEBUG)
 logging.basicConfig(
     level=conf.log_level,
@@ -33,14 +32,13 @@ logging.basicConfig(
 )
 
 start_filter = TextFilter.command("start", "התחל", "התחלה", prefixes=("!", "/"))
-
 wa.add_handlers(
     MessageHandler(
         search.on_search,
         TextFilter.ANY,
         TextFilter.length((3, 72)),
         fil.not_(fil.REPLY),
-        lambda _, m: not m.text.isdigit()
+        lambda _, m: m.type == MessageType.TEXT and not m.text.isdigit()
     ),
     SelectionCallbackHandler(
         utils.show_book,

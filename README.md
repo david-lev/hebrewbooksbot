@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/42866208/253880953-49790cd4-3afb-441b-8f06-953ca7b798b6.png" width="100" height="100" alg/>
+<img src="https://user-images.githubusercontent.com/42866208/254011871-e2cfe5e5-70c1-45b6-b375-b56a006c576f.png" width="100" height="100" alg/>
 
 # HebrewBooksBot
 

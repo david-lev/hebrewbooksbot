@@ -62,11 +62,11 @@ def set_tg_user_active(tg_id: int, active: bool):
     session.commit()
 
 
-def add_wa_user(wa_id: str, lang: str) -> bool:
+def add_wa_user(wa_id: str, lang: str, active: bool = True) -> bool:
     """Add new wa user to db, return True if new user added"""
     session = get_session()
     try:
-        session.add(WaUser(wa_id=wa_id, lang=lang))
+        session.add(WaUser(wa_id=wa_id, lang=lang, active=active))
         session.commit()
         return True
     except IntegrityError:

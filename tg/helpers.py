@@ -1,5 +1,7 @@
 from functools import lru_cache
 from typing import Callable, Any
+
+from pyrogram import filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineQuery
 from data import api, config
 from data.models import Book, Masechet, Tursa
@@ -8,7 +10,6 @@ from data.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookTyp
 from data.strings import String as s, STRINGS, String, RTL, LTR
 
 DEFAULT_LANGUAGE = "en"
-
 
 def get_lang_code(mqc: Message | CallbackQuery | InlineQuery) -> str:
     """Get the user's language code."""
@@ -33,6 +34,13 @@ class Menu:
     CONTACT_URL = 'https://t.me/davidlev'
     GITHUB_URL = 'https://github.com/david-lev/hebrewbooksbot'
     HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
+
+
+MESSAGE_SEARCH_FILTER = (
+        filters.text & ~filters.via_bot & ~filters.reply & ~filters.command([Menu.START, Menu.BROADCAST]) &
+        ~filters.create(lambda _, __, msg: msg.text.isdigit())
+        & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
+)
 
 
 def is_admin(mqc: Message | CallbackQuery | InlineQuery) -> bool:

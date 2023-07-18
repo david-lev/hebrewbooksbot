@@ -73,6 +73,7 @@ class String(Enum):
     LANGUAGE_CHANGED = auto()  # V
     SEARCHING_FOR_Q = auto()  # V
     NAVIGATE_BETWEEN_RESULTS = auto()  # V
+    UNDER_MAINTENANCE = auto()  # V
 
 
 STRINGS = {
@@ -457,5 +458,9 @@ STRINGS = {
     String.ABOUT: {
         'en': 'ℹ️ About',
         'he': f'{RTL}ℹ️ אודות'
-    }
+    },
+    String.UNDER_MAINTENANCE: {
+        'en': 'The bot is currently under maintenance. Please try again later.',
+        'he': 'הבוט כרגע בתחזוקה. נא לנסות שוב מאוחר יותר.'
+    },
 }

@@ -24,7 +24,7 @@ class Menu:
     HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
 
 
-def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
+def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
     try:
         show = ShowBook.from_callback(msg_or_cb.text if isinstance(msg_or_cb, Message) else msg_or_cb.data)
     except ValueError:
@@ -50,7 +50,7 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
         book_type=BookType.BOOK
     )
     message_id = msg_or_cb.reply_document(
-        document=book.pdf_url,
+        document=helpers.url_to_media_id(wa=client, url=book.pdf_url),
         file_name=f"{book.title} • {book.author}.pdf",
         caption=helpers.get_book_details(book),
         footer=gs(s.IN_MEMORY_FOOTER),
@@ -70,7 +70,7 @@ def show_book(_: WhatsApp, msg_or_cb: Message | CallbackSelection):
     repository.increase_stats(StatsType.BOOKS_READ)
 
 
-def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton, data: ReadBook | None = None) -> str | None:
+def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: ReadBook | None = None) -> str | None:
     book, masechet, page = None, None, None
     if data is not None:
         read = data
@@ -147,11 +147,11 @@ def read_book(_: WhatsApp, msg_or_clb: Message | CallbackButton, data: ReadBook 
             callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
         ))
     if is_image:
-        kwargs = dict(image=url, buttons=buttons)
+        kwargs = dict(image=helpers.url_to_media_id(wa=client, url=url), buttons=buttons)
     else:
         file_name = f"{book.title} • {book.author} ({read.page}).pdf" \
             if is_book else f"{masechet.name} ({page.name}).pdf"
-        kwargs = dict(document=url, file_name=file_name, buttons=buttons)
+        kwargs = dict(document=helpers.url_to_media_id(wa=client, url=url), file_name=file_name, buttons=buttons)
     if isinstance(msg_or_clb, Message):
         msg_or_clb.react("⬆️")
     caption = helpers.get_page_details(book, gs(s.PAGE_X_OF_Y, x=read.page, y=total)) \

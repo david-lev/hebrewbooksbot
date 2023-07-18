@@ -2,9 +2,9 @@ import logging
 import wa.utils as utils
 from fastapi import FastAPI
 from pywa import WhatsApp, filters as fil
-from pywa.filters import TextFilter, CallbackFilter
+from pywa.filters import TextFilter, CallbackFilter, MessageStatusFilter
 from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
-from pywa.types import Message, MessageType
+from pywa.types import Message, MessageStatus
 from data.callbacks import ShowBook, ShareBook, SearchNavigation, ReadBook
 from data.config import get_settings
 from db import repository
@@ -96,3 +96,8 @@ wa.add_handlers(
 def on_new_user(client: WhatsApp, msg: Message):
     if repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE) and fil.not_(start_filter)(client, msg):
         utils.on_start(client, msg)
+
+
+@wa.on_message_status(MessageStatusFilter.FAILED)
+def on_message_failed(_: WhatsApp, status: MessageStatus):
+    logging.error(f"Message failed to send to {status.from_user.wa_id} with error: {status.error}")

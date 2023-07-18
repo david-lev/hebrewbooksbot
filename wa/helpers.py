@@ -1,8 +1,11 @@
+from datetime import date
+from functools import lru_cache
+from urllib import parse
+from pywa import WhatsApp
 from pywa.types.others import User
 from data.config import get_settings
 from data.models import Book, Masechet
 from data.strings import STRINGS, RTL, String as s
-from urllib import parse
 from db import repository
 
 conf = get_settings()
@@ -95,3 +98,15 @@ def get_masechet_details(masechet: Masechet):
         f"📚 {masechet.name}\n",
         f"{RTL}📖 {masechet.pages[0].name}- {masechet.pages[-1].name}\n"
     ))
+
+
+def url_to_media_id(wa: WhatsApp, url: str) -> str:
+    """Get the media ID from a URL."""
+    today = date.today()
+    return _url_to_media_id(wa, url, year_month=f"{today.year}-{today.month}")
+
+
+@lru_cache
+def _url_to_media_id(wa: WhatsApp, url: str, year_month: str) -> str:
+    """Get the media ID from a URL."""
+    return wa.upload_media(media=url, mime_type=None)

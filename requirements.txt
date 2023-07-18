@@ -16,4 +16,4 @@ typing_extensions==4.7.1
 urllib3==2.0.3
 fastapi==0.100.0
 uvicorn==0.22.0
-pywa>=0.0.1rc24
+pywa>=0.0.1rc25

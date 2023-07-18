@@ -100,13 +100,13 @@ def get_masechet_details(masechet: Masechet):
     ))
 
 
-def url_to_media_id(wa: WhatsApp, url: str) -> str:
+def url_to_media_id(wa: WhatsApp, url: str, file_name: str) -> str:
     """Get the media ID from a URL."""
     today = date.today()
-    return _url_to_media_id(wa, url, year_month=f"{today.year}-{today.month}")
+    return _url_to_media_id(wa, url, year_month=f"{today.year}-{today.month}", file_name=file_name)
 
 
 @lru_cache
-def _url_to_media_id(wa: WhatsApp, url: str, year_month: str) -> str:
+def _url_to_media_id(wa: WhatsApp, url: str, file_name: str, year_month: str) -> str:
     """Get the media ID from a URL."""
-    return wa.upload_media(media=url, mime_type=None)
+    return wa.upload_media(media=url, mime_type=None, file_name=file_name)

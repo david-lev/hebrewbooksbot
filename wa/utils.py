@@ -50,8 +50,12 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         book_type=BookType.BOOK
     )
     message_id = msg_or_cb.reply_document(
-        document=helpers.url_to_media_id(wa=client, url=book.pdf_url),
-        file_name=f"{book.title} • {book.author}.pdf",
+        document=helpers.url_to_media_id(
+            wa=client,
+            url=book.pdf_url,
+            file_name=(file_name := f"{book.title} • {book.author}.pdf")
+        ),
+        file_name=file_name,
         caption=helpers.get_book_details(book),
         footer=gs(s.IN_MEMORY_FOOTER),
         quote=True,
@@ -147,11 +151,11 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
             callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
         ))
     if is_image:
-        kwargs = dict(image=helpers.url_to_media_id(wa=client, url=url), buttons=buttons)
+        kwargs = dict(image=helpers.url_to_media_id(wa=client, url=url, file_name=''), buttons=buttons)
     else:
         file_name = f"{book.title} • {book.author} ({read.page}).pdf" \
             if is_book else f"{masechet.name} ({page.name}).pdf"
-        kwargs = dict(document=helpers.url_to_media_id(wa=client, url=url), file_name=file_name, buttons=buttons)
+        kwargs = dict(document=helpers.url_to_media_id(wa=client, url=url, file_name=file_name), file_name=file_name, buttons=buttons)
     if isinstance(msg_or_clb, Message):
         msg_or_clb.react("⬆️")
     caption = helpers.get_page_details(book, gs(s.PAGE_X_OF_Y, x=read.page, y=total)) \

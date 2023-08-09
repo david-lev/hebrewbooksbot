@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     wa_phone_number: int
     wa_phone_id: str
     wa_admins: list[str]
-
+    hb_api_key: str
     hb_pdf_full_limit: Limit
     hb_pdf_page_limit: Limit
     hb_image_page_limit: Limit

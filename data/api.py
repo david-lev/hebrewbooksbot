@@ -2,12 +2,17 @@ import json
 import requests
 from functools import lru_cache
 from data.enums import BrowseType
+from .config import get_settings
 from data.models import Letter, DateRange, Subject, Book, SearchResults, MasechetBase, Masechet, MasechetPage, \
     PageContent, Tursa
 from data import helpers
 from bs4 import BeautifulSoup
 
 BASE_API = 'https://beta.hebrewbooks.org'
+conf = get_settings()
+api_key = {'api_key': conf.hb_api_key}
+session = requests.Session()
+session.headers.update({'User-Agent': 'HebrewBooksBot/1.0'})
 
 
 def _make_request(
@@ -23,7 +28,8 @@ def _make_request(
         params: The parameters to send (e.g. {'searchtype': 'all', 'search': 'אבגדה'})
         convert_to: The type to convert the response to (either 'dict', 'list' or 'html')
     """
-    res = requests.get(f'{BASE_API}{endpoint}', params=params)
+    params.update(api_key) if params is not None else api_key
+    res = session.get(f'{BASE_API}{endpoint}', params=params)
     res.raise_for_status()
     start, end = ('[', ']') if convert_to == 'list' else ('{', '}')
     return json.loads(res.text[res.text.index(start):res.text.rindex(end) + 1]) \

@@ -1,6 +1,7 @@
 from pyrogram import Client
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from data.rate_limit import limiter, RateLimit
 from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu, get_string as gs
@@ -75,6 +76,17 @@ def show_book(_: Client, clb: CallbackQuery):
     """
     Show a book.
     """
+    if (seconds := limiter.get_seconds_to_wait(
+            user_id=clb.from_user.id,
+            rate_limit_type=RateLimit.PDF_FULL
+    )) > 0:
+        clb.answer(
+            text=gs(clb, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
+                x=int(seconds // 60 if seconds >= 60 else seconds)
+            ),
+            show_alert=True
+        )
+        return
     _book_id, *others = clb.data.split(',')
 
     book = api.get_book(ShowBook.from_callback(_book_id).id)
@@ -121,6 +133,18 @@ def read_book(_: Client, clb: CallbackQuery):
     book, masechet, tursa, previous_tursa, total = None, None, None, None, None
     _read_book, *others = clb.data.split(',')
     read_clb = ReadBook.from_callback(_read_book)
+    if (seconds := limiter.get_seconds_to_wait(
+            user_id=clb.from_user.id,
+            rate_limit_type=RateLimit.IMAGE_PAGE if read_clb.read_mode == ReadMode.IMAGE else RateLimit.PDF_PAGE
+    )) > 0:
+        clb.answer(
+            text=gs(clb, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
+                x=int(seconds // 60 if seconds >= 60 else seconds)
+            ),
+            show_alert=True
+        )
+        return
+
     if read_clb.book_type == BookType.BOOK:
         book = api.get_book(int(read_clb.id))
         total = book.pages
@@ -198,7 +222,26 @@ def jump_to_page(_: Client, msg: Message):
     except (StopIteration, IndexError):
         return
     jump_clb = JumpToPage.from_callback(jump_button.callback_data)
+    _next_or_previous = next(filter(
+        lambda b: helpers.callback_matcher(
+            b.callback_data, ReadBook
+        ), msg.reply_to_message.reply_markup.inline_keyboard[1:-1][0])
+    )
+    next_or_previous, *nop_others = _next_or_previous.callback_data.split(',')
+    nop_clb = ReadBook.from_callback(next_or_previous)
     is_book = jump_clb.book_type == BookType.BOOK
+    if (seconds := limiter.get_seconds_to_wait(
+            user_id=msg.from_user.id,
+            rate_limit_type=RateLimit.IMAGE_PAGE
+            if nop_clb.read_mode == ReadMode.IMAGE else RateLimit.PDF_PAGE
+    )) > 0:
+        msg.reply(
+            text=gs(msg, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
+                x=int(seconds // 60 if seconds >= 60 else seconds)
+            ),
+            quote=True
+        )
+        return
     if not is_book:
         masechet = api.get_masechet(jump_clb.id)
         try:
@@ -219,13 +262,7 @@ def jump_to_page(_: Client, msg: Message):
             msg.reply_text(text=gs(mqc=msg, string=s.NUMBERS_ONLY))
             return
         book = api.get_book(jump_clb.id)
-    _next_or_previous = next(filter(
-        lambda b: helpers.callback_matcher(
-            b.callback_data, ReadBook
-        ), msg.reply_to_message.reply_markup.inline_keyboard[1:-1][0])
-    )
-    next_or_previous, *nop_others = _next_or_previous.callback_data.split(',')
-    nop_clb = ReadBook.from_callback(next_or_previous)
+
     kwargs = dict(
         text="".join((
             gs(mqc=msg, string=s.INSTANT_READ),

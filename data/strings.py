@@ -74,6 +74,8 @@ class String(Enum):
     SEARCHING_FOR_Q = auto()  # V
     NAVIGATE_BETWEEN_RESULTS = auto()  # V
     UNDER_MAINTENANCE = auto()  # V
+    WAIT_X_SECONDS = auto()  # V
+    WAIT_X_MINUTES = auto()  # V
 
 
 STRINGS = {
@@ -462,5 +464,13 @@ STRINGS = {
     String.UNDER_MAINTENANCE: {
         'en': 'The bot is currently under maintenance. Please try again later.',
         'he': 'הבוט כרגע בתחזוקה. נא לנסות שוב מאוחר יותר.'
+    },
+    String.WAIT_X_SECONDS: {
+        'en': 'You need to wait {x} seconds before getting the book/page.',
+        'he': 'עליכם להמתין {x} שניות לפני שתוכלו לקבל את הספר/עמוד.'
+    },
+    String.WAIT_X_MINUTES: {
+        'en': 'You need to wait {x} minutes before getting the book/page.',
+        'he': 'עליכם להמתין {x} דקות לפני שתוכלו לקבל את הספר/עמוד.'
     },
 }

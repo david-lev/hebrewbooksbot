@@ -2,10 +2,11 @@ import dataclasses
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
 from data import api, config
-from db import repository
-from db.repository import StatsType
 from data.callbacks import ShareBook, ReadBook, ReadMode, BookType, ShowBook
 from data.strings import String as s
+from data.rate_limit import limiter, RateLimit
+from db import repository
+from db.repository import StatsType
 from wa import helpers
 from wa.helpers import get_string as gs
 
@@ -31,6 +32,16 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         msg_or_cb.react("❌")
         msg_or_cb.reply_text(
             text=gs(s.NUMBERS_ONLY),
+            quote=True
+        )
+        return
+    if (seconds := limiter.get_seconds_to_wait(
+            user_id=msg_or_cb.from_user.wa_id,
+            rate_limit_type=RateLimit.PDF_FULL
+    )) > 0:
+        msg_or_cb.reply_text(
+            text=gs((s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
+                    x=int(seconds // 60 if seconds >= 60 else seconds)),
             quote=True
         )
         return
@@ -92,6 +103,16 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
             return
     is_book = read.book_type == BookType.BOOK
     is_image = read.read_mode == ReadMode.IMAGE
+    if (seconds := limiter.get_seconds_to_wait(
+            user_id=msg_or_clb.from_user.wa_id,
+            rate_limit_type=RateLimit.IMAGE_PAGE if is_image else RateLimit.PDF_PAGE
+    )) > 0:
+        msg_or_clb.reply_text(
+            text=gs((s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
+                    x=int(seconds // 60 if seconds >= 60 else seconds)),
+            quote=True
+        )
+        return
     if is_book:
         try:
             book = api.get_book(int(read.id))

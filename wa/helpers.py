@@ -2,12 +2,12 @@ from datetime import date
 from functools import lru_cache
 from urllib import parse
 from pywa import WhatsApp
-from pywa.errors import WhatsAppError
 from pywa.types.others import User
 from data.config import get_settings
 from data.models import Book, Masechet
 from data.strings import STRINGS, RTL, String as s
 from db import repository
+from data.api import session
 
 conf = get_settings()
 
@@ -101,20 +101,16 @@ def get_masechet_details(masechet: Masechet):
     ))
 
 
-def url_to_media_id(wa: WhatsApp, url: str, file_name: str) -> str:
+def url_to_media_id(wa: WhatsApp, url: str, file_name: str, mime_type: str) -> str:
     """Get the media ID from a URL."""
     today = date.today()
-    attempts = 3
-    while attempts > 0:
-        try:
-            return _url_to_media_id(wa, url, year_month=f"{today.year}-{today.month}", file_name=file_name)
-        except WhatsAppError:
-            attempts -= 1
-            if attempts == 0:
-                raise
+    return _url_to_media_id(
+        wa=wa, url=url, year_month=f"{today.year}-{today.month}", file_name=file_name, mime_type=mime_type
+    )
 
 
 @lru_cache
-def _url_to_media_id(wa: WhatsApp, url: str, file_name: str, year_month: str) -> str:
+def _url_to_media_id(wa: WhatsApp, url: str, file_name: str, year_month: str, mime_type: str) -> str:
     """Get the media ID from a URL. year_month is used for caching purposes."""
-    return wa.upload_media(media=url, mime_type=None, file_name=file_name)
+    return wa.upload_media(media=session.get(url).content, mime_type=mime_type, file_name=file_name)
+

@@ -40,9 +40,9 @@ else:
     wa.add_handlers(
         MessageHandler(
             search.on_search,
-            TextFilter.ANY,
+            TextFilter(),
             TextFilter.length((3, 72)),
-            fil.not_(fil.REPLY),
+            fil.not_(fil.reply),
             lambda _, m: m.text is not None and not m.text.isdigit()
         ),
         SelectionCallbackHandler(
@@ -68,14 +68,14 @@ else:
             lambda _, m: m.text is not None and len(m.text.split(':')) == 3
         ),
         MessageHandler(
-            utils.jump_to_page, fil.REPLY
+            utils.jump_to_page, fil.reply
         ),
         MessageHandler(
             utils.on_start, start_filter,
         ),
         ButtonCallbackHandler(
             utils.on_start,
-            CallbackFilter.data_match("start"),
+            CallbackFilter.data_matches("start"),
         ),
         ButtonCallbackHandler(
             utils.on_share_btn,
@@ -83,15 +83,15 @@ else:
         ),
         ButtonCallbackHandler(
             utils.on_search_btn,
-            CallbackFilter.data_match(Menu.SEARCH)
+            CallbackFilter.data_matches(Menu.SEARCH)
         ),
         ButtonCallbackHandler(
             utils.on_stats_btn,
-            CallbackFilter.data_match(Menu.STATS)
+            CallbackFilter.data_matches(Menu.STATS)
         ),
         ButtonCallbackHandler(
             utils.on_about_btn,
-            CallbackFilter.data_match(Menu.ABOUT)
+            CallbackFilter.data_matches(Menu.ABOUT)
         ),
 
     )
@@ -103,6 +103,6 @@ else:
             utils.on_start(client, msg)
 
 
-@wa.on_message_status(MessageStatusFilter.FAILED)
+@wa.on_message_status(MessageStatusFilter.failed)
 def on_message_failed(_: WhatsApp, status: MessageStatus):
     logging.error(f"Message failed to send to {status.from_user.wa_id} with error: {status.error}")

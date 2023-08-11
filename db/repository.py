@@ -112,3 +112,42 @@ def increase_stats(stats_type: StatsType):
     stats = session.query(Stats).first()
     setattr(stats, stats_type.value, getattr(stats, stats_type.value) + 1)
     session.commit()
+
+
+def _get_url_path_plus_query(url: str) -> str:
+    return f"{parse.urlparse(url).path}{'?' + parse.urlparse(url).query if parse.urlparse(url).query else ''}"
+
+
+@lru_cache(maxsize=None)
+def get_tg_file(url: str) -> type[TgFile]:
+    """Get tg file. raise sqlalchemy.orm.exc.NoResultFound if not found"""
+    return get_session().query(TgFile).filter(TgFile.hb_ep == _get_url_path_plus_query(url)).one()
+
+
+def create_tg_file(url: str, file_id: str, file_uid: str) -> None:
+    """Create tg file"""
+    session = get_session()
+    session.add(TgFile(hb_ep=_get_url_path_plus_query(url), file_id=file_id, file_uid=file_uid))
+    session.commit()
+
+
+@cache.cachable(cache_name='wa_file', params='url')
+def get_wa_file(*, url: str) -> type[WaFile]:
+    """Get wa file. raise sqlalchemy.orm.exc.NoResultFound if not found or if upload_date > 30 days"""
+    return get_session().query(WaFile).filter(WaFile.hb_ep == _get_url_path_plus_query(url)).one()
+
+
+@cache.invalidate(cache_name='wa_file', params='url')
+def create_wa_file(*, url: str, file_id: str) -> None:
+    """Create wa file"""
+    session = get_session()
+    session.add(WaFile(hb_ep=_get_url_path_plus_query(url), file_id=file_id))
+    session.commit()
+
+
+@cache.invalidate(cache_name='wa_file', params='url')
+def delete_wa_file(*, url: str) -> None:
+    """Delete wa file"""
+    session = get_session()
+    session.query(WaFile).filter(WaFile.hb_ep == _get_url_path_plus_query(url)).delete()
+    session.commit()

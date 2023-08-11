@@ -1,15 +1,18 @@
 from functools import lru_cache
 from typing import Callable, Any
-
 from pyrogram import filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineQuery
+from sqlalchemy.orm import exc
 from data import api, config
 from data.models import Book, Masechet, Tursa
 from data.enums import BrowseType as BrowseTypeEnum
 from data.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
 from data.strings import String as s, STRINGS, String, RTL, LTR
+from db import repository
 
 DEFAULT_LANGUAGE = "en"
+CACHE_CHANNEL_ID = config.get_settings().tg_cache_channel_id
+
 
 def get_lang_code(mqc: Message | CallbackQuery | InlineQuery) -> str:
     """Get the user's language code."""
@@ -277,3 +280,28 @@ def next_previous_buttons(
             ).join_to_callback(*others)
         ))
     return buttons if get_lang_code(cm) == "he" else buttons[::-1]
+
+
+def get_file_id(
+        send_method: Any,
+        media_attr: str,
+        url: str
+) -> str:
+    """
+    Get the file id from the url.
+
+    Args:
+        send_method: The method to send the file (bound method of pyrogram.Client).
+        media_attr: The attribute of the media to get the file id from.
+        url: The url of the file.
+    """
+    max_attempts = 3
+    while max_attempts:
+        try:
+            max_attempts -= 1
+            return repository.get_tg_file(url).file_id
+        except exc.NoResultFound:
+            file = getattr(send_method(**{media_attr: url, 'chat_id': CACHE_CHANNEL_ID}), media_attr)
+            repository.create_tg_file(url=url, file_id=file.file_id, file_uid=file.file_unique_id)
+            continue
+    raise ValueError(f"Could not get file id for {url}")

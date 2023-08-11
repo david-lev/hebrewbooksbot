@@ -1,4 +1,4 @@
-from functools import lru_cache
+from datetime import date
 from data import config
 from sqlalchemy import create_engine, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, scoped_session
@@ -26,11 +26,25 @@ class TgUser(BaseTable):
     active: Mapped[bool] = mapped_column(default=True)
 
 
+class TgFile(BaseTable):
+    __tablename__ = 'tg_file'
+    file_id: Mapped[str] = mapped_column(String(50), unique=True)
+    file_uid: Mapped[str] = mapped_column(String(50), unique=True)
+    hb_ep: Mapped[str] = mapped_column(String(100), unique=True)
+
+
 class WaUser(BaseTable):
     __tablename__ = 'wa_user'
     wa_id: Mapped[str] = mapped_column(String(50), unique=True)
     lang: Mapped[str] = mapped_column(String(5))
     active: Mapped[bool] = mapped_column(default=True)
+
+
+class WaFile(BaseTable):
+    __tablename__ = 'wa_file'
+    file_id: Mapped[str] = mapped_column(String(100), unique=True)
+    upload_date: Mapped[date] = mapped_column(default=date.today)
+    hb_ep: Mapped[str] = mapped_column(String(100), unique=True)
 
 
 class Stats(BaseTable):

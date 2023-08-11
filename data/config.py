@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     tg_api_id: int
     tg_api_hash: str
     tg_bot_token: str
+    tg_cache_channel_id: int
     tg_admins: list[int]
     wa_token: str
     wa_verify_token: str

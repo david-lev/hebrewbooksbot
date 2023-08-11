@@ -3,11 +3,12 @@ from functools import lru_cache
 from urllib import parse
 from pywa import WhatsApp
 from pywa.types.others import User
+from sqlalchemy.orm import exc
 from data.config import get_settings
 from data.models import Book, Masechet
 from data.strings import STRINGS, RTL, String as s
 from db import repository
-from data.api import session
+from data.api import session as api_session
 
 conf = get_settings()
 
@@ -101,16 +102,19 @@ def get_masechet_details(masechet: Masechet):
     ))
 
 
-def url_to_media_id(wa: WhatsApp, url: str, file_name: str, mime_type: str) -> str:
+def get_file_id(wa: WhatsApp, url: str, file_name: str, mime_type: str) -> str:
     """Get the media ID from a URL."""
-    today = date.today()
-    return _url_to_media_id(
-        wa=wa, url=url, year_month=f"{today.year}-{today.month}", file_name=file_name, mime_type=mime_type
-    )
-
-
-@lru_cache
-def _url_to_media_id(wa: WhatsApp, url: str, file_name: str, year_month: str, mime_type: str) -> str:
-    """Get the media ID from a URL. year_month is used for caching purposes."""
-    return wa.upload_media(media=session.get(url).content, mime_type=mime_type, file_name=file_name)
-
+    max_attempts = 3
+    while max_attempts:
+        try:
+            max_attempts -= 1
+            exists = repository.get_wa_file(url=url)
+            if exists.upload_date < (date.today() - timedelta(days=30)):
+                repository.delete_wa_file(url=url)
+                raise exc.NoResultFound
+            return exists.file_id
+        except exc.NoResultFound:
+            file_id = wa.upload_media(media=api_session.get(url).content, mime_type=mime_type, filename=file_name)
+            repository.create_wa_file(url=url, file_id=file_id)
+            continue
+    raise ValueError(f"Could not get file id for {url}")

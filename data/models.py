@@ -52,12 +52,12 @@ class Tursa:
     def pdf_url(self):
         """Get the page PDF url
         """
-        return f"https://beta.hebrewbooks.org/tursa/{self.id}.pdf?{api_key=!s}"
+        return f"https://beta.hebrewbooks.org/tursa/{self.id}.pdf"
 
     @property
     def url(self):
         """Get the read page url"""
-        return f"https://beta.hebrewbooks.org/tursa.aspx?a={self.id}&{api_key=!s}"
+        return f"https://beta.hebrewbooks.org/tursa.aspx?a={self.id}"
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,7 +93,7 @@ class MasechetPage:
     @property
     def pdf_url(self) -> str:
         """Get the page's PDF URL"""
-        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.masechet_id}_{self.id}.pdf?{api_key=!s}'
+        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.masechet_id}_{self.id}.pdf'
 
     def get_page_img(self, width: int, height: int) -> str:
         """
@@ -103,7 +103,7 @@ class MasechetPage:
             width: The width of the image.
             height: The height of the image.
         """
-        return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.masechet_id}_{self.id}_{width}_{height}.png?{api_key=!s}'
+        return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.masechet_id}_{self.id}_{width}_{height}.png'
 
     def get_page_url(self, fmt: str = 'pdf') -> str:
         """
@@ -112,7 +112,7 @@ class MasechetPage:
         Args:
             fmt: The format of the page (pdf, or text)
         """
-        return f'https://hebrewbooks.org/shas.aspx?mesechta={self.masechet_read_id}&daf={self.read_id}&format={fmt}&{api_key=!s}'
+        return f'https://hebrewbooks.org/shas.aspx?mesechta={self.masechet_read_id}&daf={self.read_id}&format={fmt}'
 
 
 @dataclass(frozen=True, slots=True)
@@ -167,7 +167,7 @@ class Book:
     @property
     def pdf_url(self) -> str:
         """Get the book's PDF URL"""
-        return f'https://download.hebrewbooks.org/downloadhandler.ashx?req={self.id}&{api_key=!s}'
+        return f'https://download.hebrewbooks.org/downloadhandler.ashx?req={self.id}'
 
     def _validate_page(self, page: int) -> None:
         if page < 1 or page > self.pages:
@@ -183,7 +183,7 @@ class Book:
             height: The height of the image.
         """
         self._validate_page(page)
-        return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png?{api_key=!s}'
+        return f'https://beta.hebrewbooks.org/reader/pagepngs/{self.id}_{page}_{width}_{height}.png'
 
     def get_page_pdf(self, page: int) -> str:
         """
@@ -193,7 +193,7 @@ class Book:
             page: The page number.
         """
         self._validate_page(page)
-        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.id}_{page}.pdf?{api_key=!s}'
+        return f'https://beta.hebrewbooks.org/pagefeed/hebrewbooks_org_{self.id}_{page}.pdf'
 
     def get_page_url(self, page: int) -> str:
         """
@@ -203,4 +203,4 @@ class Book:
             page: The page number.
         """
         self._validate_page(page)
-        return f'https://hebrewbooks.org/pdfpager.aspx?req={self.id}&pgnum={page}&{api_key=!s}'
+        return f'https://hebrewbooks.org/pdfpager.aspx?req={self.id}&pgnum={page}'

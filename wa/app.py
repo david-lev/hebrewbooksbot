@@ -2,18 +2,16 @@ import logging
 import wa.utils as utils
 from fastapi import FastAPI
 from pywa import WhatsApp, filters as fil
-from pywa.filters import TextFilter, CallbackFilter, MessageStatusFilter
-from pywa.handlers import MessageHandler, ButtonCallbackHandler, SelectionCallbackHandler
+from pywa.handlers import MessageHandler, CallbackButtonHandler, CallbackSelectionHandler
 from pywa.types import Message, MessageStatus
 from data.callbacks import ShowBook, ShareBook, SearchNavigation, ReadBook
 from data.config import get_settings
 from db import repository
-from wa import search
+from wa import search, helpers
 from wa.helpers import DEFAULT_LANGUAGE
 from wa.utils import Menu
 
 conf = get_settings()
-start_filter = TextFilter.command("start", "התחל", "התחלה", prefixes=("!", "/"))
 fastapi_app = FastAPI()
 wa = WhatsApp(
     token=conf.wa_token,
@@ -35,63 +33,77 @@ logging.basicConfig(
 if conf.under_maintenance:
     @wa.on_message()
     def register_user(_: WhatsApp, msg: Message):
-        repository.add_wa_user(wa_id=msg.from_user.wa_id, lang=DEFAULT_LANGUAGE, active=False)
+        repository.add_wa_user(
+            wa_id=msg.from_user.wa_id,
+            lang=helpers.resolve_user_lang(msg),
+            active=False
+        )
 else:
+
+    # @wa.on_message()
+    # def on_new_user(client: WhatsApp, msg: Message):
+    #     if repository.add_wa_user(
+    #         wa_id=msg.from_user.wa_id,
+    #         lang=helpers.resolve_user_lang(msg),
+    #     ):
+    #         utils.on_start(client, msg)
+    #
+
     wa.add_handlers(
         MessageHandler(
             search.on_search,
-            TextFilter(),
-            TextFilter.length((3, 72)),
+            fil.text,
+            fil.text.length((3, 72)),
             fil.not_(fil.reply),
             lambda _, m: m.text is not None and not m.text.isdigit()
         ),
-        SelectionCallbackHandler(
+        CallbackSelectionHandler(
             utils.show_book,
-            CallbackFilter.data_startswith(ShowBook.__clbname__)
+            fil.callback.data_startswith(ShowBook.__clbname__)
         ),
-        SelectionCallbackHandler(
+        CallbackSelectionHandler(
             search.on_search,
-            CallbackFilter.data_startswith(SearchNavigation.__clbname__)
+            fil.callback.data_startswith(SearchNavigation.__clbname__)
         ),
         MessageHandler(
             utils.show_book,
-            TextFilter.startswith(ShowBook.__clbname__),
+            fil.text.startswith(ShowBook.__clbname__),
             lambda _, m: m.text is not None and len(m.text.split(':')) == 2
         ),
-        ButtonCallbackHandler(
+        CallbackButtonHandler(
             utils.read_book,
-            CallbackFilter.data_startswith(ReadBook.__clbname__)
+            fil.callback.data_startswith(ReadBook.__clbname__)
         ),
         MessageHandler(
             utils.read_book,
-            TextFilter.startswith(ShowBook.__clbname__),
+            fil.text.startswith(ShowBook.__clbname__),
             lambda _, m: m.text is not None and len(m.text.split(':')) == 3
         ),
         MessageHandler(
             utils.jump_to_page, fil.reply
         ),
         MessageHandler(
-            utils.on_start, start_filter,
+            utils.on_start, fil.text.command("start", "התחל", "התחלה", prefixes=("!", "/")),
         ),
-        ButtonCallbackHandler(
+        CallbackButtonHandler(
             utils.on_start,
-            CallbackFilter.data_matches("start"),
+            fil.callback.data_matches("start"),
         ),
-        ButtonCallbackHandler(
+        CallbackButtonHandler(
             utils.on_share_btn,
-            CallbackFilter.data_startswith(ShareBook.__clbname__)
+            fil.callback.data_startswith(ShareBook.__clbname__)
         ),
-        ButtonCallbackHandler(
+        CallbackButtonHandler(
             utils.on_search_btn,
-            CallbackFilter.data_matches(Menu.SEARCH)
+            fil.callback.data_matches(Menu.SEARCH)
         ),
-        ButtonCallbackHandler(
+        CallbackButtonHandler(
             utils.on_stats_btn,
-            CallbackFilter.data_matches(Menu.STATS)
+            fil.callback.data_matches(Menu.STATS)
         ),
-        ButtonCallbackHandler(
+        CallbackButtonHandler(
             utils.on_about_btn,
-            CallbackFilter.data_matches(Menu.ABOUT)
+            fil.callback.data_matches(Menu.ABOUT)
         ),
 
     )
@@ -99,10 +111,11 @@ else:
 
     @wa.on_message()
     def on_new_user(client: WhatsApp, msg: Message):
-        if repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE) and fil.not_(start_filter)(client, msg):
+        if (repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE) and
+                fil.not_(fil.text.command("start", "התחל", "התחלה", prefixes=("!", "/")))(client, msg)):
             utils.on_start(client, msg)
 
 
-@wa.on_message_status(MessageStatusFilter.failed)
+@wa.on_message_status(fil.message_status.failed)
 def on_message_failed(_: WhatsApp, status: MessageStatus):
     logging.error(f"Message failed to send to {status.from_user.wa_id} with error: {status.error}")

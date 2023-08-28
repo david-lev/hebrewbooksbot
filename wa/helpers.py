@@ -1,5 +1,4 @@
-from datetime import date
-from functools import lru_cache
+from datetime import date, timedelta
 from urllib import parse
 from pywa import WhatsApp
 from pywa.types.others import User
@@ -12,7 +11,7 @@ from data.api import session as api_session
 
 conf = get_settings()
 
-DEFAULT_LANGUAGE = "he"
+DEFAULT_LANGUAGE = "en"
 
 
 class Commands:

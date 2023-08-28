@@ -1,6 +1,6 @@
 import dataclasses
 from pywa import WhatsApp
-from pywa.types import Message, CallbackSelection, InlineButton, CallbackButton
+from pywa.types import Message, CallbackSelection, Button, CallbackButton
 from data import api, config
 from data.callbacks import ShareBook, ReadBook, ReadMode, BookType, ShowBook
 from data.strings import String as s
@@ -69,11 +69,11 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         footer=gs(s.IN_MEMORY_FOOTER),
         quote=True,
         buttons=[
-            InlineButton(
+            Button(
                 title=gs(s.SHARE),
                 callback_data=ShareBook(book.id).to_callback()
             ),
-            InlineButton(
+            Button(
                 title=gs(s.INSTANT_READ),
                 callback_data=read_btn.to_callback()
             )
@@ -151,7 +151,7 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
     func = msg_or_clb.reply_image if is_image else msg_or_clb.reply_document
     total = book.pages if is_book else len(masechet.pages)
     buttons = [
-        InlineButton(
+        Button(
             title=gs(s.DOCUMENT if is_image else s.IMAGE),
             callback_data=dataclasses.replace(
                 read,
@@ -160,12 +160,12 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
         ),
     ]
     if read.page < total:
-        buttons.append(InlineButton(
+        buttons.append(Button(
             title=gs(s.NEXT),
             callback_data=dataclasses.replace(read, page=read.page + 1).to_callback()
         ))
     if read.page > 1:
-        buttons.append(InlineButton(
+        buttons.append(Button(
             title=gs(s.PREVIOUS),
             callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
         ))
@@ -227,7 +227,7 @@ def on_share_btn(_: WhatsApp, clb: CallbackButton):
 def on_search_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_text(
         text=f"{gs(s.SEARCH_INSTRUCTIONS)}\n{gs(s.SEARCH_TIP)}",
-        keyboard=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+        keyboard=[Button(title=gs(s.BACK), callback_data=Menu.START)],
         footer=gs(s.PYWA_CREDIT),
     )
 
@@ -236,7 +236,7 @@ def on_stats_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_text(
         text=helpers.get_stats(clb.from_user),
         footer=gs(s.PYWA_CREDIT),
-        keyboard=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+        keyboard=[Button(title=gs(s.BACK), callback_data=Menu.START)],
     )
 
 
@@ -245,7 +245,7 @@ def on_about_btn(_: WhatsApp, clb: CallbackButton):
         image='https://user-images.githubusercontent.com/42866208/253792713-07c75d45-4613-4ff8-a077-9d9b2f61f144.png',
         body=gs(s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
         footer=gs(s.PYWA_CREDIT),
-        buttons=[InlineButton(title=gs(s.BACK), callback_data=Menu.START)],
+        buttons=[Button(title=gs(s.BACK), callback_data=Menu.START)],
     )
 
 
@@ -254,15 +254,15 @@ def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton):
         header=gs(s.WA_WELCOME_HEADER),
         text=gs(s.WA_WELCOME_BODY, contact_phone_number=conf.contact_phone),
         keyboard=[
-            InlineButton(
+            Button(
                 title=gs(s.SEARCH),
                 callback_data=Menu.SEARCH
             ),
-            InlineButton(
+            Button(
                 title=gs(s.STATS),
                 callback_data=Menu.STATS
             ),
-            InlineButton(
+            Button(
                 title=gs(s.ABOUT),
                 callback_data=Menu.ABOUT
             )

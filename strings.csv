@@ -1,0 +1,304 @@
+Key,Language,Translation
+TG_WELCOME,en,"**📚 Welcome to the HebrewBook bot on Telegram! 📚**
+
+This bot allows searching and browsing books on hebrewbooks.org
+
+**⚡️ Features:**
+	🔎 Searching for books in inline mode or by sending a message
+	📓 Browsing through the Shas masechtot
+	📚 Browse the library by category, date or letter
+	📖 Reading mode as an image or as a PDF (text coming soon)
+	⏩ Jump to page
+	♻️ Sharing books with friends
+
+**💡 Tips:**
+	• To search for a book by title or author, use the format `title:author`
+	• In Read Mode, you can jump to a page by replying to the message with the page number
+
+**🔜 Coming soon:**
+	• Search the contents of the books
+	• Saving favorite books and bookmarks
+	• Change language manually
+
+__🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l 🕯__"
+TG_WELCOME,fr,"** Bienvenue sur le bot HebrewBook sur Telegram!
+**
+Ce bot permet de rechercher et de parcourir des livres sur hebrewbooks.org
+
+**  Caractéristiques:**
+ Rechercher des livres en mode en ligne ou en envoyant un message
+ Parcourir le masechtot du Shas
+ Parcourez la bibliothèque par catégorie, date ou lettre
+ Mode lecture sous forme d&#39;image ou sous forme de PDF (texte à venir)
+? Aller à la page
+ Partager des livres avec des amis
+
+**  Conseils:**
+• Pour rechercher un livre par titre ou par auteur, utilisez le format «titre:auteur»
+• En mode lecture, vous pouvez accéder à une page en répondant au message
+avec le numéro de page.
+
+**  À venir:**
+• Rechercher dans le contenu des livres
+• Enregistrer vos livres et signets préférés
+• Changer la langue manuellement
+
+__  À la mémoire de mon grand-père, Rabbi Aharon Yitzchak ben Shmuel Zanvil Zl__"
+TG_WELCOME,he,"**📚 ברוכים הבאים לבוט היברובוקס בטלגרם! 📚**
+
+בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org
+
+**⚡️ פיצ'רים:**
+	🔎 חיפוש ספרים במצב אינליין או על ידי שליחת הודעה
+	📓 עיון במסכתות הש""ס
+	📚 עיון בספריה לפי קטגוריה, תאריך או אות
+	📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)
+	⏪ קפיצה לעמוד
+	♻️ שיתוף ספרים עם חברים
+
+**💡 טיפים:**
+	• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט `כותרת:מחבר`
+	• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר הדף
+
+**🔜 בקרוב:**
+	• חיפוש בתוכן הספרים
+	• שמירת ספרים מועדפים וסימניות
+	• שינוי שפה באופן ידני
+
+__🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז""ל 🕯__"
+WA_WELCOME_HEADER,en,"📚 Welcome to the HebrewBook bot on WhatsApp! 📚"
+WA_WELCOME_HEADER,fr,"📚 Bienvenue sur le bot HebrewBook WhatsApp ! 📚"
+WA_WELCOME_HEADER,he,"📚 ברוכים הבאים לבוט היברובוקס בוואטסאפ! 📚"
+WA_WELCOME_BODY,en,"This bot allows searching and browsing books on hebrewbooks.org
+
+*⚡️ Features:*
+🔎 Searching for books by sending a message
+📖 Reading mode as an image or as a PDF (text coming soon)
+⏩ Jump to page
+♻️ Sharing books with friends
+
+*💡 Tips:*
+• To search for a book by title or author, use the format ```title:author```
+• You can jump to a page by replying to book with the page number
+
+*🔜 Coming soon:*
+• Browse the library by category, date or letter
+• Browsing through the Shas masechtot
+• Search the contents of the books
+• Saving favorite books and bookmarks
+• Change language manually
+"
+WA_WELCOME_BODY,he,"בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org
+
+*⚡️ פיצ'רים:*
+🔎 חיפוש ספרים על ידי שליחת הודעה
+📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)
+⏪ קפיצה לעמוד
+♻️ שיתוף ספרים עם חברים
+
+*💡 טיפים:*
+• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט ```כותרת:מחבר```
+• כדי לקפוץ לדף מסוים, הגיבו על הספר עם מספר דף
+
+*🔜 בקרוב:*
+• עיון בספריה לפי קטגוריה, תאריך או אות
+• עיון במסכתות הש""ס
+• חיפוש בתוכן הספרים
+• שמירת ספרים מועדפים וסימניות
+• שינוי שפה באופן ידני
+"
+WA_WELCOME_BODY,fr,"Ce bot permet de rechercher et de parcourir des
+livres sur hebrewbooks.org
+
+*⚡️Caractéristiques:*
+🔎 Rechercher des livres en envoyant un message
+📖 Mode lecture sous forme image ou sous forme de PDF (texte à venir)
+⏪ Aller à la page
+️️♻️ Partager des livres avec des amis
+
+*💡Conseils:*
+• Pour rechercher un livre par titre ou par auteur, utilisez le format ```titre:auteur```
+• Vous pouvez accéder à une page en répondant au livre avec le numéro de page.
+
+*🔜 À venir:*
+• Parcourez la bibliothèque par catégorie, date ou lettre
+• Parcourir le masechtot du Shas
+• Rechercher dans le contenu des livres
+• Enregistrer vos livres et signets préférés
+• Changer la langue manuellement
+"
+PYWA_CREDIT,en,⚡ Powered by PyWa
+PYWA_CREDIT,he,⚡ נבנה באמצעות PyWa
+PYWA_CREDIT,fr,⚡ Propulsé par PyWa
+IN_MEMORY_FOOTER,en,"🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l"
+IN_MEMORY_FOOTER,he,"🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל"
+IN_MEMORY_FOOTER,fr,"🕯 À la mémoire de Rabbi Aharon Yitzchak ben Shmuel Zanvil Zl"
+WA_ABOUT_MSG,en,"This bot was built with the aim of making the content of the hebrewbooks.org website accessible via WhatsApp.
+
+An improved version of the bot is also available on Telegram: t.me/hebooksbot
+
+The bot was built using the pywa library github.com/david-lev/pywa"
+WA_ABOUT_MSG,he,"*בוט זה נבנה במטרה להנגיש את תוכן אתר hebrewbooks.org באמצעות וואטסאפ.*
+
+גרסה משופרת של הבוט קיימת גם בטלגרם: t.me/hebooksbot
+
+הבוט נבנה באמצעות ספריית pywa github.com/david-lev/pywa"
+WA_ABOUT_MSG,fr,"Ce bot a été construit dans le but de rendre le
+contenu du site hebrewbooks.org accessible via WhatsApp.
+
+Une version améliorée du bot est également disponible sur Telegram t.me/hebooksbot
+
+Le bot a été construit à l&#39;aide de la bibliothèque pywa github.com/david-
+ lev/pywa"
+SEARCH_INSTRUCTIONS,en,"🔎 To search for a book, send a message with your search query"
+SEARCH_INSTRUCTIONS,he,"🔎 כדי לחפש ספר, שלחו הודעה עם מילות החיפוש"
+SEARCH,en,🔎 Search
+SEARCH,he,🔎 חיפוש
+SEARCH_IN_CHATS,en,🔎 Search in chats
+SEARCH_IN_CHATS,he,🔎 חיפוש בצאטים
+BROWSE,en,📖 Browse
+BROWSE,he,📖 עיון
+BACK,en,🔙 Back
+BACK,he,🔙 חזרה
+HEBREWBOOKS_SITE,en,🌍 HebrewBooks Website 🌍
+HEBREWBOOKS_SITE,he,🌍 אתר היברובוקס 🌍
+STATS,en,📊 Stats
+STATS,he,📊 סטטיסטיקות
+SHOW_STATS,en,"📊 Bot Stats 📊
+
+📚 Books read: {books_read:,}
+📖 Pages read: {pages_read:,}
+🔎 Searches: {searches:,}"
+SHOW_STATS,he,"📊 סטטיסטיקות הבוט 📊
+
+📚 ספרים נקראו: {books_read:,}
+📖 דפים נקראו: {pages_read:,}
+🔎 חיפושים: {searches:,}"
+SHOW_STATS_ADMIN,en,"📊 Bot Stats 📊
+
+👥 Telegram users: {tg_users_count:,}
+👥 WhatsApp users: {wa_users_count:,}
+📚 Books read: {books_read:,}
+📖 Pages read: {pages_read:,}
+🔎 Inline Searches: {inline_searches:,}
+💬 Message Searches: {msg_searches:,}
+⏭ Jumps to page: {jumps:,}"
+SHOW_STATS_ADMIN,he,"📊 סטטיסטיקות הבוט 📊
+
+👥 משתמשי טלגרם: {tg_users_count:,}
+👥 משתמשי וואטסאפ: {wa_users_count:,}
+📚 ספרים נקראו: {books_read:,}
+📖 דפים נקראו: {pages_read:,}
+🔎 חיפושים באינליין: {inline_searches:,}
+💬 חיפושים בהודעות: {msg_searches:,}
+⏭ קפיצות לדף: {jumps:,}"
+INSTANT_READ,en,📖 Instant Read 📖
+INSTANT_READ,he,📖 קריאה מהירה 📖
+SHARE,en,♻️ Share ♻️
+SHARE,he,♻️ שיתוף ♻️
+DOWNLOAD,en,⬇️ Download ⬇️
+DOWNLOAD,he,⬇️ הורדה ⬇️
+NEXT,en,Next ⏩
+NEXT,he,הבא ⏪
+PREVIOUS,en,⏪ Previous
+PREVIOUS,he,⏩ הקודם
+WAIT_FOR_PREVIEW,en,Wait a few seconds for the preview to load
+WAIT_FOR_PREVIEW,he,יש להמתין מספר שניות לטעינת התצוגה המקדימה
+READ_ON_SITE,en,🌍 Read on site 🌍
+READ_ON_SITE,he,🌍 קריאה באתר 🌍
+SLOW_DOWN,en,Slow down...
+SLOW_DOWN,he,אני לא מלאך.. לאט יותר
+NUMBERS_ONLY,en,Please use numbers only
+NUMBERS_ONLY,he,יש להשתמש במספרים בלבד
+JUMP_TIP,en,"Tip: instead of browsing, reply to this message with the page number you want to read."
+JUMP_TIP,he,"טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא."
+JUMP_ALSO_BY_EDIT_TIP,en,"Tip: instead of browsing, reply to this message with the page number you want to read.
+You can also edit the number you sent and the page will update accordingly."
+JUMP_ALSO_BY_EDIT_TIP,he,"טיפ: במקום לדפדף, הגיבו על ההודעה הזו עם מספר העמוד שברצונכם לקרוא.
+ניתן גם לערוך את המספר ששלחתם והעמוד ישתנה בהתאם."
+NO_BOOK_SELECTED,en,No book selected or the message is too old
+NO_BOOK_SELECTED,he,לא נבחר ספר או שההודעה נשלחה לפני זמן רב
+PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,en,The page does not exist! (Choose a page between {x} and {y})
+PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,he,הדף אינו קיים! (בחרו דף בין {x} ל-{y})
+SEARCH_TIP,en,Tip: You can search in the 'Title:Author' format in order to get more accurate results
+SEARCH_TIP,he,טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות
+START_SEARCH_INLINE,en,Start searching
+START_SEARCH_INLINE,he,התחילו לחפש
+BOOK_NOT_FOUND,en,Book not found
+BOOK_NOT_FOUND,he,ספר לא נמצא
+MASECHET_NOT_FOUND,en,Masechet not found
+MASECHET_NOT_FOUND,he,מסכת לא נמצאה
+PRESS_TO_SHARE,en,Click on the result to share {title}
+PRESS_TO_SHARE,he,לחצו על התוצאה כדי לשתף את {title}
+NO_RESULTS_FOR_Q,en,No results found for: {q}
+NO_RESULTS_FOR_Q,he,לא נמצאו תוצאות עבור: {q}
+SEARCH_INLINE,en,🔎 Inline Search
+SEARCH_INLINE,he,🔎 חיפוש באינליין
+ORIGINAL_SEARCH_DELETED,en,The original search was deleted
+ORIGINAL_SEARCH_DELETED,he,החיפוש המקורי נמחק
+CHOOSE_BROWSE_TYPE,en,Choose a browse type
+CHOOSE_BROWSE_TYPE,he,בחר סוג עיון
+SHAS,en,📚 Shas
+SHAS,he,"📚 ש""ס"
+SHAS_CMD,en,"!shas ברכות, יז:"
+SHAS_CMD,he,"!שס ברכות, יז:"
+TUR_AND_SA,en,📓 Tur & Shulchan Aruch
+TUR_AND_SA,he,📓 טור ושולחן ערוך
+TUR_AND_SA_CMD,en,"!tur, טור יורה דעה קכז ג"
+TUR_AND_SA_CMD,he,"!טור, טור יורה דעה קכז ג"
+SUBJECTS,en,🗂 Subjects
+SUBJECTS,he,🗂 נושאים
+SUBJECTS_CMD,en,"!sub, מוסר"
+SUBJECTS_CMD,he,"!נושא, מוסר"
+LETTERS,en,🔠 Letters
+LETTERS,he,🔠 אותיות
+LETTERS_CMD,en,"!let, א"
+LETTERS_CMD,he,"!אות, א"
+DATE_RANGES,en,📅 Date Ranges
+DATE_RANGES,he,📅 תאריכים
+DATE_RANGES_CMD,en,"!date, 1945"
+DATE_RANGES_CMD,he,"!תאריך, תר""נ"
+CHOOSE,en,Choose
+CHOOSE,he,בחרו
+CHOOSE_LETTER,en,Choose a letter
+CHOOSE_LETTER,he,בחרו אות
+CHOOSE_SUBJECT,en,Choose a subject
+CHOOSE_SUBJECT,he,בחרו נושא
+CHOOSE_DATE_RANGE,en,Choose a date range
+CHOOSE_DATE_RANGE,he,בחרו טווח תאריכים
+CHOOSE_MASECHET,en,Choose a masechet
+CHOOSE_MASECHET,he,בחרו מסכת
+PAGE_X_OF_Y,en,Page {x} of {y}
+PAGE_X_OF_Y,he,עמוד {x} מתוך {y}
+SEARCH_RESULTS,en,📚 Results 📚
+SEARCH_RESULTS,he,📚 תוצאות חיפוש 📚
+X_RESULTS_FOR_S,en,"{x:,} results for: {s}"
+X_RESULTS_FOR_S,he,"‏{x:,} תוצאות עבור: {s}"
+X_TO_Y_OF_TOTAL_FOR_S,en,"{x:,} - {y:,} from {total:,} results for: {s}"
+X_TO_Y_OF_TOTAL_FOR_S,he,"‏{x:,} - {y:,} מתוך {total:,} תוצאות עבור: {s}"
+X_TO_Y_OF_TOTAL,en,"{x:,} - {y:,} from {total:,} results"
+X_TO_Y_OF_TOTAL,he,"‏{x:,} - {y:,} מתוך {total:,} תוצאות"
+IMAGE,en,🖼 Image
+IMAGE,he,🖼 תמונה
+TEXT,en,📜 Text
+TEXT,he,📜 טקסט
+DOCUMENT,en,📄 Document
+DOCUMENT,he,📄 מסמך
+NOT_REGISTERED,en,You are not registered in the bot. Please send /start to the bot in order to register.
+NOT_REGISTERED,he,אינכם רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.
+SEARCHING_FOR_Q,en,🔎 Searching for: {q}
+SEARCHING_FOR_Q,he,"🔍 מתבצע חיפוש עבור: ""{q}"""
+NAVIGATE_BETWEEN_RESULTS,en,Navigate between results
+NAVIGATE_BETWEEN_RESULTS,he,נווטו בין התוצאות
+ABOUT,en,ℹ️ About
+ABOUT,he,‏ℹ️ אודות
+UNDER_MAINTENANCE,en,The bot is currently under maintenance. Please try again later.
+UNDER_MAINTENANCE,he,הבוט כרגע בתחזוקה. נא לנסות שוב מאוחר יותר.
+WAIT_X_SECONDS,en,You need to wait {x} seconds before getting the book/page.
+WAIT_X_SECONDS,he,עליכם להמתין {x} שניות לפני שתוכלו לקבל את הספר/עמוד.
+WAIT_X_MINUTES,en,You need to wait {x} minutes before getting the book/page.
+WAIT_X_MINUTES,he,עליכם להמתין {x} דקות לפני שתוכלו לקבל את הספר/עמוד.
+X_IS_UPLOADED,en,The book {x} is uploaded
+X_IS_UPLOADED,he,הספר {x} בתהליך העלאה
+RESEARCH,en,🔍 Research
+RESEARCH,he,🔍 חיפוש מחדש

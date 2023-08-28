@@ -1,6 +1,9 @@
 from enum import Enum
+from functools import lru_cache
+from urllib import parse
 from sqlalchemy.exc import IntegrityError
-from db.tables import TgUser, Stats, get_session, WaUser
+from data.cache import cache
+from db.tables import TgUser, Stats, get_session, WaUser, TgFile, WaFile
 
 
 def add_tg_user(tg_id: int, lang: str) -> bool:
@@ -62,7 +65,8 @@ def set_tg_user_active(tg_id: int, active: bool):
     session.commit()
 
 
-def add_wa_user(wa_id: str, lang: str, active: bool = True) -> bool:
+@cache.invalidate(cache_name='is_wa_user_exists', params=['wa_id'])
+def add_wa_user(*, wa_id: str, lang: str, active: bool = True) -> bool:
     """Add new wa user to db, return True if new user added"""
     session = get_session()
     try:
@@ -74,7 +78,24 @@ def add_wa_user(wa_id: str, lang: str, active: bool = True) -> bool:
         return False
 
 
-def get_wa_user(wa_id: str) -> type[WaUser]:
+@cache.cachable(cache_name='is_wa_user_exists', params=['wa_id'])
+def is_wa_user_exists(*, wa_id: str) -> bool:
+    """Check if wa user exists"""
+    session = get_session()
+    return session.query(WaUser).filter(WaUser.wa_id == wa_id).first() is not None
+
+
+@cache.invalidate(cache_name='wa_user', params=['wa_id'])
+@cache.invalidate(cache_name='is_wa_user_exists', params=['wa_id'])
+def set_wa_user_lang(*, wa_id: str, lang: str):
+    """Set wa user lang"""
+    session = get_session()
+    session.query(WaUser).filter(WaUser.wa_id == wa_id).update({WaUser.lang: lang})
+    session.commit()
+
+
+@cache.cachable(cache_name='wa_user', params=['wa_id'])
+def get_wa_user(*, wa_id: str) -> type[WaUser]:
     """Get wa user"""
     session = get_session()
     return session.query(WaUser).filter(WaUser.wa_id == wa_id).first()

@@ -1,3 +1,4 @@
+import io
 from functools import lru_cache
 from typing import Callable, Any
 from pyrogram import filters
@@ -285,7 +286,9 @@ def next_previous_buttons(
 def get_file_id(
         send_method: Any,
         media_attr: str,
-        url: str
+        url: str,
+        filename: str | None = None,
+        **kwargs,
 ) -> str:
     """
     Get the file id from the url.
@@ -294,6 +297,7 @@ def get_file_id(
         send_method: The method to send the file (bound method of pyrogram.Client).
         media_attr: The attribute of the media to get the file id from.
         url: The url of the file.
+        filename: The filename of the file. (default: None)
     """
     max_attempts = 3
     while max_attempts:
@@ -301,7 +305,10 @@ def get_file_id(
             max_attempts -= 1
             return repository.get_tg_file(url).file_id
         except exc.NoResultFound:
-            file = getattr(send_method(**{media_attr: url, 'chat_id': CACHE_CHANNEL_ID}), media_attr)
+            file_content = io.BytesIO(api.session.get(url).content)
+            if filename:
+                file_content.name = filename
+            file = getattr(send_method(**{media_attr: file_content, 'chat_id': CACHE_CHANNEL_ID}, **kwargs), media_attr)
             repository.create_tg_file(url=url, file_id=file.file_id, file_uid=file.file_unique_id)
             continue
     raise ValueError(f"Could not get file id for {url}")

@@ -1,6 +1,8 @@
+import csv
 from typing import Callable
 from bs4 import BeautifulSoup, ResultSet, PageElement
 from data.models import Section
+from data.strings import String, STRINGS
 
 
 def get_sections(
@@ -60,3 +62,17 @@ def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
         offset = total - current_offset
         return 0 if offset < increase else offset
     return current_offset + increase
+
+
+def write_strings_to_csv(filename: str):
+    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Key', 'Language', 'Translation'])
+        for key, translations_dict in STRINGS.items():
+            for lang, translation in translations_dict.items():
+                writer.writerow([key.name, lang, translation])
+
+
+if __name__ == '__main__':
+    import sys
+    write_strings_to_csv(sys.argv[1])

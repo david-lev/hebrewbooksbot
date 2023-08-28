@@ -1,5 +1,6 @@
 import json
 import requests
+from typing import Literal
 from functools import lru_cache
 from data.enums import BrowseType
 from .config import get_settings
@@ -125,7 +126,12 @@ def search(title: str, author: str, offset: int, limit: int) -> tuple[list[Searc
 
 
 @lru_cache(maxsize=10_000)
-def browse(browse_type: BrowseType, browse_id: int | str, offset: int, limit: int) -> tuple[list[SearchResults], int]:
+def browse(
+        browse_type: Literal[BrowseType.LETTER, BrowseType.DATERANGE, BrowseType.SUBJECT],
+        browse_id: int | str,
+        offset: int,
+        limit: int
+) -> tuple[list[SearchResults], int]:
     """
     Browse books on HebrewBooks.org
 

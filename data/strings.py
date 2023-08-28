@@ -76,6 +76,8 @@ class String(Enum):
     UNDER_MAINTENANCE = auto()  # V
     WAIT_X_SECONDS = auto()  # V
     WAIT_X_MINUTES = auto()  # V
+    X_IS_UPLOADED = auto()  # V
+    RESEARCH = auto()  # V
 
 
 STRINGS = {
@@ -97,7 +99,6 @@ STRINGS = {
             "\t• Search the contents of the books",
             "\t• Saving favorite books and bookmarks",
             "\t• Change language manually\n",
-            "📮 For feedback and comments - @davidlev\n",
             "__🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z\"l 🕯__"
         ]),
         'he': "\n".join([
@@ -117,7 +118,6 @@ STRINGS = {
             "\t• חיפוש בתוכן הספרים",
             "\t• שמירת ספרים מועדפים וסימניות",
             "\t• שינוי שפה באופן ידני\n",
-            "📮 למשוב והערות - @davidlev\n",
             "__🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל 🕯__"
         ])
     },
@@ -142,7 +142,6 @@ STRINGS = {
             "• Search the contents of the books",
             "• Saving favorite books and bookmarks",
             "• Change language manually\n",
-            "📮 For feedback and comments - t.me/davidlev\n"
         ]),
         'he': "\n".join([
             "בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org\n",
@@ -160,7 +159,6 @@ STRINGS = {
             "• חיפוש בתוכן הספרים",
             "• שמירת ספרים מועדפים וסימניות",
             "• שינוי שפה באופן ידני\n",
-            "📮 למשוב והערות - wa.me/{contact_phone_number}\n"
         ])
     },
     String.PYWA_CREDIT: {
@@ -174,24 +172,12 @@ STRINGS = {
     String.WA_ABOUT_MSG: {
         'en': "\n".join((
             "This bot was built with the aim of making the content of the hebrewbooks.org website accessible via WhatsApp.",
-            "The use is completely free and In memory my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil zt'l",
-            "If you would like to donate to cover the costs (server + access to the WhatsApp API), you can do so using one of the following options",
-            "- PayPal paypal.me/davidlev",
-            "- GitHub github.com/sponsors/david-lev",
-            "- Contact me on WhatsApp wa.me/{contact_phone_number}",
             "\nAn improved version of the bot is also available on Telegram: t.me/hebooksbot",
-            "\nThe bot source code is available on GitHub: github.com/david-lev/hebrewbooksbot"
             "\nThe bot was built using the pywa library github.com/david-lev/pywa"
         )),
         'he': "\n".join((
             "*בוט זה נבנה במטרה להנגיש את תוכן אתר hebrewbooks.org באמצעות וואטסאפ.*\n",
-            "השימוש בבוט חינמי לחלוטין ולעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז\"ל",
-            "\nאם ברצונכם לתרום לצורך כיסוי העלויות (שרת + גישה ל-WhatsApp API), תוכלו לעשות זאת באמצעות אחת מהאפשרויות הבאות:",
-            "- פייפאל paypal.me/davidlev",
-            "- גיטהאב github.com/sponsors/david-lev",
-            "- צרו קשר בוואטסאפ wa.me/{contact_phone_number}",
             "\nגרסה משופרת של הבוט קיימת גם בטלגרם: t.me/hebooksbot",
-            "\nקוד הבוט זמין בגיטהאב github.com/david-lev/hebrewbooksbot",
             "\nהבוט נבנה באמצעות ספריית pywa github.com/david-lev/pywa",
         ))
     },
@@ -214,10 +200,6 @@ STRINGS = {
     String.BACK: {
         'en': '🔙 Back',
         'he': '🔙 חזרה'
-    },
-    String.GITHUB: {
-        'en': '⭐️ GitHub ⭐️',
-        'he': '⭐️ גיטהאב ⭐️'
     },
     String.HEBREWBOOKS_SITE: {
         'en': '🌍 HebrewBooks Website 🌍',
@@ -473,4 +455,12 @@ STRINGS = {
         'en': 'You need to wait {x} minutes before getting the book/page.',
         'he': 'עליכם להמתין {x} דקות לפני שתוכלו לקבל את הספר/עמוד.'
     },
+    String.X_IS_UPLOADED: {
+        'en': "The book {x} is uploaded",
+        'he': "הספר {x} בתהליך העלאה"
+    },
+    String.RESEARCH: {
+        'en': '🔍 Research',
+        'he': '🔍 חיפוש מחדש'
+    }
 }

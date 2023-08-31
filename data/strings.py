@@ -150,6 +150,6 @@ for s in _strings:
             # sys.exit(1)
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def get_string(string: String, lng: Language, **kwargs) -> str:
     return _strings[string][lng].format(**kwargs)

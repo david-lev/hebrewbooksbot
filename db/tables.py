@@ -1,11 +1,8 @@
-from datetime import date
 from data import config
 from sqlalchemy import create_engine, BigInteger, String
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, scoped_session
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, scoped_session, Session, sessionmaker
 
 engine = create_engine(f'sqlite:///{config.get_settings().sqlite_file_path}')  # , echo=True)
-
 session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 
@@ -21,30 +18,16 @@ class BaseTable(DeclarativeBase):
 
 class TgUser(BaseTable):
     __tablename__ = 'tg_user'
-    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    lang: Mapped[str] = mapped_column(String(5))
-    active: Mapped[bool] = mapped_column(default=True)
-
-
-class TgFile(BaseTable):
-    __tablename__ = 'tg_file'
-    file_id: Mapped[str] = mapped_column(String(50), unique=True)
-    file_uid: Mapped[str] = mapped_column(String(50), unique=True)
-    hb_ep: Mapped[str] = mapped_column(String(100), unique=True)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
+    lang: Mapped[str] = mapped_column(String(2), nullable=False)
+    active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
 
 class WaUser(BaseTable):
     __tablename__ = 'wa_user'
-    wa_id: Mapped[str] = mapped_column(String(50), unique=True)
-    lang: Mapped[str] = mapped_column(String(5))
-    active: Mapped[bool] = mapped_column(default=True)
-
-
-class WaFile(BaseTable):
-    __tablename__ = 'wa_file'
-    file_id: Mapped[str] = mapped_column(String(100), unique=True)
-    upload_date: Mapped[date] = mapped_column(default=date.today)
-    hb_ep: Mapped[str] = mapped_column(String(100), unique=True)
+    wa_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    lang: Mapped[str] = mapped_column(String(2), nullable=False)
+    active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
 
 class Stats(BaseTable):
@@ -58,6 +41,20 @@ class Stats(BaseTable):
     @property
     def searches(self) -> int:
         return self.inline_searches + self.msg_searches
+
+
+# class TgFile(BaseTable):
+#     __tablename__ = 'tg_file'
+#     file_id: Mapped[str] = mapped_column(String(50), unique=True)
+#     file_uid: Mapped[str] = mapped_column(String(50), unique=True)
+#     hb_ep: Mapped[str] = mapped_column(String(100), unique=True)
+
+
+# class WaFile(BaseTable):
+#     __tablename__ = 'wa_file'
+#     file_id: Mapped[str] = mapped_column(String(100), unique=True)
+#     upload_date: Mapped[date] = mapped_column(default=date.today)
+#     hb_ep: Mapped[str] = mapped_column(String(100), unique=True)
 
 
 BaseTable.metadata.create_all(engine)

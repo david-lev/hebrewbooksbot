@@ -8,7 +8,6 @@ from data.callbacks import ShowBook, ShareBook, SearchNavigation, ReadBook
 from data.config import get_settings
 from db import repository
 from wa import search, helpers
-from wa.helpers import DEFAULT_LANGUAGE
 from wa.utils import Menu
 
 conf = get_settings()
@@ -30,28 +29,36 @@ logging.basicConfig(
     handlers=[console_handler, file_handler],
 )
 
+country_filter = lambda _, m: m.from_user.wa_id.startswith(helpers.SUPPORTED_COUNTRIES)  # noqa
+
 if conf.under_maintenance:
     @wa.on_message()
     def register_user(_: WhatsApp, msg: Message):
         repository.add_wa_user(
             wa_id=msg.from_user.wa_id,
-            lang=helpers.resolve_user_lang(msg),
+            lang=helpers.phone_number_to_lang(msg.from_user.wa_id).code,
             active=False
         )
 else:
 
-    # @wa.on_message()
-    # def on_new_user(client: WhatsApp, msg: Message):
-    #     if repository.add_wa_user(
-    #         wa_id=msg.from_user.wa_id,
-    #         lang=helpers.resolve_user_lang(msg),
-    #     ):
-    #         utils.on_start(client, msg)
-    #
+    @wa.on_message()
+    def on_new_user(client: WhatsApp, msg: Message):
+        allowed = country_filter(client, msg)
+        if repository.add_wa_user(
+                wa_id=msg.from_user.wa_id,
+                lang=helpers.phone_number_to_lang(msg.from_user.wa_id).code,
+                active=allowed
+        ):
+            if allowed:
+                utils.on_start(client, msg)
+            else:
+                logging.info(f"User {msg.from_user.wa_id} is not allowed to use the bot.")
+
 
     wa.add_handlers(
         MessageHandler(
             search.on_search,
+            country_filter,
             fil.text,
             fil.text.length((3, 72)),
             fil.not_(fil.reply),
@@ -67,6 +74,7 @@ else:
         ),
         MessageHandler(
             utils.show_book,
+            country_filter,
             fil.text.startswith(ShowBook.__clbname__),
             lambda _, m: m.text is not None and len(m.text.split(':')) == 2
         ),
@@ -76,13 +84,16 @@ else:
         ),
         MessageHandler(
             utils.read_book,
+            country_filter,
             fil.text.startswith(ShowBook.__clbname__),
             lambda _, m: m.text is not None and len(m.text.split(':')) == 3
         ),
         MessageHandler(
+            country_filter,
             utils.jump_to_page, fil.reply
         ),
         MessageHandler(
+            country_filter,
             utils.on_start, fil.text.command("start", "התחל", "התחלה", prefixes=("!", "/")),
         ),
         CallbackButtonHandler(
@@ -107,13 +118,6 @@ else:
         ),
 
     )
-
-
-    @wa.on_message()
-    def on_new_user(client: WhatsApp, msg: Message):
-        if (repository.add_wa_user(msg.from_user.wa_id, DEFAULT_LANGUAGE) and
-                fil.not_(fil.text.command("start", "התחל", "התחלה", prefixes=("!", "/")))(client, msg)):
-            utils.on_start(client, msg)
 
 
 @wa.on_message_status(fil.message_status.failed)

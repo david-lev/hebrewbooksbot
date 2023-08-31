@@ -1,17 +1,16 @@
 from datetime import date, timedelta
+from functools import lru_cache
 from urllib import parse
 from pywa import WhatsApp
 from pywa.types.others import User
 from sqlalchemy.orm import exc
 from data.config import get_settings
 from data.models import Book, Masechet
-from data.strings import STRINGS, RTL, String as s
+from data.strings import STRINGS, RTL, String as s, Language
 from db import repository
 from data.api import session as api_session
 
 conf = get_settings()
-
-DEFAULT_LANGUAGE = "en"
 
 
 class Commands:
@@ -20,6 +19,29 @@ class Commands:
     DATERANGE = ('date', 'תאריך')
     LETTER = ('let', 'אות')
     TURSA = ('tur', 'טור')
+
+
+languages = {
+    # Israel
+    ("972",): Language.HE,
+    # France
+    ("33",): Language.FR,
+    # United States & Canada, Switzerland, Ukraine, Russia, Germany, Italy, Netherlands, Belgium, South Africa, Poland
+    ("1", "41", "380", "7", "49", "39", "31", "32", "27", "48", "44"): Language.EN,
+    # Spain, Argentina, Panama
+    ("54", "34", "507", "52", "55"): Language.ES,
+}
+
+SUPPORTED_COUNTRIES = tuple(code for codes in languages.keys() for code in codes)
+
+
+@lru_cache(maxsize=None)
+def phone_number_to_lang(phone: str) -> Language:
+    """Get the language from a phone number."""
+    for prefixes, lang in languages.items():
+        if phone.startswith(prefixes):
+            return lang
+    return Language.EN
 
 
 def get_self_share(text: str) -> str:

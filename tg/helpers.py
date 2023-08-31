@@ -1,33 +1,20 @@
-import io
 from functools import lru_cache
 from typing import Callable, Any
 from pyrogram import filters
-from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineQuery
-from sqlalchemy.orm import exc
+from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton
 from data import api, config
 from data.models import Book, Masechet, Tursa
 from data.enums import BrowseType as BrowseTypeEnum
 from data.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
-from data.strings import String as s, STRINGS, String, RTL, LTR
+from data.strings import String as s, get_string as gs, String, Language, RTL  # noqa
 from db import repository
 
-DEFAULT_LANGUAGE = "en"
 CACHE_CHANNEL_ID = config.get_settings().tg_cache_channel_id
 
 
-def get_lang_code(mqc: Message | CallbackQuery | InlineQuery) -> str:
-    """Get the user's language code."""
-    try:
-        lang = mqc.from_user.language_code or DEFAULT_LANGUAGE
-    except AttributeError:
-        lang = DEFAULT_LANGUAGE
-    return lang
-
-
-def get_string(mqc: Message | CallbackQuery | InlineQuery, string: String) -> str:
+def get_string(user_id: int, string: String, **kwargs) -> str:
     """Get a string in the user's language."""
-    lang = get_lang_code(mqc)
-    return STRINGS[string].get(lang, STRINGS[string][DEFAULT_LANGUAGE])
+    return gs(string=string, lng=Language.from_code(repository.get_tg_user(tg_id=user_id).lang), **kwargs)
 
 
 class Menu:
@@ -35,8 +22,8 @@ class Menu:
     BROADCAST = 'broadcast'
     BROWSE = 'browse_menu'
     STATS = 'stats'
+    CHOOSE_LANG = 'choose_lang'
     CONTACT_URL = 'https://t.me/davidlev'
-    GITHUB_URL = 'https://github.com/david-lev/hebrewbooksbot'
     HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
 
 
@@ -47,11 +34,11 @@ MESSAGE_SEARCH_FILTER = (
 )
 
 
-def is_admin(mqc: Message | CallbackQuery | InlineQuery) -> bool:
+def is_admin(user_id: int) -> bool:
     """
     Check if the user is an admin.
     """
-    return mqc.from_user.id in config.get_settings().tg_admins
+    return user_id in config.get_settings().tg_admins
 
 
 def get_book_text(book: Book, page: int | None = None, read_mode: ReadMode | None = None) -> str:
@@ -170,21 +157,21 @@ def get_browse_type_data(
 
 
 def read_mode_chooser(
-        cm: CallbackQuery | Message,
+        user_id: int,
         read_clb: ReadBook,
         page: int,
         others: list[str],
-        read_modes: list[ReadMode] = (ReadMode.PDF, ReadMode.IMAGE),
+        read_modes: tuple[ReadMode, ...] = (ReadMode.PDF, ReadMode.IMAGE),
 ) -> list[InlineKeyboardButton]:
     """
     Get the read mode chooser buttons.
 
     Args:
-        cm: The callback query or message.
+        user_id: The user id who sent the original message.
         read_clb: The read book callback data.
         page: The current page.
         others: The other callback data to join to the callback data.
-        read_modes: The read modes to choose from. (default: (ReadMode.PDF, ReadMode.IMAGE))
+        read_modes: The read modes to choose from.
     """
     modes = list(filter(
         lambda rm: rm[0] in read_modes, (
@@ -197,7 +184,7 @@ def read_mode_chooser(
         return []
     return [
         InlineKeyboardButton(
-            text=get_string(cm, string) if new_read_mode is read_clb.read_mode else emoji,
+            text=get_string(user_id, string) if new_read_mode is read_clb.read_mode else emoji,
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page,
@@ -210,7 +197,7 @@ def read_mode_chooser(
 
 
 def next_previous_buttons(
-        cm: CallbackQuery | Message,
+        user_id: int,
         read_clb: ReadBook,
         page: int,
         total: int,
@@ -220,18 +207,19 @@ def next_previous_buttons(
     Get the next and previous buttons.
 
     Args:
-        cm: The callback query or message.
+        user_id: The callback query or message.
         read_clb: The read book callback data.
         page: The current page.
         total: The total number of pages.
         others: The other callback data to join to the callback data.
     """
+    user_lang = repository.get_tg_user(tg_id=user_id).lang
     buttons = []
     if not total:
         return buttons
     if page < total:
         buttons.append(InlineKeyboardButton(
-            text=get_string(mqc=cm, string=s.NEXT),
+            text=get_string(user_id=user_id, string=s.NEXT),
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page + 1,
@@ -271,7 +259,7 @@ def next_previous_buttons(
 
     if page > 1:
         buttons.append(InlineKeyboardButton(
-            text=get_string(mqc=cm, string=s.PREVIOUS),
+            text=get_string(user_id=user_id, string=s.PREVIOUS),
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page - 1,
@@ -280,35 +268,36 @@ def next_previous_buttons(
                 book_type=read_clb.book_type
             ).join_to_callback(*others)
         ))
-    return buttons if get_lang_code(cm) == "he" else buttons[::-1]
+    return buttons if Language.from_code(user_lang).rtl else buttons[::-1]
 
 
-def get_file_id(
-        send_method: Any,
-        media_attr: str,
-        url: str,
-        filename: str | None = None,
-        **kwargs,
-) -> str:
-    """
-    Get the file id from the url.
-
-    Args:
-        send_method: The method to send the file (bound method of pyrogram.Client).
-        media_attr: The attribute of the media to get the file id from.
-        url: The url of the file.
-        filename: The filename of the file. (default: None)
-    """
-    max_attempts = 3
-    while max_attempts:
-        try:
-            max_attempts -= 1
-            return repository.get_tg_file(url).file_id
-        except exc.NoResultFound:
-            file_content = io.BytesIO(api.session.get(url).content)
-            if filename:
-                file_content.name = filename
-            file = getattr(send_method(**{media_attr: file_content, 'chat_id': CACHE_CHANNEL_ID}, **kwargs), media_attr)
-            repository.create_tg_file(url=url, file_id=file.file_id, file_uid=file.file_unique_id)
-            continue
-    raise ValueError(f"Could not get file id for {url}")
+# def get_file_id(
+#         send_method: Any,
+#         media_attr: str,
+#         url: str,
+#         filename: str | None = None,
+#         **kwargs,
+# ) -> str:
+#     """
+#     Get the file id from the url.
+#
+#     Args:
+#         send_method: The method to send the file (bound method of pyrogram.Client).
+#         media_attr: The attribute of the media to get the file id from.
+#         url: The url of the file.
+#         filename: The filename of the file. (default: None)
+#     """
+#     max_attempts = 3
+#     while max_attempts:
+#         try:
+#             max_attempts -= 1
+#             return repository.get_tg_file(url).file_id
+#         except exc.NoResultFound:
+#             file_content = io.BytesIO(api.session.get(url).content)
+#             if filename:
+#                 file_content.name = filename
+#             file = getattr(send_method(**{media_attr: file_content, 'chat_id': CACHE_CHANNEL_ID}, **kwargs),
+#             media_attr)
+#             repository.create_tg_file(url=url, file_id=file.file_id, file_uid=file.file_unique_id)
+#             continue
+#     raise ValueError(f"Could not get file id for {url}")

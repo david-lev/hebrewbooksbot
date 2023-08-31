@@ -6,30 +6,30 @@ from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu, get_string as gs
 from data.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
-from data.strings import String as s
+from data.strings import String as s, Language
 from data import api
 from db import repository
 
 
 def start(_: Client, mc: Message | CallbackQuery):
     """Start message"""
+    user_id = mc.from_user.id
     if isinstance(mc, Message):
-        repository.add_tg_user(tg_id=mc.from_user.id, lang=mc.from_user.language_code)
+        repository.add_tg_user(tg_id=user_id, lang=mc.from_user.language_code)
     kwargs = dict(
-        text=gs(mc, s.TG_WELCOME),
+        text=gs(user_id, s.TG_WELCOME),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(gs(mc, s.SEARCH), switch_inline_query_current_chat=""),
-                    InlineKeyboardButton(gs(mc, s.BROWSE), callback_data=Menu.BROWSE),
+                    InlineKeyboardButton(gs(user_id, s.SEARCH), switch_inline_query_current_chat=""),
+                    InlineKeyboardButton(gs(user_id, s.BROWSE), callback_data=Menu.BROWSE),
                 ],
                 [
                     InlineKeyboardButton("📤", switch_inline_query=""),
-                    InlineKeyboardButton(text=gs(mc, s.STATS), callback_data=Menu.STATS),
-                    InlineKeyboardButton("📮", url=Menu.CONTACT_URL),
+                    InlineKeyboardButton(text=gs(user_id, s.STATS), callback_data=Menu.STATS),
                 ],
-                [InlineKeyboardButton(text=gs(mc, s.GITHUB), url=Menu.GITHUB_URL)],
-                [InlineKeyboardButton(text=gs(mc, s.HEBREWBOOKS_SITE), url=Menu.HEBREWBOOKS_SITE_URL)],
+                [InlineKeyboardButton(text="🇮🇱🇺🇸🇫🇷", callback_data=Menu.CHOOSE_LANG)],
+                [InlineKeyboardButton(text=gs(user_id, s.HEBREWBOOKS_SITE), url=Menu.HEBREWBOOKS_SITE_URL)],
             ]
         )
     )
@@ -42,14 +42,43 @@ def start(_: Client, mc: Message | CallbackQuery):
             pass
 
 
+def choose_lang(_: Client, clb: CallbackQuery):
+    """
+    Choose a language.
+    """
+    languages = [[
+        InlineKeyboardButton(text=f"{lang.flag} {lang.name}", callback_data=f"lang:{lang.code}")
+    ] for lang in Language]
+    clb.edit_message_text(
+        text="Choose a language:",
+        reply_markup=InlineKeyboardMarkup(
+            [*languages, [InlineKeyboardButton(text=gs(clb.from_user.id, s.BACK), callback_data=Menu.START)]]
+        )
+    )
+
+
+def set_lang(_: Client, clb: CallbackQuery):
+    """
+    Set a language.
+    """
+    _, lang_code = clb.data.split(':')
+    repository.update_tg_user(tg_id=clb.from_user.id, lang=lang_code)
+    clb.answer(
+        text="Language set successfully!",
+        show_alert=True
+    )
+    start(_, clb)
+
+
 def show_stats(_: Client, clb: CallbackQuery):
     """
     Show stats.
     """
+    user_id = clb.from_user.id
     stats = repository.get_stats()
-    if helpers.is_admin(clb):
+    if helpers.is_admin(user_id):
         clb.answer(
-            text=gs(clb, s.SHOW_STATS_ADMIN).format(
+            text=gs(user_id, s.SHOW_STATS_ADMIN).format(
                 tg_users_count=repository.get_tg_users_count(),
                 wa_users_count=repository.get_wa_users_count(),
                 books_read=stats.books_read,
@@ -62,7 +91,7 @@ def show_stats(_: Client, clb: CallbackQuery):
         )
     else:
         clb.answer(
-            text=gs(clb, s.SHOW_STATS).format(
+            text=gs(user_id, s.SHOW_STATS).format(
                 books_read=stats.books_read,
                 pages_read=stats.pages_read,
                 searches=stats.searches
@@ -76,19 +105,18 @@ def show_book(_: Client, clb: CallbackQuery):
     """
     Show a book.
     """
+    user_id = clb.from_user.id
     if (seconds := limiter.get_seconds_to_wait(
-            user_id=clb.from_user.id,
+            user_id=user_id,
             rate_limit_type=RateLimit.PDF_FULL
     )) > 0:
         clb.answer(
-            text=gs(clb, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
-                x=int(seconds // 60 if seconds >= 60 else seconds)
-            ),
+            text=gs(user_id, s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS,
+                    x=int(seconds // 60 if seconds >= 60 else seconds)),
             show_alert=True
         )
         return
     _book_id, *others = clb.data.split(',')
-
     book = api.get_book(ShowBook.from_callback(_book_id).id)
     clb.edit_message_text(
         text=helpers.get_book_text(book),
@@ -96,7 +124,7 @@ def show_book(_: Client, clb: CallbackQuery):
             [
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=clb, string=s.INSTANT_READ),
+                        text=gs(user_id=user_id, string=s.INSTANT_READ),
                         callback_data=ReadBook(
                             id=str(book.id),
                             page=1,
@@ -107,16 +135,16 @@ def show_book(_: Client, clb: CallbackQuery):
                     )
                 ], [
                     InlineKeyboardButton(
-                        text=gs(mqc=clb, string=s.SHARE),
+                        text=gs(user_id=user_id, string=s.SHARE),
                         switch_inline_query=str(book.id)
                     )
                 ],
                 [
-                    InlineKeyboardButton(text=gs(mqc=clb, string=s.DOWNLOAD), url=book.pdf_url)
+                    InlineKeyboardButton(text=gs(user_id=user_id, string=s.DOWNLOAD), url=book.pdf_url)
                 ],
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=clb, string=s.BACK),
+                        text=gs(user_id=user_id, string=s.BACK),
                         callback_data=",".join(others)
                     )
                 ] if others else others
@@ -130,15 +158,16 @@ def read_book(_: Client, clb: CallbackQuery):
     """
     Read a book.
     """
+    user_id = clb.from_user.id
     book, masechet, tursa, previous_tursa, total = None, None, None, None, None
     _read_book, *others = clb.data.split(',')
     read_clb = ReadBook.from_callback(_read_book)
     if (seconds := limiter.get_seconds_to_wait(
-            user_id=clb.from_user.id,
+            user_id=user_id,
             rate_limit_type=RateLimit.IMAGE_PAGE if read_clb.read_mode == ReadMode.IMAGE else RateLimit.PDF_PAGE
     )) > 0:
         clb.answer(
-            text=gs(clb, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
+            text=gs(user_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
                 x=int(seconds // 60 if seconds >= 60 else seconds)
             ),
             show_alert=True
@@ -159,13 +188,13 @@ def read_book(_: Client, clb: CallbackQuery):
     else:
         raise ValueError("Invalid book type")
     clb.answer(
-        text=gs(mqc=clb, string=s.WAIT_FOR_PREVIEW),
+        text=gs(user_id=user_id, string=s.WAIT_FOR_PREVIEW),
         show_alert=False
     )
     try:
         clb.edit_message_text(
             text="".join((
-                gs(mqc=clb, string=s.INSTANT_READ),
+                gs(user_id=user_id, string=s.INSTANT_READ),
                 "\n\n",
                 helpers.get_book_text(book=book, page=read_clb.page, read_mode=read_clb.read_mode)
                 if read_clb.book_type == BookType.BOOK
@@ -175,36 +204,27 @@ def read_book(_: Client, clb: CallbackQuery):
             )),
             reply_markup=InlineKeyboardMarkup(
                 [
-                    helpers.read_mode_chooser(
-                        cm=clb,
-                        read_clb=read_clb,
-                        page=read_clb.page,
-                        others=others,
-                        read_modes=[ReadMode.PDF, ReadMode.IMAGE] if read_clb.book_type != BookType.TURSA else [],
-                    ),
-                    helpers.next_previous_buttons(
-                        cm=clb,
-                        read_clb=read_clb,
-                        total=total,
-                        page=read_clb.page,
-                        others=others,
-                    ),
+                    helpers.read_mode_chooser(user_id=user_id, read_clb=read_clb, page=read_clb.page, others=others,
+                                              read_modes=(ReadMode.PDF, ReadMode.IMAGE)
+                                              if read_clb.book_type != BookType.TURSA else ()),
+                    helpers.next_previous_buttons(user_id=user_id, read_clb=read_clb, page=read_clb.page, total=total,
+                                                  others=others),
                     [InlineKeyboardButton(
-                        text=gs(mqc=clb, string=s.READ_ON_SITE),
+                        text=gs(user_id=user_id, string=s.READ_ON_SITE),
                         url=book.get_page_url(read_clb.page)
                         if read_clb.book_type == BookType.BOOK
                         else masechet.pages[read_clb.page - 1].get_page_url()
                         if read_clb.book_type == BookType.MASECHET
                         else tursa.url
                     )],
-                    [InlineKeyboardButton(text=gs(mqc=clb, string=s.BACK), callback_data=",".join(others))],
+                    [InlineKeyboardButton(text=gs(user_id=user_id, string=s.BACK), callback_data=",".join(others))],
                 ]
             ),
         )
         repository.increase_stats(StatsType.PAGES_READ)
     except MessageNotModified:
         clb.answer(
-            text=gs(mqc=clb, string=s.SLOW_DOWN)
+            text=gs(user_id=user_id, string=s.SLOW_DOWN)
         )
 
 
@@ -214,6 +234,8 @@ def jump_to_page(_: Client, msg: Message):
 
     msg.text: number
     """
+    masechet, book = None, None
+    user_id = msg.from_user.id
     try:
         jump_button = next(filter(
             lambda b: helpers.callback_matcher(b.callback_data, JumpToPage),
@@ -231,14 +253,13 @@ def jump_to_page(_: Client, msg: Message):
     nop_clb = ReadBook.from_callback(next_or_previous)
     is_book = jump_clb.book_type == BookType.BOOK
     if (seconds := limiter.get_seconds_to_wait(
-            user_id=msg.from_user.id,
+            user_id=user_id,
             rate_limit_type=RateLimit.IMAGE_PAGE
             if nop_clb.read_mode == ReadMode.IMAGE else RateLimit.PDF_PAGE
     )) > 0:
         msg.reply(
-            text=gs(msg, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
-                x=int(seconds // 60 if seconds >= 60 else seconds)
-            ),
+            text=gs(user_id, s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS,
+                    x=int(seconds // 60 if seconds >= 60 else seconds)),
             quote=True
         )
         return
@@ -247,42 +268,38 @@ def jump_to_page(_: Client, msg: Message):
         try:
             jump_to = masechet.pages.index(next(filter(lambda p: p.name == msg.text, masechet.pages))) + 1
         except (StopIteration, ValueError):
-            msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(
-                x=masechet.pages[0].name,
-                y=masechet.pages[-1].name
-            ))
+            msg.reply_text(
+                text=gs(user_id=user_id, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,
+                        x=masechet.pages[0].name, y=masechet.pages[-1].name))
             return
     else:
         try:
             jump_to = int(msg.text)
             if jump_to > jump_clb.total or jump_to < 1:
-                msg.reply_text(text=gs(mqc=msg, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(x=1, y=jump_clb.total))
+                msg.reply_text(text=gs(
+                    user_id=user_id, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=jump_clb.total))
                 return
         except ValueError:
-            msg.reply_text(text=gs(mqc=msg, string=s.NUMBERS_ONLY))
+            msg.reply_text(text=gs(user_id=user_id, string=s.NUMBERS_ONLY))
             return
         book = api.get_book(jump_clb.id)
 
     kwargs = dict(
         text="".join((
-            gs(mqc=msg, string=s.INSTANT_READ),
+            gs(user_id=user_id, string=s.INSTANT_READ),
             "\n\n",
             helpers.get_book_text(book=book, page=jump_to, read_mode=nop_clb.read_mode)
             if is_book else helpers.get_masechet_page_text(masechet=masechet, page=jump_to, read_mode=nop_clb.read_mode)
         )),
         reply_markup=InlineKeyboardMarkup(
             [
-                helpers.read_mode_chooser(cm=msg, read_clb=nop_clb, page=jump_to, others=nop_others),
-                helpers.next_previous_buttons(
-                    cm=msg,
-                    read_clb=nop_clb,
-                    total=jump_clb.total,
-                    page=jump_to,
-                    others=nop_others,
-                ),
+                helpers.read_mode_chooser(user_id=user_id, read_clb=nop_clb, page=jump_to, others=nop_others),
+                helpers.next_previous_buttons(user_id=user_id, read_clb=nop_clb, page=jump_to, total=jump_clb.total,
+                                              others=nop_others),
                 [InlineKeyboardButton(
-                    text=gs(mqc=msg, string=s.READ_ON_SITE),
-                    url=book.get_page_url(jump_clb.page) if is_book else masechet.pages[jump_clb.page - 1].get_page_url()
+                    text=gs(user_id=user_id, string=s.READ_ON_SITE),
+                    url=book.get_page_url(jump_clb.page)
+                    if is_book else masechet.pages[jump_clb.page - 1].get_page_url()
                 )],
                 [msg.reply_to_message.reply_markup.inline_keyboard[-1][-1]]
             ]
@@ -303,6 +320,6 @@ def jump_tip(_: Client, clb: CallbackQuery):
     Jump to a page tip.
     """
     clb.answer(
-        text=gs(mqc=clb, string=s.JUMP_ALSO_BY_EDIT_TIP),
+        text=gs(user_id=clb.from_user.id, string=s.JUMP_ALSO_BY_EDIT_TIP),
         show_alert=True
     )

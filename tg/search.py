@@ -7,22 +7,23 @@ from data.models import Book
 from db import repository
 from db.repository import StatsType
 from tg import helpers
-from tg.helpers import get_string as gs, get_lang_code as glc
+from tg.helpers import get_string as gs
+from data.strings import String as s, Language
 from data.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
-from data.strings import String as s
 
 
 def empty_search(_: Client, query: InlineQuery):
     """Show a message when the user searches for nothing"""
+    user_id = query.from_user.id
     query.answer(
         results=[
             InlineQueryResultArticle(
                 id="1",
-                title=gs(mqc=query, string=s.START_SEARCH_INLINE),
-                description=gs(mqc=query, string=s.SEARCH_TIP),
+                title=gs(user_id=user_id, string=s.START_SEARCH_INLINE),
+                description=gs(user_id=user_id, string=s.SEARCH_TIP),
                 input_message_content=InputTextMessageContent(
                     message_text="/start"
-                )
+                ),
             )
         ]
     )
@@ -37,6 +38,7 @@ def _get_book_article(book: Book, query: InlineQuery, read_at_page: int) -> Inli
         query: The inline query
         read_at_page: The page to show when the user clicks on the "Read" button
     """
+    user_id = query.from_user.id
     return InlineQueryResultArticle(
         id=str(book.id),
         title=book.title,
@@ -48,9 +50,9 @@ def _get_book_article(book: Book, query: InlineQuery, read_at_page: int) -> Inli
             [
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.INSTANT_READ),
+                        text=gs(user_id=user_id, string=s.INSTANT_READ),
                         callback_data=ReadBook(
-                            id=book.id,
+                            id=str(book.id),
                             page=read_at_page,
                             total=book.pages,
                             read_mode=ReadMode.IMAGE,
@@ -60,19 +62,19 @@ def _get_book_article(book: Book, query: InlineQuery, read_at_page: int) -> Inli
                 ],
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.SHARE),
+                        text=gs(user_id=user_id, string=s.SHARE),
                         switch_inline_query=str(book.id)
                     )
                 ],
                 [
                     InlineKeyboardButton(
-                        text=gs(mqc=query, string=s.DOWNLOAD),
+                        text=gs(user_id=user_id, string=s.DOWNLOAD),
                         url=book.pdf_url
                     ),
                 ]
             ]
         ),
-        thumb_url=book.get_page_img(page=1, width=100, height=100),
+        thumb_url=book.get_page_img(page=read_at_page, width=100, height=100),
     )
 
 
@@ -84,7 +86,7 @@ def search_books_inline(_: Client, query: InlineQuery):
     """
     if query.offset is not None and query.offset == '0':
         return  # No more results
-
+    user_id = query.from_user.id
     if all(part.isdigit() for part in query.query.split(':')):  # The user searched for a book id or a book id:page
         if ':' in query.query:
             book_id, page = map(int, query.query.split(':'))
@@ -95,38 +97,38 @@ def search_books_inline(_: Client, query: InlineQuery):
         if book is None:
             query.answer(
                 results=[],
-                switch_pm_text=gs(mqc=query, string=s.BOOK_NOT_FOUND),
+                switch_pm_text=gs(user_id=user_id, string=s.BOOK_NOT_FOUND),
                 switch_pm_parameter="search"
             )
             return
         if page > book.pages:
             query.answer(
                 results=[],
-                switch_pm_text=gs(mqc=query, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y).format(x=1, y=book.pages),
+                switch_pm_text=gs(user_id=user_id, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=book.pages),
                 switch_pm_parameter="search"
             )
             return
         query.answer(
             results=[_get_book_article(book=book, query=query, read_at_page=page)],
-            switch_pm_text=gs(mqc=query, string=s.PRESS_TO_SHARE).format(title=book.title),
+            switch_pm_text=gs(user_id=user_id, string=s.PRESS_TO_SHARE, title=book.title),
             switch_pm_parameter="search"
         )
         repository.increase_stats(StatsType.BOOKS_READ)
         return
 
     title, author = data.helpers.get_title_author(query.query)
-    results, total = api.search(
-        title=title.strip(),
-        author=author.strip(),
+    res, total = api.search(
+        title=title,
+        author=author,
         offset=int(query.offset or 1),
         limit=5
     )
     query.answer(
-        switch_pm_text=gs(query, s.X_RESULTS_FOR_S).format(
-            x=total, s=f"{title}:{author}" if author else title
-        ),
+        switch_pm_text=gs(user_id, s.X_RESULTS_FOR_S, x=total, s=f"{title} - {author}" if author else title),
         switch_pm_parameter="search",
-        results=[_get_book_article(book=book, query=query, read_at_page=1) for book in (api.get_book(b.id) for b in results)],
+        results=[
+            _get_book_article(book=book, query=query, read_at_page=1) for book in (api.get_book(b.id) for b in res)
+        ],
         next_offset=str(data.helpers.get_offset(int(query.offset or 1), total, increase=5))
     )
     repository.increase_stats(StatsType.INLINE_SEARCHES)
@@ -138,6 +140,7 @@ def search_books_message(_: Client, msg: Message):
 
     msg.text format: "{title}" / "{title}:{author}"
     """
+    user_id = msg.from_user.id
     title, author = data.helpers.get_title_author(msg.text)
     results, total = api.search(
         title=title,
@@ -147,23 +150,22 @@ def search_books_message(_: Client, msg: Message):
     )
     if total == 0:
         msg.reply_text(
-            text=gs(mqc=msg, string=s.NO_RESULTS_FOR_Q).format(q=msg.text),
+            text=gs(user_id, string=s.NO_RESULTS_FOR_Q, q=msg.text),
             quote=True
         )
         return
     next_offset = data.helpers.get_offset(1, total, increase=5)
-    next_previous_buttons = []
+    next_prev_buttons = []
     if next_offset:
-        next_previous_buttons.append(
+        next_prev_buttons.append(
             InlineKeyboardButton(
-                text=gs(mqc=msg, string=s.NEXT),
+                text=gs(user_id=user_id, string=s.NEXT),
                 callback_data=SearchNavigation(offset=next_offset, total=total).to_callback()
             )
         )
     msg.reply(
-        text=gs(msg, s.X_TO_Y_OF_TOTAL_FOR_S).format(
-            x=1, y=(next_offset - 1) if next_offset else total, total=total, s=msg.text
-        ),
+        text=gs(user_id, s.X_TO_Y_OF_TOTAL_FOR_S,
+                x=1, y=(next_offset - 1) if next_offset else total, total=total, s=msg.text),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -173,8 +175,11 @@ def search_books_message(_: Client, msg: Message):
                     )
                 ] for book in results
             ] + [
-                next_previous_buttons,
-                [InlineKeyboardButton(gs(mqc=msg, string=s.SEARCH_INLINE), switch_inline_query_current_chat=msg.text)]
+                next_prev_buttons,
+                [InlineKeyboardButton(
+                    text=gs(user_id=user_id, string=s.SEARCH_INLINE),
+                    switch_inline_query_current_chat=msg.text
+                )]
             ]
         ),
         quote=True
@@ -186,13 +191,14 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
     """
     Navigate through search results
     """
+    user_id, user_lang = clb.from_user.id, clb.from_user.language_code
     search_nav = SearchNavigation.from_callback(clb.data)
     try:
         search = clb.message.reply_to_message.text
         if not search:
             raise AttributeError
     except AttributeError:
-        clb.answer(gs(mqc=clb, string=s.ORIGINAL_SEARCH_DELETED), show_alert=True)
+        clb.answer(gs(user_id=user_id, string=s.ORIGINAL_SEARCH_DELETED), show_alert=True)
         return
 
     title, author = data.helpers.get_title_author(search)
@@ -207,21 +213,20 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
     if next_offset:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text=gs(mqc=clb, string=s.NEXT),
+                text=gs(user_id=user_id, string=s.NEXT),
                 callback_data=SearchNavigation(offset=next_offset, total=total).to_callback()
             )
         )
     if search_nav.offset > 5:
         next_previous_buttons.append(
             InlineKeyboardButton(
-                text=gs(mqc=clb, string=s.PREVIOUS),
+                text=gs(user_id=user_id, string=s.PREVIOUS),
                 callback_data=SearchNavigation(offset=search_nav.offset - 5, total=total).to_callback()
             )
         )
     clb.message.edit_text(
-        text=gs(clb, s.X_TO_Y_OF_TOTAL_FOR_S).format(
-            x=search_nav.offset, y=(next_offset - 1) if next_offset else total, total=total, s=search
-        ),
+        text=gs(user_id, s.X_TO_Y_OF_TOTAL_FOR_S,
+                x=search_nav.offset, y=(next_offset - 1) if next_offset else total, total=total, s=search),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -231,8 +236,8 @@ def search_books_navigator(_: Client, clb: CallbackQuery):
                     )
                 ] for book in results
             ] + [
-                next_previous_buttons if glc(clb) == "he" else next_previous_buttons[::-1],
-                [InlineKeyboardButton(gs(mqc=clb, string=s.SEARCH_INLINE), switch_inline_query_current_chat=search)]
+                next_previous_buttons if Language.from_code(user_lang).rtl else next_previous_buttons[::-1],
+                [InlineKeyboardButton(gs(user_id, string=s.SEARCH_INLINE), switch_inline_query_current_chat=search)]
             ]
         )
     )

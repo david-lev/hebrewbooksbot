@@ -19,16 +19,16 @@ app = Client(
     bot_token=cfg.tg_bot_token
 )
 
+app.add_handler(
+    MessageHandler(
+        utils.start, filters=filters.command(Menu.START)
+    )
+)
+
 if cfg.under_maintenance:
     app.add_handler(
         MessageHandler(
-            utils.start, filters=filters.command(Menu.START)
-        )
-    )
-    app.add_handler(
-        MessageHandler(
-            callback=lambda _, m: m.reply_text(gs(m, s.UNDER_MAINTENANCE)),
-            filters=helpers.MESSAGE_SEARCH_FILTER
+            callback=lambda _, m: m.reply_text(gs(m.from_user.id, s.UNDER_MAINTENANCE)),
         )
     )
     app.add_handler(
@@ -49,6 +49,16 @@ if cfg.under_maintenance:
         )
     )
 else:
+    app.add_handler(
+        CallbackQueryHandler(
+            utils.choose_lang, filters=filters.create(lambda _, __, query: query.data.startswith(Menu.CHOOSE_LANG))
+        )
+    )
+    app.add_handler(
+        CallbackQueryHandler(
+            utils.set_lang, filters=filters.create(lambda _, __, query: query.data.startswith("lang:"))
+        )
+    )
     app.add_handler(
         CallbackQueryHandler(
             utils.start, filters=filters.create(lambda _, __, query: query.data == Menu.START)
@@ -93,11 +103,7 @@ else:
 
     app.add_handler(
         MessageHandler(
-            search.search_books_message, filters=(
-                    filters.text & ~filters.via_bot & ~filters.reply & ~filters.command([Menu.START, Menu.BROADCAST]) &
-                    ~filters.create(lambda _, __, msg: msg.text.isdigit())
-                    & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
-            )
+            search.search_books_message, filters=helpers.MESSAGE_SEARCH_FILTER
         )
     )
 

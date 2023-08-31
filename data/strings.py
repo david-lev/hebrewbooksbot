@@ -2,16 +2,18 @@ import csv
 import sys
 from collections import defaultdict
 from enum import Enum
+from functools import lru_cache
 
 RTL = '\u200f'
 LTR = '\u200e'
 
 
 class Language(Enum):
-    EN = ('en', 'English', '🇺🇸')
-    HE = ('he', 'עברית', '🇮🇱')
-    FR = ('fr', 'Français', '🇫🇷')
-    ES = ('es', 'Español', '🇪🇸')
+    # CONST -> (CODE, NAME, FLAG, RTL)
+    EN = ('en', 'English', '🇺🇸', False)
+    HE = ('he', 'עברית', '🇮🇱', True)
+    FR = ('fr', 'Français', '🇫🇷', False)
+    ES = ('es', 'Español', '🇪🇸', False)
 
     def __new__(cls, *values):
         obj = object.__new__(cls)
@@ -20,6 +22,13 @@ class Language(Enum):
             cls._value2member_map_[other_value] = obj
         obj._all_values = values
         return obj
+
+    @classmethod
+    def from_code(cls, code: str):
+        try:
+            return cls(code)
+        except ValueError:
+            return cls.EN
 
     def __repr__(self):
         return f'{self.flag}'
@@ -35,6 +44,10 @@ class Language(Enum):
     @property
     def flag(self) -> str:
         return self._all_values[2]
+
+    @property
+    def rtl(self) -> bool:
+        return self._all_values[3]
 
 
 class String(str, Enum):
@@ -130,13 +143,13 @@ def read_strings_from_csv(filename: str) -> dict[String, dict[Language, str]]:
 
 _strings = read_strings_from_csv('strings.csv')
 
-for string in _strings:
+for s in _strings:
     for lang in Language:
-        if lang not in _strings[string]:
-            print(f'"{lang.name}" is missing for "{string.name}"')
+        if lang not in _strings[s]:
+            print(f'"{lang.name}" is missing for "{s.name}"')
             # sys.exit(1)
 
 
-def get_string(s: String, lng: Language, **kwargs) -> str:
-    return _strings[string][lang].format(**kwargs)
-
+@lru_cache
+def get_string(string: String, lng: Language, **kwargs) -> str:
+    return _strings[string][lng].format(**kwargs)

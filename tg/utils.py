@@ -62,7 +62,7 @@ def set_lang(_: Client, clb: CallbackQuery):
     Set a language.
     """
     _, lang_code = clb.data.split(':')
-    repository.update_tg_user(tg_id=clb.from_user.id, lang=lang_code)
+    repository.update_tg_user(tg_id=clb.from_user.id, lang=Language.from_code(lang_code).code)
     clb.answer(
         text="Language set successfully!",
         show_alert=True

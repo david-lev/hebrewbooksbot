@@ -6,7 +6,7 @@ from data import api, config
 from data.models import Book, Masechet, Tursa
 from data.enums import BrowseType as BrowseTypeEnum
 from data.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
-from data.strings import String as s, get_string as gs, String, Language, RTL  # noqa
+from data.strings import String as s, get_string as _gs, String, Language, RTL  # noqa
 from db import repository
 
 CACHE_CHANNEL_ID = config.get_settings().tg_cache_channel_id
@@ -14,7 +14,7 @@ CACHE_CHANNEL_ID = config.get_settings().tg_cache_channel_id
 
 def get_string(user_id: int, string: String, **kwargs) -> str:
     """Get a string in the user's language."""
-    return gs(string=string, lng=Language.from_code(repository.get_tg_user(tg_id=user_id).lang), **kwargs)
+    return _gs(string=string, lng=Language.from_code(repository.get_tg_user(tg_id=user_id).lang), **kwargs)
 
 
 class Menu:

@@ -2,14 +2,16 @@ from data import config
 from sqlalchemy import create_engine, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, scoped_session, Session, sessionmaker
 
-engine = create_engine(f'sqlite:///{config.get_settings().sqlite_file_path}')  # , echo=True)
-session_factory = sessionmaker(bind=engine)
-Session = scoped_session(session_factory)
-
-
-def get_session() -> Session:
-    """Get SQLAlchemy session"""
-    return Session()
+conf = config.get_settings()
+engine = create_engine(
+    url=f'sqlite:///{conf.sqlite_file_path}',
+    pool_size=20,
+    max_overflow=10,
+    pool_timeout=30,
+    echo=conf.log_level == 'DEBUG',
+)
+Session = sessionmaker(bind=engine)
+global_session = Session()
 
 
 class BaseTable(DeclarativeBase):
@@ -58,8 +60,6 @@ class Stats(BaseTable):
 
 
 BaseTable.metadata.create_all(engine)
-session = get_session()
-session.bind = engine
-if not session.query(Stats).count():
-    session.add(Stats())
-    session.commit()
+if not global_session.query(Stats).count():
+    global_session.add(Stats())
+    global_session.commit()

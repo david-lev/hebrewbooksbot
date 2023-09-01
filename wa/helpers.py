@@ -1,16 +1,23 @@
-from datetime import date, timedelta
 from functools import lru_cache
 from urllib import parse
 from pywa import WhatsApp
-from pywa.types.others import User
-from sqlalchemy.orm import exc
 from data.config import get_settings
 from data.models import Book, Masechet
-from data.strings import STRINGS, RTL, String as s, Language
+from data.strings import RTL, String as s, Language, get_string as _gs  # noqa
 from db import repository
-from data.api import session as api_session
+# from data.api import session as api_session
+# from sqlalchemy.orm import exc
+# from datetime import date, timedelta
 
 conf = get_settings()
+
+
+def get_string(wa_id: str, string: s, **kwargs) -> str:
+    """Get a string from the strings file."""
+    return _gs(string=string, lng=Language.from_code(repository.get_wa_user(wa_id=wa_id).lang), **kwargs)
+
+
+gs = get_string  # internal alias
 
 
 class Commands:
@@ -54,17 +61,9 @@ def get_self_share(text: str) -> str:
     return f"wa.me/{conf.wa_phone_number}?text={parse.quote_plus(text)}"
 
 
-def is_admin(wa_user: User) -> bool:
+def is_admin(wa_id: str) -> bool:
     """Check if a user is an admin."""
-    return wa_user.wa_id in conf.wa_admins
-
-
-def get_string(string: s, **kwargs) -> str:
-    """Get a string from the strings file."""
-    return STRINGS[string].get(DEFAULT_LANGUAGE).format(**kwargs)
-
-
-gs = get_string  # internal alias
+    return wa_id in conf.wa_admins
 
 
 def slice_long_string(string: str, max_length: int, suffix: str = "...") -> str:
@@ -82,22 +81,23 @@ def get_book_details(book: Book) -> str:
     ))
 
 
-def get_page_details(book: Book, page_status: str) -> str:
+def get_page_details(wa_id: str, book: Book, page_status: str) -> str:
     return "".join((
-        f"*{gs(s.INSTANT_READ)}*\n\n"
+        f"*{gs(wa_id, s.INSTANT_READ)}*\n\n"
         f"📚 {book.title}\n",
         f"👤 {book.author}\n" if book.author else "",
         f"{RTL}📅 {book.year}\n" if book.year else "",
         f"🏙 {book.city}\n" if book.city else "",
         f"📖 {page_status}\n",
-        f"\n_💡{gs(s.JUMP_TIP)}_\n",
+        f"\n_💡{gs(wa_id, s.JUMP_TIP)}_\n",
     ))
 
 
-def get_stats(wa_user: User):
+def get_stats(wa_id: str) -> str:
     stats = repository.get_stats()
-    if is_admin(wa_user):
+    if is_admin(wa_id=wa_id):
         return gs(
+            wa_id=wa_id,
             string=s.SHOW_STATS_ADMIN,
             tg_users_count=repository.get_tg_users_count(),
             wa_users_count=repository.get_wa_users_count(),
@@ -109,6 +109,7 @@ def get_stats(wa_user: User):
         )
     else:
         return gs(
+            wa_id=wa_id,
             string=s.SHOW_STATS,
             books_read=stats.books_read,
             pages_read=stats.pages_read,
@@ -124,18 +125,21 @@ def get_masechet_details(masechet: Masechet):
 
 
 def get_file_id(wa: WhatsApp, url: str, file_name: str, mime_type: str) -> str:
-    """Get the media ID from a URL."""
-    max_attempts = 3
-    while max_attempts:
-        try:
-            max_attempts -= 1
-            exists = repository.get_wa_file(url=url)
-            if exists.upload_date < (date.today() - timedelta(days=30)):
-                repository.delete_wa_file(url=url)
-                raise exc.NoResultFound
-            return exists.file_id
-        except exc.NoResultFound:
-            file_id = wa.upload_media(media=api_session.get(url).content, mime_type=mime_type, filename=file_name)
-            repository.create_wa_file(url=url, file_id=file_id)
-            continue
-    raise ValueError(f"Could not get file id for {url}")
+    """
+    Wrapper to get a file id from a url.
+    """
+    return url
+    # max_attempts = 3
+    # while max_attempts:
+    #     try:
+    #         max_attempts -= 1
+    #         exists = repository.get_wa_file(url=url)
+    #         if exists.upload_date < (date.today() - timedelta(days=30)):
+    #             repository.delete_wa_file(url=url)
+    #             raise exc.NoResultFound
+    #         return exists.file_id
+    #     except exc.NoResultFound:
+    #         file_id = wa.upload_media(media=api_session.get(url).content, mime_type=mime_type, filename=file_name)
+    #         repository.create_wa_file(url=url, file_id=file_id)
+    #         continue
+    # raise ValueError(f"Could not get file id for {url}")

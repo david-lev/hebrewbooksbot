@@ -164,6 +164,12 @@ HEBREWBOOKS_SITE,en,🌍 HebrewBooks Website 🌍
 HEBREWBOOKS_SITE,he,🌍 אתר היברובוקס 🌍
 STATS,en,📊 Stats
 STATS,he,📊 סטטיסטיקות
+CHANGE_LANGUAGE,en,🌐 Change Language
+CHANGE_LANGUAGE,he,🌐 שינוי שפה
+CHANGE_LANGUAGE,fr,🌐 Changer de langue
+CHOOSE_LANGUAGE,en,Choose a language
+CHOOSE_LANGUAGE,he,בחרו שפה
+CHOOSE_LANGUAGE,fr,Choisissez une langue
 SHOW_STATS,en,"📊 Bot Stats 📊
 
 📚 Books read: {books_read:,}

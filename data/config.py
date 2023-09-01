@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     sqlite_file_path: str
     log_level: str
     under_maintenance: bool
+    reply_under_maintenance: bool
     contact_phone: int
     tg_api_id: int
     tg_api_hash: str

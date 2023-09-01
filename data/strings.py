@@ -144,12 +144,12 @@ def read_strings_from_csv(filename: str) -> dict[String, dict[Language, str]]:
 _strings = read_strings_from_csv('strings.csv')
 
 for s in _strings:
-    for lang in Language:
-        if lang not in _strings[s]:
-            print(f'"{lang.name}" is missing for "{s.name}"')
+    for l in Language:
+        if l not in _strings[s]:
+            print(f'"{l.name}" is missing for "{s.name}"')
             # sys.exit(1)
 
 
 @lru_cache(maxsize=None)
 def get_string(string: String, lng: Language, **kwargs) -> str:
-    return _strings[string][lng].format(**kwargs)
+    return _strings[string].get(lng, _strings[string][Language.EN]).format(**kwargs)

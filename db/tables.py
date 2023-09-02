@@ -1,6 +1,7 @@
+from contextlib import contextmanager
 from data import config
 from sqlalchemy import create_engine, BigInteger, String
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, scoped_session, Session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, sessionmaker
 
 conf = config.get_settings()
 engine = create_engine(
@@ -8,10 +9,19 @@ engine = create_engine(
     pool_size=20,
     max_overflow=10,
     pool_timeout=30,
-    echo=conf.log_level == 'DEBUG',
+    # echo=conf.log_level == 'DEBUG',
 )
 Session = sessionmaker(bind=engine)
-global_session = Session()
+
+
+@contextmanager
+def get_session() -> Session:
+    """Get session"""
+    new_session = Session()
+    try:
+        yield new_session
+    finally:
+        new_session.close()
 
 
 class BaseTable(DeclarativeBase):
@@ -60,6 +70,6 @@ class Stats(BaseTable):
 
 
 BaseTable.metadata.create_all(engine)
-if not global_session.query(Stats).count():
-    global_session.add(Stats())
-    global_session.commit()
+with get_session() as session:
+    if not session.query(Stats).count():
+        session.add(Stats())

@@ -2,13 +2,13 @@ import data
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from data import api
-from data.enums import BrowseType as BrowseTypeEnum
+from data.enums import BrowseType as BrowseTypeEnum, BookType, ReadMode, Language
 from db import repository
 from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu, get_string as gs
-from data.strings import String as s, Language  # noqa
-from data.callbacks import BrowseNavigation, BrowseType, ShowBook, BookType, ReadBook, ReadMode
+from data.strings import String as s  # noqa
+from data.callbacks import BrowseNavigation, BrowseType, ShowBook, ReadBook
 
 
 def browse_menu(_: Client, query: CallbackQuery):

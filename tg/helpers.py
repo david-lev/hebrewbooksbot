@@ -4,12 +4,10 @@ from pyrogram import filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton
 from data import api, config
 from data.models import Book, Masechet, Tursa
-from data.enums import BrowseType as BrowseTypeEnum
-from data.callbacks import CallbackData, JumpToPage, ReadMode, ReadBook, BookType
-from data.strings import String as s, get_string as _gs, String, Language, RTL  # noqa
+from data.enums import BrowseType as BrowseTypeEnum, BookType, ReadMode, Language
+from data.callbacks import CallbackData, JumpToPage, ReadBook
+from data.strings import String as s, get_string as _gs, String, RTL  # noqa
 from db import repository
-
-CACHE_CHANNEL_ID = config.get_settings().tg_cache_channel_id
 
 
 def get_string(user_id: int, string: String, **kwargs) -> str:

@@ -14,7 +14,7 @@ class Limit:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
 
     sqlite_file_path: str
     log_level: str
@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     tg_api_id: int
     tg_api_hash: str
     tg_bot_token: str
-    tg_cache_channel_id: int
     tg_admins: list[int]
     wa_token: str
     wa_verify_token: str

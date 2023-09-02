@@ -3,7 +3,8 @@ from urllib import parse
 from pywa import WhatsApp
 from data.config import get_settings
 from data.models import Book, Masechet
-from data.strings import RTL, String as s, Language, get_string as _gs  # noqa
+from data.strings import RTL, String as s, get_string as _gs  # noqa
+from data.enums import Language
 from db import repository
 # from data.api import session as api_session
 # from sqlalchemy.orm import exc

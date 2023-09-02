@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from data.enums import BaseEnum, BrowseType as BrowseTypeEnum
+from data.enums import BrowseType as BrowseTypeEnum, BookType, ReadMode
 
 
 class CallbackData:
@@ -90,18 +90,6 @@ class SearchNavigation(CallbackData):
 class ShowBook(CallbackData):
     __clbname__ = '!book'
     id: int
-
-
-class ReadMode(BaseEnum):
-    PDF = 'p'
-    IMAGE = 'i'
-    TEXT = 't'
-
-
-class BookType(BaseEnum):
-    BOOK = 'b'
-    MASECHET = 'm'
-    TURSA = 't'
 
 
 @dataclass(frozen=True, slots=True)

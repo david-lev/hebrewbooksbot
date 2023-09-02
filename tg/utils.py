@@ -5,8 +5,9 @@ from data.rate_limit import limiter, RateLimit
 from db.repository import StatsType
 from tg import helpers
 from tg.helpers import Menu, get_string as gs
-from data.callbacks import ShowBook, ReadBook, JumpToPage, ReadMode, BookType, BrowseType
-from data.strings import String as s, Language
+from data.callbacks import ShowBook, ReadBook, JumpToPage, BrowseType
+from data.enums import BookType, ReadMode, Language
+from data.strings import String as s  # noqa
 from data import api
 from db import repository
 

@@ -8,8 +8,9 @@ from db import repository
 from db.repository import StatsType
 from tg import helpers
 from tg.helpers import get_string as gs
-from data.strings import String as s, Language
-from data.callbacks import SearchNavigation, ShowBook, ReadBook, ReadMode, BookType
+from data.strings import String as s
+from data.callbacks import SearchNavigation, ShowBook, ReadBook
+from data.enums import BookType, ReadMode, Language
 
 
 def empty_search(_: Client, query: InlineQuery):

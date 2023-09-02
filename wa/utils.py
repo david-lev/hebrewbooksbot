@@ -2,8 +2,9 @@ import dataclasses
 from pywa import WhatsApp
 from pywa.types import Message, CallbackSelection, Button, CallbackButton, SectionList, Section, SectionRow
 from data import api, config
-from data.callbacks import ShareBook, ReadBook, ReadMode, BookType, ShowBook
-from data.strings import String as s, Language  # noqa
+from data.callbacks import ShareBook, ReadBook, ShowBook
+from data.enums import BookType, ReadMode, Language
+from data.strings import String as s  # noqa
 from data.rate_limit import limiter, RateLimit
 from db import repository
 from db.repository import StatsType

@@ -40,7 +40,7 @@ if conf.under_maintenance:
             active=False
         )
         if conf.reply_under_maintenance:
-            msg.reply_text(text=helpers.get_string(wa_id, s.UNDER_MAINTENANCE))
+            msg.reply_text(text=helpers.get_string(wa_id, s.BOT_UNDER_MAINTENANCE))
 
 else:
 

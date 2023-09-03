@@ -508,11 +508,16 @@ TUR_AND_SA_CMD,es,"!tur, טור יורה דעה קכז ג "
 TUR_AND_SA_CMD,he,"!טור, טור יורה דעה קכז ג"
 TUR_AND_SA_CMD,yi,"!טור, טור יורה דעה קכז ג"
 TUR_AND_SA_CMD,fr,"!tur, טור יורה דעה קכז ג"
-UNDER_MAINTENANCE,en,The bot is currently under maintenance. Please try again later.
-UNDER_MAINTENANCE,es,"El bot está actualmente en mantenimiento. Por favor, inténtalo más tarde. "
-UNDER_MAINTENANCE,he,הבוט כרגע בתחזוקה. נא לנסות שוב מאוחר יותר.
-UNDER_MAINTENANCE,yi,"די באט ווערט יעצט ריפערד. ביטע, פרעביר שפעטער."
-UNDER_MAINTENANCE,fr,Le bot est actuellement en maintenance. Veuillez réessayer plus tard.
+BOT_UNDER_MAINTENANCE,en,The bot is currently under maintenance. Please try again later.
+BOT_UNDER_MAINTENANCE,es,"El bot está actualmente en mantenimiento. Por favor, inténtalo más tarde. "
+BOT_UNDER_MAINTENANCE,he,הבוט כרגע בתחזוקה. נא לנסות שוב מאוחר יותר.
+BOT_UNDER_MAINTENANCE,yi,"די באט ווערט יעצט ריפערד. ביטע, פרעביר שפעטער."
+BOT_UNDER_MAINTENANCE,fr,Le bot est actuellement en maintenance. Veuillez réessayer plus tard.
+FEATURE_UNDER_MAINTENANCE,en,This feature is currently under maintenance. Please try again later.
+FEATURE_UNDER_MAINTENANCE,es,"Esta función está actualmente en mantenimiento. Por favor, inténtalo más tarde. "
+FEATURE_UNDER_MAINTENANCE,he,פיצ'ר זה כרגע בתחזוקה. נא לנסות שוב מאוחר יותר.
+FEATURE_UNDER_MAINTENANCE,yi,"דער פיטשער איז יעצט ריפערד. ביטע, פרעביר שפעטער."
+FEATURE_UNDER_MAINTENANCE,fr,Cette fonctionnalité est actuellement en maintenance. Veuillez réessayer plus tard.
 WA_ABOUT_MSG,en,"This bot was built with the aim of making the content of the hebrewbooks.org website accessible via WhatsApp.
 
 An improved version of the bot is also available on Telegram: t.me/hebooksbot

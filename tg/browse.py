@@ -50,8 +50,8 @@ def browse_types(_: Client, clb: CallbackQuery):
     _browse_type, *others = clb.data.split(",")
     browse_type = BrowseType.from_callback(_browse_type)
 
-    if browse_type.type == BrowseTypeEnum.SHAS:  # TODO: Remove this when the SHAS is ready
-        clb.answer(text=gs(user_id, s.UNDER_MAINTENANCE), show_alert=True)
+    if browse_type.type in (BrowseTypeEnum.SHAS, BrowseTypeEnum.TURSA):  # TODO: Remove when it's ready
+        clb.answer(text=gs(user_id, s.FEATURE_UNDER_MAINTENANCE), show_alert=True)
         return
 
     func, choose_msg, buttons_in_row = helpers.get_browse_type_data(browse_type.type)

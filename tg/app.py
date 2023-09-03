@@ -30,13 +30,13 @@ app.add_handler(
 if cfg.under_maintenance:
     app.add_handler(
         MessageHandler(
-            callback=lambda _, m: m.reply_text(gs(m.from_user.id, s.UNDER_MAINTENANCE)),
+            callback=lambda _, m: m.reply_text(gs(m.from_user.id, s.BOT_UNDER_MAINTENANCE)),
         )
     )
     app.add_handler(
         CallbackQueryHandler(
             lambda _, cq: cq.answer(
-                text=gs(cq, s.UNDER_MAINTENANCE),
+                text=gs(cq, s.BOT_UNDER_MAINTENANCE),
                 show_alert=True
             ),
         )
@@ -45,7 +45,7 @@ if cfg.under_maintenance:
         InlineQueryHandler(
             lambda _, iq: iq.answer(
                 results=[],
-                switch_pm_text=gs(iq, s.UNDER_MAINTENANCE),
+                switch_pm_text=gs(iq, s.BOT_UNDER_MAINTENANCE),
                 switch_pm_parameter="start"
             ),
         )

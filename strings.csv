@@ -1,14 +1,14 @@
 Key,Language,Translation
 ABOUT,en,ℹ️ About
 ABOUT,es,ℹ️ Acerca de 
-ABOUT,he,‏ℹ️ אודות
+ABOUT,he,ℹ️ אודות
 ABOUT,yi,ℹ️ וועגן
 ABOUT,fr,?? À propos
 BACK,en,🔙 Back
 BACK,es,🔙 Atrás 
 BACK,he,🔙 חזרה
 BACK,yi,🔙 צוריק
-BACK,fr,retour ??
+BACK,fr,🔙 Retour
 BOOK_NOT_FOUND,en,Book not found
 BOOK_NOT_FOUND,es,Libro no encontrado 
 BOOK_NOT_FOUND,he,ספר לא נמצא
@@ -18,7 +18,7 @@ BROWSE,en,📖 Browse
 BROWSE,es,📖 Explorar 
 BROWSE,he,📖 עיון
 BROWSE,yi,📖 בראויז
-BROWSE,fr,?? Parcourir
+BROWSE,fr,📖 Parcourir
 CHOOSE,en,Choose
 CHOOSE,es,Elige 
 CHOOSE,he,בחרו
@@ -53,7 +53,7 @@ DATE_RANGES,en,📅 Date Ranges
 DATE_RANGES,es,📅 Rangos de fecha 
 DATE_RANGES,he,📅 תאריכים
 DATE_RANGES,yi,📅 דאטומס 
-DATE_RANGES,fr,?? Plages de dates
+DATE_RANGES,fr,📅 Plages de dates
 DATE_RANGES_CMD,en,"!date, 1945"
 DATE_RANGES_CMD,es,"!fecha, 1945 "
 DATE_RANGES_CMD,he,"!תאריך, תר""נ"
@@ -63,32 +63,32 @@ DOCUMENT,en,📄 Document
 DOCUMENT,es,📄 Documento 
 DOCUMENT,he,📄 מסמך
 DOCUMENT,yi,📄 דאקיומענט
-DOCUMENT,fr,?? Document
+DOCUMENT,fr,📄 Document
 DOWNLOAD,en,⬇️ Download ⬇️
 DOWNLOAD,es,⬇️ Descargar ⬇️ 
 DOWNLOAD,he,⬇️ הורדה ⬇️
 DOWNLOAD,yi,⬇️דאונלאוד⬇️
-DOWNLOAD,fr,?? Télécharger ??
+DOWNLOAD,fr,⬇️ Télécharger ⬇️
 HEBREWBOOKS_SITE,en,🌍 HebrewBooks Website 🌍
 HEBREWBOOKS_SITE,es,🌍 Sitio web de HebrewBooks 🌍 
 HEBREWBOOKS_SITE,he,🌍 אתר היברובוקס 🌍
 HEBREWBOOKS_SITE,yi,🌍 היברובוקס וועבסייט 🌍
-HEBREWBOOKS_SITE,fr,?? Site Web HebrewBooks ??
+HEBREWBOOKS_SITE,fr,🌍 HebrewBooks Site Web 🌍
 IMAGE,en,🖼 Image
-IMAGE,es,🖼 Imagen 
+IMAGE,es,🖼 Imagen
 IMAGE,he,🖼 תמונה
 IMAGE,yi,🖼 בילד
-IMAGE,fr,?? Image
+IMAGE,fr,🖼 Image
 IN_MEMORY_FOOTER,en,"🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l"
 IN_MEMORY_FOOTER,es,"🕯 En memoria del rabino Aharon Yitzchak ben Shmuel Zanvil z""l "
 IN_MEMORY_FOOTER,he,"🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל"
 IN_MEMORY_FOOTER,yi,"🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל"
-IN_MEMORY_FOOTER,fr,"?? À la mémoire du rabbin Aharon Yitzchak ben Shmuel Zanvil z""l"
+IN_MEMORY_FOOTER,fr,"🕯 À la mémoire du rabbin Aharon Yitzchak ben Shmuel Zanvil z""l"
 INSTANT_READ,en,📖 Instant Read 📖
 INSTANT_READ,es,📖 Lectura instantánea 📖 
 INSTANT_READ,he,📖 קריאה מהירה 📖
 INSTANT_READ,yi,📖 שנעל ליינען 📖
-INSTANT_READ,fr,?? Lecture Instantanée ??
+INSTANT_READ,fr,📖 Lecture instantanée 📖
 JUMP_ALSO_BY_EDIT_TIP,en,"Tip: instead of browsing, reply to this message with the page number you want to read.
 You can also edit the number you sent and the page will update accordingly."
 JUMP_ALSO_BY_EDIT_TIP,es,"Consejo: en lugar de explorar, responde a este mensaje con el número de página que quieres leer. También puedes editar el número que enviaste y la página se actualizará en consecuencia. "
@@ -106,7 +106,7 @@ LETTERS,en,🔠 Letters
 LETTERS,es,🔠 Letras 
 LETTERS,he,🔠 אותיות
 LETTERS,yi,🔠 אותיות
-LETTERS,fr,?? Des lettres
+LETTERS,fr,🔠 Lettres
 LETTERS_CMD,en,"!let, א"
 LETTERS_CMD,es,"!let, א "
 LETTERS_CMD,he,"!אות, א"
@@ -126,7 +126,7 @@ NEXT,en,Next ⏩
 NEXT,es,Siguiente ⏩ 
 NEXT,he,הבא ⏪
 NEXT,yi,נעקסט ⏪
-NEXT,fr,Suivant ?
+NEXT,fr,Suivant ⏩
 NO_BOOK_SELECTED,fr,Aucun livre sélectionné ou le message est trop ancien
 NO_BOOK_SELECTED,en,No book selected or the message is too old
 NO_BOOK_SELECTED,es,No se ha seleccionado ningún libro o el mensaje es demasiado antiguo 
@@ -171,7 +171,7 @@ PREVIOUS,en,⏪ Previous
 PREVIOUS,es,⏪ Anterior 
 PREVIOUS,he,⏩ הקודם
 PREVIOUS,yi,⏩פריער
-PREVIOUS,fr,? Précédent
+PREVIOUS,fr,⏪ Précédent
 PYWA_CREDIT,en,⚡ Powered by PyWa
 PYWA_CREDIT,es,⚡ Impulsado por PyWa 
 PYWA_CREDIT,he,⚡ נבנה באמצעות PyWa
@@ -181,37 +181,37 @@ READ_ON_SITE,en,🌍 Read on site 🌍
 READ_ON_SITE,es,🌍 Leer en el sitio 🌍
 READ_ON_SITE,he,🌍 קריאה באתר 🌍
 READ_ON_SITE,yi,🌍 ליין אויף די סייט 🌍
-READ_ON_SITE,fr,?? Lire sur place ??
+READ_ON_SITE,fr,🌍 Lire sur le site 🌍
 RESEARCH,en,🔍 Research
 RESEARCH,es,🔍 Investigación
 RESEARCH,he,🔍 חיפוש מחדש
 RESEARCH,yi,🔍 סערטש נאכאמאל
-RESEARCH,fr,?? Recherche
+RESEARCH,fr,🔍 Recherche
 SEARCH,en,🔎 Search
 SEARCH,es,🔎 Buscar 
 SEARCH,he,🔎 חיפוש
 SEARCH,yi,סערטש
-SEARCH,fr,?? Recherche
+SEARCH,fr,🔎 Recherche
 SEARCH_IN_CHATS,en,🔎 Search in chats
 SEARCH_IN_CHATS,es,🔎 Buscar en chats 
 SEARCH_IN_CHATS,he,🔎 חיפוש בצאטים
 SEARCH_IN_CHATS,yi,סערטש אין די טשאטס
-SEARCH_IN_CHATS,fr,?? Rechercher dans les chats
+SEARCH_IN_CHATS,fr,🔎 Recherche dans les chats
 SEARCH_INLINE,en,🔎 Inline Search
 SEARCH_INLINE,es,🔎 Búsqueda inline 
 SEARCH_INLINE,he,🔎 חיפוש באינליין
 SEARCH_INLINE,yi,🔎 אינליין סערטש
-SEARCH_INLINE,fr,?? Recherche en ligne
+SEARCH_INLINE,fr,🔎 Recherche en ligne
 SEARCH_INSTRUCTIONS,en,"🔎 To search for a book, send a message with your search query"
 SEARCH_INSTRUCTIONS,es,"🔎 Para buscar un libro, envía un mensaje con tu consulta de búsqueda "
 SEARCH_INSTRUCTIONS,he,"🔎 כדי לחפש ספר, שלחו הודעה עם מילות החיפוש"
-SEARCH_INSTRUCTIONS,yi,"כדי צו סערטשין א ספר, שיק א מעסעדזש מיט די סערטש קווערי"
-SEARCH_INSTRUCTIONS,fr,"?? Pour rechercher un livre, envoyez un message avec votre requête de recherche"
+SEARCH_INSTRUCTIONS,yi,"🔎 כדי צו סערטשין א ספר, שיק א מעסעדזש מיט די סערטש קווערי"
+SEARCH_INSTRUCTIONS,fr,"🔎 Pour rechercher un livre, envoyez un message avec votre requête de recherche"
 SEARCH_RESULTS,en,📚 Results 📚
 SEARCH_RESULTS,es,📚 Resultados 📚 
 SEARCH_RESULTS,he,📚 תוצאות חיפוש 📚
 SEARCH_RESULTS,yi,📚 תוצאות 📚
-SEARCH_RESULTS,fr,?? Résultats ??
+SEARCH_RESULTS,fr,📚 Résultats 📚
 SEARCH_TIP,en,Tip: You can search in the 'Title:Author' format in order to get more accurate results
 SEARCH_TIP,es,Consejo: Puedes buscar en el formato ‘Título:Autor’ para obtener resultados más precisos 
 SEARCH_TIP,he,טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות
@@ -220,18 +220,18 @@ SEARCH_TIP,fr,Conseil : Vous pouvez effectuer une recherche au format « Titre :
 SEARCHING_FOR_Q,en,🔎 Searching for: {q}
 SEARCHING_FOR_Q,es,🔎 Buscando: {q} 
 SEARCHING_FOR_Q,he,"🔍 מתבצע חיפוש עבור: ""{q}"""
-SEARCHING_FOR_Q,yi,"מען סערטשט פאר: ""{q}"""
-SEARCHING_FOR_Q,fr,?? Recherche : {q}
+SEARCHING_FOR_Q,yi,"🔍 מען סערטשט פאר: ""{q}"""
+SEARCHING_FOR_Q,fr,🔍 Recherche : {q}
 SHARE,en,♻️ Share ♻️
 SHARE,es,♻️ Compartir ♻️ 
 SHARE,he,♻️ שיתוף ♻️
 SHARE,yi,♻️ שער♻️
-SHARE,fr,?? Partager ??
+SHARE,fr,♻️ Partager ♻️
 SHAS,en,📚 Shas
 SHAS,es, 📚 Shas 
 SHAS,he,"📚 ש""ס"
 SHAS,yi,"📚 ש""ס"
-SHAS,fr,?? Shas
+SHAS,fr,📚 Shas
 SHAS_CMD,en,"!shas ברכות, יז:"
 SHAS_CMD,es,"!shas ברכות, יז"
 SHAS_CMD,he,"!שס ברכות, יז:"
@@ -257,7 +257,7 @@ SHOW_STATS,yi,"📊 באט סטעטס 📊
 📚ביכער געליינט: {books_read:,}
 📖בלעטער געליינט: {pages_read:,}
 🔎 סערטשיס: {searches:,}"
-SHOW_STATS,fr,"?? Statistiques du bot ??
+SHOW_STATS,fr,"📊 Statistiques du bot 📊
  
 
  ?? Livres lus : {books_read :,}
@@ -299,7 +299,8 @@ SHOW_STATS_ADMIN,yi,"📊 באט סטעטס 📊
 🔎 אינליין סערטשיס: {inline_searches:,}
 💬מעסעדזש סערטשיס: {msg_searches:,}
 ⏭ היפט צו די בלאט: {jumps:,}"
-SHOW_STATS_ADMIN,fr,"?? Statistiques du bot ??
+SHOW_STATS_ADMIN,fr,"📊 Statistiques du bot 📊
+
  ?? Utilisateurs de Telegram : {tg_users_count :,}
  ?? Utilisateurs de WhatsApp : {wa_users_count :,}
  ?? Livres lus : {books_read :,}
@@ -320,10 +321,8 @@ START_SEARCH_INLINE,fr,Commencer la recherche
 STATS,en,📊 Stats
 STATS,es,📊 Estadísticas 
 STATS,he,📊 סטטיסטיקות
-STATS,yi," 📊 סטאטס
-
-"
-STATS,fr,?? Statistiques
+STATS,yi," 📊 סטאטס"
+STATS,fr,📊 Statistiques
 SUBJECTS,en,🗂 Subjects
 SUBJECTS,es,🗂 Temas 
 SUBJECTS,he,🗂 נושאים
@@ -338,7 +337,7 @@ TEXT,en,📜 Text
 TEXT,es,📜 Texto 
 TEXT,he,📜 טקסט
 TEXT,yi,📜 טעקסט
-TEXT,fr,?? Texte
+TEXT,fr,📜 Texte
 TG_WELCOME,en,"**📚 Welcome to the HebrewBook bot on Telegram! 📚**
 
 This bot allows searching and browsing books on hebrewbooks.org

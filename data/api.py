@@ -29,7 +29,9 @@ def _make_request(
         params: The parameters to send (e.g. {'searchtype': 'all', 'search': 'אבגדה'})
         convert_to: The type to convert the response to (either 'dict', 'list' or 'html')
     """
-    params.update(api_key) if params is not None else api_key
+    if params is None:
+        params = {}
+    params.update(api_key)
     res = session.get(f'{BASE_API}{endpoint}', params=params)
     res.raise_for_status()
     start, end = ('[', ']') if convert_to == 'list' else ('{', '}')

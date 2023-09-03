@@ -46,13 +46,19 @@ def browse_types(_: Client, clb: CallbackQuery):
     """
     Browse types
     """
+    user_id = clb.from_user.id
     _browse_type, *others = clb.data.split(",")
     browse_type = BrowseType.from_callback(_browse_type)
+
+    if browse_type.type == BrowseTypeEnum.SHAS:  # TODO: Remove this when the SHAS is ready
+        clb.answer(text=gs(user_id, s.UNDER_MAINTENANCE), show_alert=True)
+        return
+
     func, choose_msg, buttons_in_row = helpers.get_browse_type_data(browse_type.type)
     results = func(browse_type.id) if browse_type.id else func()
 
     clb.edit_message_text(
-        text=gs(clb.from_user.id, string=choose_msg),
+        text=gs(user_id, string=choose_msg),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
@@ -89,7 +95,7 @@ def browse_types(_: Client, clb: CallbackQuery):
                 ][i:i + buttons_in_row][::-1] for i in range(0, len(results), buttons_in_row)
             ] + [[
                 InlineKeyboardButton(
-                    text=gs(user_id=clb.from_user.id, string=s.BACK),
+                    text=gs(user_id=user_id, string=s.BACK),
                     callback_data=",".join(others) or Menu.BROWSE
                 )
             ]]

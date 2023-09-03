@@ -1,4 +1,79 @@
 Key,Language,Translation
+CHANGE_LANGUAGE,en,🌐 Change Language
+CHANGE_LANGUAGE,es,🌐 Cambiar idioma
+CHANGE_LANGUAGE,he,🌐 שינוי שפה
+CHANGE_LANGUAGE,yi,🌐 ענדערן שפראך
+CHANGE_LANGUAGE,fr,🌐 Changer de langue
+CHOOSE_LANGUAGE,en,Choose a language
+CHOOSE_LANGUAGE,es,Elige un idioma
+CHOOSE_LANGUAGE,he,בחרו שפה
+CHOOSE_LANGUAGE,yi,קלייב א שפראך
+CHOOSE_LANGUAGE,fr,Choisissez une langue
+LANGUAGE_CHANGED,en,Language changed to English
+LANGUAGE_CHANGED,es,Idioma cambiado a español
+LANGUAGE_CHANGED,he,השפה הוחלפה לעברית
+LANGUAGE_CHANGED,yi,שפראך אנדערט צו יידיש
+LANGUAGE_CHANGED,fr,Langue changée en français
+START_CMD,en,!start
+START_CMD,es,!start; !comenzar; !iniciar
+START_CMD,he,!start; !התחל; !התחילו
+START_CMD,yi,!start; !שטארטן; !אָנהייבן
+START_CMD,fr,!start; !commencer; !démarrer
+START_CMD_DESC,en,📚 Start the bot
+START_CMD_DESC,es,📚 Inicia el bot
+START_CMD_DESC,he,📚 התחילו את הבוט
+START_CMD_DESC,yi,📚 שטארטן די באט
+START_CMD_DESC,fr,📚 Démarrer le bot
+CHANGE_LANG_CMD,en,!lang
+CHANGE_LANG_CMD,es,!lang; !idioma; !lengua
+CHANGE_LANG_CMD,he,!lang; !שפה; !שינוישפה
+CHANGE_LANG_CMD,yi,!lang; !שפראך; !ענדערןשפראך
+CHANGE_LANG_CMD,fr,!lang; !langue; !changer de langue
+CHANGE_LANG_CMD_DESC,en,🌐 Change the language
+CHANGE_LANG_CMD_DESC,es,🌐 Cambia el idioma
+CHANGE_LANG_CMD_DESC,he,🌐 שינוי שפה
+CHANGE_LANG_CMD_DESC,yi,🌐 ענדערן שפראך
+CHANGE_LANG_CMD_DESC,fr,🌐 Changer de langue
+STATS_CMD,en,!stats
+STATS_CMD,es,!stats; !estadísticas
+STATS_CMD,he,!stats; !סטטיסטיקות
+STATS_CMD,yi,!stats; !סטאטיסטיקס
+STATS_CMD,fr,!stats; !statistiques
+STATS_CMD_DESC,en,📊 Show bot stats
+STATS_CMD_DESC,es,📊 Muestra las estadísticas del bot
+STATS_CMD_DESC,he,📊 הצג סטטיסטיקות על הבוט
+STATS_CMD_DESC,yi,📊 ווייַזן באט סטעטס
+STATS_CMD_DESC,fr,📊 Afficher les statistiques du bot
+BROWSE_CMD,en,!browse
+BROWSE_CMD,es,!browse; !explorar
+BROWSE_CMD,he,!browse; !עיון
+BROWSE_CMD,yi,!browse; !בראויז
+BROWSE_CMD,fr,!browse; !parcourir
+BROWSE_CMD_DESC,en,📖 Browse the library
+BROWSE_CMD_DESC,es,📖 Explora la biblioteca
+BROWSE_CMD_DESC,he,📖 עיון בספריה
+BROWSE_CMD_DESC,yi,📖 בראויז די ביבליאָטעק
+BROWSE_CMD_DESC,fr,📖 Parcourir la bibliothèque
+SEARCH_CMD,en,!search
+SEARCH_CMD,es,!search; !buscar
+SEARCH_CMD,he,!search; !חיפוש; !חפש
+SEARCH_CMD,yi,!search; !סערטש
+SEARCH_CMD,fr,!search; !recherche
+SEARCH_CMD_DESC,en,🔎 Search for a book
+SEARCH_CMD_DESC,es,🔎 Busca un libro
+SEARCH_CMD_DESC,he,🔎 חיפוש ספר
+SEARCH_CMD_DESC,yi,🔎 סערטש אַ בוך
+SEARCH_CMD_DESC,fr,🔎 Rechercher un livre
+CONTACT_US_CMD,en,!contact
+CONTACT_US_CMD,es,!contacto; !contactar
+CONTACT_US_CMD,he,!contact; !צורקשר
+CONTACT_US_CMD,yi,!contact; !קאנטאקט
+CONTACT_US_CMD,fr,!contact; !contacter
+CONTACT_US_CMD_DESC,en,📧 Contact us
+CONTACT_US_CMD_DESC,es,📧 Contáctanos
+CONTACT_US_CMD_DESC,he,📧 יצירת קשר
+CONTACT_US_CMD_DESC,yi,📧 קאנטאקט אונז
+CONTACT_US_CMD_DESC,fr,📧 Contactez-nous
 ABOUT,en,ℹ️ About
 ABOUT,es,ℹ️ Acerca de 
 ABOUT,he,ℹ️ אודות
@@ -301,13 +376,13 @@ SHOW_STATS_ADMIN,yi,"📊 באט סטעטס 📊
 ⏭ היפט צו די בלאט: {jumps:,}"
 SHOW_STATS_ADMIN,fr,"📊 Statistiques du bot 📊
 
- ?? Utilisateurs de Telegram : {tg_users_count :,}
- ?? Utilisateurs de WhatsApp : {wa_users_count :,}
+ ?? Utilisateurs de Telegram : {tg_users_count:,}
+ ?? Utilisateurs de WhatsApp : {wa_users_count:,}
  ?? Livres lus : {books_read :,}
  ?? Pages lues : {pages_read :,}
- ?? Recherches en ligne : {inline_searches :,}
- ?? Recherches de messages : {msg_searches :,}
- ? Passe à la page : {sauts :,}"
+ ?? Recherches en ligne : {inline_searches:,}
+ ?? Recherches de messages : {msg_searches:,}
+ ? Passe à la page : {jumps:,}"
 SLOW_DOWN,en,Slow down...
 SLOW_DOWN,es,Desacelerar…
 SLOW_DOWN,he,אני לא מלאך.. לאט יותר

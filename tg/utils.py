@@ -29,7 +29,7 @@ def start(_: Client, mc: Message | CallbackQuery):
                     InlineKeyboardButton("📤", switch_inline_query=""),
                     InlineKeyboardButton(text=gs(user_id, s.STATS), callback_data=Menu.STATS),
                 ],
-                [InlineKeyboardButton(text="🇮🇱🇺🇸🇫🇷", callback_data=Menu.CHOOSE_LANG)],
+                [InlineKeyboardButton(text=gs(user_id, s.CHANGE_LANGUAGE), callback_data=Menu.CHOOSE_LANG)],
                 [InlineKeyboardButton(text=gs(user_id, s.HEBREWBOOKS_SITE), url=Menu.HEBREWBOOKS_SITE_URL)],
             ]
         )
@@ -43,17 +43,18 @@ def start(_: Client, mc: Message | CallbackQuery):
             pass
 
 
-def choose_lang(_: Client, clb: CallbackQuery):
+def choose_lang(_: Client, mc: Message | CallbackQuery):
     """
     Choose a language.
     """
     languages = [[
         InlineKeyboardButton(text=f"{lang.flag} {lang.name}", callback_data=f"lang:{lang.code}")
     ] for lang in Language]
-    clb.edit_message_text(
-        text="Choose a language:",
+    # meth = mc.reply_text if isinstance(mc, Message) else mc.edit_message_text
+    mc.edit_message_text(
+        text=gs(mc.from_user.id, s.CHOOSE_LANGUAGE),
         reply_markup=InlineKeyboardMarkup(
-            [*languages, [InlineKeyboardButton(text=gs(clb.from_user.id, s.BACK), callback_data=Menu.START)]]
+            [*languages, [InlineKeyboardButton(text=gs(mc.from_user.id, s.BACK), callback_data=Menu.START)]]
         )
     )
 
@@ -65,7 +66,7 @@ def set_lang(_: Client, clb: CallbackQuery):
     _, lang_code = clb.data.split(':')
     repository.update_tg_user(tg_id=clb.from_user.id, lang=Language.from_code(lang_code).code)
     clb.answer(
-        text="Language set successfully!",
+        text=gs(clb.from_user.id, s.LANGUAGE_CHANGED),
         show_alert=True
     )
     start(_, clb)
@@ -79,7 +80,8 @@ def show_stats(_: Client, clb: CallbackQuery):
     stats = repository.get_stats()
     if helpers.is_admin(user_id):
         clb.answer(
-            text=gs(user_id, s.SHOW_STATS_ADMIN).format(
+            text=gs(
+                user_id, s.SHOW_STATS_ADMIN,
                 tg_users_count=repository.get_tg_users_count(),
                 wa_users_count=repository.get_wa_users_count(),
                 books_read=stats.books_read,
@@ -92,7 +94,8 @@ def show_stats(_: Client, clb: CallbackQuery):
         )
     else:
         clb.answer(
-            text=gs(user_id, s.SHOW_STATS).format(
+            text=gs(
+                user_id, s.SHOW_STATS,
                 books_read=stats.books_read,
                 pages_read=stats.pages_read,
                 searches=stats.searches
@@ -135,11 +138,11 @@ def show_book(_: Client, clb: CallbackQuery):
                         ).join_to_callback(ShowBook(id=book.id), *others)
                     )
                 ], [
-                    InlineKeyboardButton(
-                        text=gs(user_id=user_id, string=s.SHARE),
-                        switch_inline_query=str(book.id)
-                    )
-                ],
+                InlineKeyboardButton(
+                    text=gs(user_id=user_id, string=s.SHARE),
+                    switch_inline_query=str(book.id)
+                )
+            ],
                 [
                     InlineKeyboardButton(text=gs(user_id=user_id, string=s.DOWNLOAD), url=book.pdf_url)
                 ],
@@ -168,9 +171,8 @@ def read_book(_: Client, clb: CallbackQuery):
             rate_limit_type=RateLimit.IMAGE_PAGE if read_clb.read_mode == ReadMode.IMAGE else RateLimit.PDF_PAGE
     )) > 0:
         clb.answer(
-            text=gs(user_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS)).format(
-                x=int(seconds // 60 if seconds >= 60 else seconds)
-            ),
+            text=gs(user_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
+                    x=int(seconds // 60 if seconds >= 60 else seconds)),
             show_alert=True
         )
         return

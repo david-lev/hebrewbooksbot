@@ -1,4 +1,5 @@
 import csv
+import logging
 from collections import defaultdict
 from enum import Enum
 from functools import lru_cache
@@ -19,7 +20,6 @@ class String(str, Enum):
     BROWSE = 'BROWSE'
     INSTANT_READ = 'INSTANT_READ'
     BACK = 'BACK'
-    GITHUB = 'GITHUB'
     ABOUT = 'ABOUT'
     WA_ABOUT_MSG = 'WA_ABOUT_MSG'
     PYWA_CREDIT = 'PYWA_CREDIT'
@@ -41,6 +41,18 @@ class String(str, Enum):
     JUMP_ALSO_BY_EDIT_TIP = 'JUMP_ALSO_BY_EDIT_TIP'
     NO_BOOK_SELECTED = 'NO_BOOK_SELECTED'
     CHOOSE_BROWSE_TYPE = 'CHOOSE_BROWSE_TYPE'
+    START_CMD = 'START_CMD'
+    START_CMD_DESC = 'START_CMD_DESC'
+    CHANGE_LANG_CMD = 'CHANGE_LANG_CMD'
+    CHANGE_LANG_CMD_DESC = 'CHANGE_LANG_CMD_DESC'
+    STATS_CMD = 'STATS_CMD'
+    STATS_CMD_DESC = 'STATS_CMD_DESC'
+    BROWSE_CMD = 'BROWSE_CMD'
+    BROWSE_CMD_DESC = 'BROWSE_CMD_DESC'
+    SEARCH_CMD = 'SEARCH_CMD'
+    SEARCH_CMD_DESC = 'SEARCH_CMD_DESC'
+    CONTACT_US_CMD = 'CONTACT_US_CMD'
+    CONTACT_US_CMD_DESC = 'CONTACT_US_CMD_DESC'
     SHAS = 'SHAS'
     SHAS_CMD = 'SHAS_CMD'
     TUR_AND_SA = 'TUR_AND_SA'
@@ -102,15 +114,17 @@ def read_strings_from_csv(filename: str) -> dict[String, dict[Language, str]]:
         return strings
 
 
-_strings = read_strings_from_csv('strings.csv')
+_strings: dict[String, dict[Language, str]] = read_strings_from_csv('strings.csv')
 
-for s in _strings:
+for s in String:
     for l in Language:
         if l not in _strings[s]:
-            print(f'"{l.name}" is missing for "{s.name}"')
-            # sys.exit(1)
+            logging.warning(f'String "{s}" is missing language "{l}"')
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1_000)
 def get_string(string: String, lng: Language, **kwargs) -> str:
-    return _strings[string].get(lng, _strings[string][Language.EN]).format(**kwargs)
+    try:
+        return (value := _strings[string].get(lng, _strings[string][Language.EN])).format(**kwargs)
+    except KeyError:
+        raise KeyError(f'String "{string}", language "{lng}", Kwargs: {kwargs}, Value: {value}')  # noqa

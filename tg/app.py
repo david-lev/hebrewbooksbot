@@ -1,6 +1,8 @@
 from pyrogram import Client, filters
 from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler, EditedMessageHandler
-from data import config
+from pyrogram.types import BotCommand
+from data import config, strings
+from data.enums import Language
 from tg import search, helpers
 from tg import browse
 from tg import utils
@@ -148,4 +150,18 @@ else:
     )
 
 if __name__ == '__main__':
+    # app.start()
+    # for lang in Language:
+    #     app.set_bot_commands(
+    #         commands=[
+    #             BotCommand(command="start", description=strings.get_string(s.START_CMD_DESC, lang)),
+    #             BotCommand(command="browse", description=strings.get_string(s.BROWSE_CMD_DESC, lang)),
+    #             BotCommand(command="search", description=strings.get_string(s.SEARCH_CMD_DESC, lang)),
+    #             BotCommand(command="stats", description=strings.get_string(s.STATS_CMD_DESC, lang)),
+    #             BotCommand(command="contact", description=strings.get_string(s.CONTACT_US_CMD_DESC, lang)),
+    #             BotCommand(command="lang", description=strings.get_string(s.CHANGE_LANG_CMD_DESC, lang)),
+    #         ],
+    #         language_code=lang.code
+    #     )
+    # app.stop()
     app.run()

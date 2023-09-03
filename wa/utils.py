@@ -304,5 +304,7 @@ def on_change_language(_: WhatsApp, clb: CallbackButton):
 
 def on_language_selected(client: WhatsApp, clb: CallbackSelection):
     wa_id = clb.from_user.wa_id
+    clb.react("✅")
     repository.update_wa_user(wa_id=wa_id, lang=Language.from_code(clb.data.split(':')[1]).code)
+    clb.reply_text(text=gs(wa_id, s.LANGUAGE_CHANGED), quote=True)
     on_start(client, clb)

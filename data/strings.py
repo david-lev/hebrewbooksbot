@@ -94,7 +94,10 @@ def read_strings_from_csv(filename: str) -> dict[String, dict[Language, str]]:
         for row in reader:
             if row[0] == 'Key':
                 continue
-            key, lang, value = row
+            try:
+                key, lang, value = row
+            except ValueError:
+                raise ValueError(f'Invalid row: {row}')
             strings[String(key)][Language(lang)] = value
         return strings
 

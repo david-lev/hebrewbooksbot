@@ -1,5 +1,6 @@
 from enum import Enum
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import exists
 from data.cache import cache
 from db.tables import TgUser, Stats, WaUser, get_session
 # from db.tables import TgFile, WaFile
@@ -7,7 +8,22 @@ from db.tables import TgUser, Stats, WaUser, get_session
 # from urllib import parse
 
 
-@cache.invalidate(cache_name='tg_user', params=['tg_id'])
+@cache.cachable(cache_name='is_tg_user_exists', params=('tg_id',))
+def is_tg_user_exists(*, tg_id: int) -> bool:
+    """Check if tg user exists"""
+    with get_session() as session:
+        return session.query(exists().where(TgUser.tg_id == tg_id)).scalar()
+
+
+@cache.cachable(cache_name='is_tg_user_active', params=('tg_id',))
+def is_tg_user_active(*, tg_id: int) -> bool:
+    """Check if tg user active"""
+    with get_session() as session:
+        return session.query(TgUser.active).filter(TgUser.tg_id == tg_id).scalar()
+
+
+@cache.invalidate(cache_name='tg_user', params=('tg_id',))
+@cache.invalidate(cache_name='is_tg_user_exists', params=('tg_id',))
 def add_tg_user(*, tg_id: int, lang: str, active: bool = True) -> bool:
     """Add new tg user to db, return True if new user added"""
     with get_session() as session:
@@ -27,7 +43,8 @@ def get_tg_user(*, tg_id: int) -> type[TgUser] | None:
         return session.query(TgUser).filter(TgUser.tg_id == tg_id).first()
 
 
-@cache.invalidate(cache_name='tg_user', params=['tg_id'])
+@cache.invalidate(cache_name='tg_user', params=('tg_id',))
+@cache.invalidate(cache_name='is_tg_user_active', params=('tg_id',))
 def update_tg_user(*, tg_id: int, **kwargs) -> None:
     """Update tg user"""
     with get_session() as session:
@@ -44,7 +61,22 @@ def get_tg_users_count(active: bool | None = None, lang_code: str = None) -> int
         ).count()
 
 
-@cache.invalidate(cache_name='wa_user', params=['wa_id'])
+@cache.cachable(cache_name='is_wa_user_exists', params=('wa_id',))
+def is_wa_user_exists(*, wa_id: str) -> bool:
+    """Check if wa user exists"""
+    with get_session() as session:
+        return session.query(exists().where(WaUser.wa_id == wa_id)).scalar()
+
+
+@cache.cachable(cache_name='is_wa_user_active', params=('wa_id',))
+def is_wa_user_active(*, wa_id: str) -> bool:
+    """Check if wa user active"""
+    with get_session() as session:
+        return session.query(WaUser.active).filter(WaUser.wa_id == wa_id).scalar()
+
+
+@cache.invalidate(cache_name='wa_user', params=('wa_id',))
+@cache.invalidate(cache_name='is_wa_user_exists', params=('wa_id',))
 def add_wa_user(*, wa_id: str, lang: str, active: bool = True) -> bool:
     """Add new wa user to db, return True if new user added"""
     with get_session() as session:
@@ -57,14 +89,15 @@ def add_wa_user(*, wa_id: str, lang: str, active: bool = True) -> bool:
             return False
 
 
-@cache.cachable(cache_name='wa_user', params=['wa_id'])
+@cache.cachable(cache_name='wa_user', params=('wa_id',))
 def get_wa_user(*, wa_id: str) -> type[WaUser] | None:
     """Get wa user"""
     with get_session() as session:
         return session.query(WaUser).filter(WaUser.wa_id == wa_id).first()
 
 
-@cache.invalidate(cache_name='wa_user', params=['wa_id'])
+@cache.invalidate(cache_name='wa_user', params=('wa_id',))
+@cache.invalidate(cache_name='is_wa_user_active', params=('wa_id',))
 def update_wa_user(*, wa_id: str, **kwargs) -> None:
     """Update wa user"""
     with get_session() as session:

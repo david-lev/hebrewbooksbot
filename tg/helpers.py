@@ -15,6 +15,11 @@ def get_string(user_id: int, string: String, **kwargs) -> str:
     return _gs(string=string, lng=Language.from_code(repository.get_tg_user(tg_id=user_id).lang), **kwargs)
 
 
+def get_string_by_lang(lang: str, string: String, **kwargs) -> str:
+    """Get a string in the user's language."""
+    return _gs(string=string, lng=Language.from_code(lang), **kwargs)
+
+
 class Menu:
     START = 'start'
     BROADCAST = 'broadcast'

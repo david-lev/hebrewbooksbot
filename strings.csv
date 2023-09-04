@@ -212,11 +212,21 @@ NO_RESULTS_FOR_Q,es,No se encontraron resultados para: {q}
 NO_RESULTS_FOR_Q,he,לא נמצאו תוצאות עבור: {q}
 NO_RESULTS_FOR_Q,yi,נישט דא קיין תוצאות פאר: {q}
 NO_RESULTS_FOR_Q,fr,Aucun résultat trouvé pour : {q}
-NOT_REGISTERED,en,You are not registered in the bot. Please send /start to the bot in order to register.
-NOT_REGISTERED,es,"No estás registrado en el bot. Por favor, envía /start al bot para registrarte. "
-NOT_REGISTERED,he,אינכם רשומים בבוט. נא לשלוח /start לבוט על מנת להירשם.
-NOT_REGISTERED,yi,איר זענט נישט איינגעשריבען אין דעם באט. ביטע שיקט /start צו די באט כדי איינצושרייבען.
-NOT_REGISTERED,fr,Vous n'êtes pas inscrit sur le bot. Veuillez envoyer /start au bot afin de vous inscrire.
+CLICK_TO_REGISTER,en,Click here to register
+NOT_REGISTERED_TITLE,en,You are not registered in the bot
+NOT_REGISTERED_BODY,en,Please send /start to the bot in order to register
+CLICK_TO_REGISTER,es,Haz clic aquí para registrarte
+NOT_REGISTERED_TITLE,es,No estás registrado en el bot
+NOT_REGISTERED_BODY,es,"Por favor, envía /start al bot para registrarte"
+CLICK_TO_REGISTER,he,לחצו כאן כדי להירשם
+NOT_REGISTERED_TITLE,he,אינכם רשומים לבוט
+NOT_REGISTERED_BODY,he,אנא שלחו /start לבוט כדי להירשם
+CLICK_TO_REGISTER,yi,קליק דא אויף דער רעגיסטרירן
+NOT_REGISTERED_TITLE,yi,איר זענט נישט איינגעשריבען אין דעם באט. ביטע שיקט /start צו די באט כדי איינצושרייבען
+NOT_REGISTERED_BODY,yi,ביטע שיקט /start צו די באט כדי איינצושרייבען
+CLICK_TO_REGISTER,fr,Cliquez ici pour vous inscrire
+NOT_REGISTERED_TITLE,fr,Vous n'êtes pas inscrit sur le bot
+NOT_REGISTERED_BODY,fr,Veuillez envoyer /start au bot pour vous inscrire
 NUMBERS_ONLY,en,Please use numbers only
 NUMBERS_ONLY,es,"Por favor, usa solo números"
 NUMBERS_ONLY,he,יש להשתמש במספרים בלבד

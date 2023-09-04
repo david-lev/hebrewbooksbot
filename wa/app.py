@@ -29,16 +29,18 @@ wa = WhatsApp(
 # )
 
 country_filter = lambda _, m: m.from_user.wa_id.startswith(helpers.SUPPORTED_COUNTRIES)  # noqa
+active_filter = lambda _, m: repository.is_wa_user_active(wa_id=m.from_user.wa_id)  # noqa
 
 if conf.under_maintenance:
     @wa.on_message()
     def register_user(_: WhatsApp, msg: Message):
         wa_id = msg.from_user.wa_id
-        repository.add_wa_user(
-            wa_id=wa_id,
-            lang=helpers.phone_number_to_lang(wa_id).code,
-            active=False
-        )
+        if not repository.is_wa_user_exists(wa_id=wa_id):
+            repository.add_wa_user(
+                wa_id=wa_id,
+                lang=helpers.phone_number_to_lang(wa_id).code,
+                active=False
+            )
         if conf.reply_under_maintenance:
             msg.reply_text(text=helpers.get_string(wa_id, s.BOT_UNDER_MAINTENANCE))
 
@@ -46,11 +48,13 @@ else:
 
     @wa.on_message()
     def on_new_user(client: WhatsApp, msg: Message):
-        if repository.add_wa_user(
+        wa_id = msg.from_user.wa_id
+        if (not repository.is_wa_user_exists(wa_id=wa_id) and
+                repository.add_wa_user(
                 wa_id=msg.from_user.wa_id,
                 lang=helpers.phone_number_to_lang(msg.from_user.wa_id).code,
                 active=(allowed := country_filter(client, msg))
-        ):
+        )):
             if allowed:
                 utils.on_start(client, msg)
             else:
@@ -60,8 +64,7 @@ else:
     wa.add_handlers(
         MessageHandler(
             search.on_search,
-            country_filter,
-            fil.text,
+            active_filter,
             fil.text.length((3, 72)),
             fil.not_(fil.reply),
             lambda _, m: m.text is not None and not m.text.isdigit()
@@ -76,7 +79,7 @@ else:
         ),
         MessageHandler(
             utils.show_book,
-            country_filter,
+            active_filter,
             fil.text.startswith(ShowBook.__clbname__),
             lambda _, m: m.text is not None and len(m.text.split(':')) == 2
         ),
@@ -86,16 +89,16 @@ else:
         ),
         MessageHandler(
             utils.read_book,
-            country_filter,
+            active_filter,
             fil.text.startswith(ShowBook.__clbname__), lambda _, m: m.text is not None and len(m.text.split(':')) == 3
         ),
         MessageHandler(
             utils.jump_to_page,
-            country_filter, fil.reply
+            active_filter, fil.reply
         ),
         MessageHandler(
             utils.on_start,
-            country_filter,
+            active_filter,
             fil.text.command("start", "התחל", "התחלה", prefixes=("!", "/")),
         ),
         CallbackButtonHandler(

@@ -1,4 +1,3 @@
-from functools import lru_cache
 from urllib import parse
 from pywa import WhatsApp
 from data.config import get_settings
@@ -43,7 +42,6 @@ languages = {
 SUPPORTED_COUNTRIES = tuple(code for codes in languages.keys() for code in codes)
 
 
-@lru_cache(maxsize=None)
 def phone_number_to_lang(phone: str) -> Language:
     """Get the language from a phone number."""
     for prefixes, lang in languages.items():

@@ -1,10 +1,11 @@
 from pyrogram import Client
 from pyrogram.errors import MessageNotModified
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery, InlineQueryResultArticle, \
+    InputTextMessageContent, InlineQuery
 from data.rate_limit import limiter, RateLimit
 from db.repository import StatsType
 from tg import helpers
-from tg.helpers import Menu, get_string as gs
+from tg.helpers import Menu, get_string as gs, get_string_by_lang as gsbl
 from data.callbacks import ShowBook, ReadBook, JumpToPage, BrowseType
 from data.enums import BookType, ReadMode, Language
 from data.strings import String as s  # noqa
@@ -15,7 +16,7 @@ from db import repository
 def start(_: Client, mc: Message | CallbackQuery):
     """Start message"""
     user_id = mc.from_user.id
-    if isinstance(mc, Message):
+    if isinstance(mc, Message) and not repository.is_tg_user_exists(tg_id=user_id):
         repository.add_tg_user(tg_id=user_id, lang=mc.from_user.language_code)
     kwargs = dict(
         text=gs(user_id, s.TG_WELCOME),
@@ -163,6 +164,9 @@ def read_book(_: Client, clb: CallbackQuery):
     Read a book.
     """
     user_id = clb.from_user.id
+    if not repository.is_tg_user_exists(tg_id=user_id):
+        on_unregistered_user(user_lang=clb.from_user.language_code, query=clb)
+        return
     book, masechet, tursa, previous_tursa, total = None, None, None, None, None
     _read_book, *others = clb.data.split(',')
     read_clb = ReadBook.from_callback(_read_book)
@@ -322,7 +326,31 @@ def jump_tip(_: Client, clb: CallbackQuery):
     """
     Jump to a page tip.
     """
+    user_id = clb.from_user.id
+    if not repository.is_tg_user_exists(tg_id=user_id):
+        on_unregistered_user(user_lang=clb.from_user.language_code, query=clb)
+        return
     clb.answer(
-        text=gs(user_id=clb.from_user.id, string=s.JUMP_ALSO_BY_EDIT_TIP),
+        text=gs(user_id=user_id, string=s.JUMP_ALSO_BY_EDIT_TIP),
         show_alert=True
+    )
+
+
+def on_unregistered_user(user_lang: str, query: CallbackQuery | InlineQuery):
+    query.answer(
+        results=[
+            InlineQueryResultArticle(
+                title=gsbl(lang=user_lang, string=s.NOT_REGISTERED_TITLE),
+                description=gsbl(lang=user_lang, string=s.NOT_REGISTERED_BODY),
+                thumb_url="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/"
+                          "Forbidden_Symbol_Transparent.svg/2048px-Forbidden_Symbol_Transparent.svg.png",
+                input_message_content=InputTextMessageContent("/start"),
+            )
+        ],
+        switch_pm_text=gsbl(lang=user_lang, string=s.CLICK_TO_REGISTER),
+        switch_pm_parameter="start"
+    ) if isinstance(query, InlineQuery) else query.answer(
+        text=f"{gsbl(lang=user_lang, string=s.NOT_REGISTERED_TITLE)}\n\n"
+             f"{gsbl(lang=user_lang, string=s.NOT_REGISTERED_BODY)}",
+        show_alert=True,
     )

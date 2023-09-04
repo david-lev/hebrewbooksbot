@@ -6,9 +6,9 @@ from data import api
 from data.models import Book
 from db import repository
 from db.repository import StatsType
-from tg import helpers
-from tg.helpers import get_string as gs
-from data.strings import String as s
+from tg import helpers, utils
+from tg.helpers import get_string as gs, get_string_by_lang as gsbl  # noqa
+from data.strings import String as s  # noqa
 from data.callbacks import SearchNavigation, ShowBook, ReadBook
 from data.enums import BookType, ReadMode, Language
 
@@ -16,6 +16,9 @@ from data.enums import BookType, ReadMode, Language
 def empty_search(_: Client, query: InlineQuery):
     """Show a message when the user searches for nothing"""
     user_id = query.from_user.id
+    if not repository.is_tg_user_exists(tg_id=user_id):
+        utils.on_unregistered_user(user_lang=query.from_user.language_code, query=query)
+        return
     query.answer(
         results=[
             InlineQueryResultArticle(
@@ -87,7 +90,10 @@ def search_books_inline(_: Client, query: InlineQuery):
     """
     if query.offset is not None and query.offset == '0':
         return  # No more results
-    user_id = query.from_user.id
+    user_id, user_lang = query.from_user.id, query.from_user.language_code
+    if not repository.is_tg_user_exists(tg_id=user_id):
+        utils.on_unregistered_user(user_lang=user_lang, query=query)
+        return
     if all(part.isdigit() for part in query.query.split(':')):  # The user searched for a book id or a book id:page
         if ':' in query.query:
             book_id, page = map(int, query.query.split(':'))
@@ -99,20 +105,20 @@ def search_books_inline(_: Client, query: InlineQuery):
             query.answer(
                 results=[],
                 switch_pm_text=gs(user_id=user_id, string=s.BOOK_NOT_FOUND),
-                switch_pm_parameter="search"
+                switch_pm_parameter="start"
             )
             return
         if page > book.pages:
             query.answer(
                 results=[],
                 switch_pm_text=gs(user_id=user_id, string=s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=book.pages),
-                switch_pm_parameter="search"
+                switch_pm_parameter="start"
             )
             return
         query.answer(
             results=[_get_book_article(book=book, query=query, read_at_page=page)],
             switch_pm_text=gs(user_id=user_id, string=s.PRESS_TO_SHARE, title=book.title),
-            switch_pm_parameter="search"
+            switch_pm_parameter="start"
         )
         repository.increase_stats(StatsType.BOOKS_READ)
         return
@@ -126,7 +132,7 @@ def search_books_inline(_: Client, query: InlineQuery):
     )
     query.answer(
         switch_pm_text=gs(user_id, s.X_RESULTS_FOR_S, x=total, s=f"{title} - {author}" if author else title),
-        switch_pm_parameter="search",
+        switch_pm_parameter="start",
         results=[
             _get_book_article(book=book, query=query, read_at_page=1) for book in (api.get_book(b.id) for b in res)
         ],

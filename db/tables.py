@@ -9,7 +9,7 @@ engine = create_engine(
     pool_size=20,
     max_overflow=10,
     pool_timeout=30,
-    # echo=conf.log_level == 'DEBUG',
+    echo=conf.log_level == 'DEBUG',
 )
 Session = sessionmaker(bind=engine)
 

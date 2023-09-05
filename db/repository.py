@@ -102,6 +102,7 @@ def update_wa_user(*, wa_id: str, **kwargs) -> None:
     """Update wa user"""
     with get_session() as session:
         session.query(WaUser).filter(WaUser.wa_id == wa_id).update(kwargs)
+        session.commit()
 
 
 def get_wa_users_count(active: bool | None = None, lang_code: str = None) -> int:

@@ -65,6 +65,7 @@ else:
         MessageHandler(
             search.on_search,
             active_filter,
+            fil.text,
             fil.text.length((3, 72)),
             fil.not_(fil.reply),
             lambda _, m: m.text is not None and not m.text.isdigit()

@@ -184,7 +184,7 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
             if is_book else f"{masechet.name} ({page.name}).pdf"
         kwargs = dict(
             document=helpers.get_file_id(wa=client, url=url, file_name=file_name, mime_type='application/pdf'),
-            file_name=file_name, buttons=buttons)
+            filename=file_name, buttons=buttons)
     if isinstance(msg_or_clb, Message):
         msg_or_clb.react("⬆️")
     caption = helpers.get_page_details(wa_id, book, gs(wa_id, s.PAGE_X_OF_Y, x=read.page, y=total)) \

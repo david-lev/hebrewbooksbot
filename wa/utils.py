@@ -69,7 +69,7 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
                                      mime_type='application/pdf'),
         filename=file_name,
         caption=helpers.get_book_details(book),
-        footer=gs(wa_id, s.IN_MEMORY_FOOTER),
+        footer=sls(gs(wa_id, s.IN_MEMORY_FOOTER), 60),
         quote=True,
         buttons=[
             Button(
@@ -189,7 +189,7 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
         msg_or_clb.react("⬆️")
     caption = helpers.get_page_details(wa_id, book, gs(wa_id, s.PAGE_X_OF_Y, x=read.page, y=total)) \
         if is_book else helpers.get_masechet_details(masechet)
-    message_id = func(**kwargs, footer=gs(wa_id, s.IN_MEMORY_FOOTER), caption=caption)
+    message_id = func(**kwargs, footer=sls(gs(wa_id, s.IN_MEMORY_FOOTER), 60), caption=caption)
     MSG_TO_BOOK_CACHE[message_id] = dataclasses.replace(read, total=total)
     repository.increase_stats(StatsType.PAGES_READ)
     return message_id
@@ -243,7 +243,7 @@ def on_stats_btn(_: WhatsApp, clb: CallbackButton):
     wa_id = clb.from_user.wa_id
     clb.reply_text(
         text=helpers.get_stats(wa_id),
-        footer=gs(wa_id, s.PYWA_CREDIT),
+        footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
         keyboard=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
     )
 
@@ -253,7 +253,7 @@ def on_about_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_image(
         image='https://user-images.githubusercontent.com/42866208/253792713-07c75d45-4613-4ff8-a077-9d9b2f61f144.png',
         body=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
-        footer=gs(wa_id, s.PYWA_CREDIT),
+        footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
         buttons=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
     )
 
@@ -298,7 +298,8 @@ def on_change_language(_: WhatsApp, clb: CallbackButton):
                     )
                 ),
             )
-        )
+        ),
+        footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
     )
 
 

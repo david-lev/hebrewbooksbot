@@ -299,7 +299,7 @@ SEARCH_RESULTS,yi,📚 תוצאות 📚
 SEARCH_RESULTS,fr,📚 Résultats 📚
 SEARCH_TIP,en,Tip: You can search in the 'Title:Author' format in order to get more accurate results
 SEARCH_TIP,es,Consejo: Puedes buscar en el formato ‘Título:Autor’ para obtener resultados más precisos 
-SEARCH_TIP,he,טיפ: ניתן לחפש בפורמט 'כותרת:מחבר' על מנת לקבל תוצאות מדוייקות
+SEARCH_TIP,he,טיפ: ניתן לחפש בפורמט 'כותר:מחבר' על מנת לקבל תוצאות מדוייקות
 SEARCH_TIP,yi,עצה: איר קענט סערטשין מיט דעם פארמאט 'טיטל: מחבר' כּדי צו באַקומען מער פּינקטלעכע תוצאות
 SEARCH_TIP,fr,Conseil : Vous pouvez effectuer une recherche au format « Titre : Auteur » afin d'obtenir des résultats plus précis.
 SEARCHING_FOR_Q,en,🔎 Searching for: {q}
@@ -428,86 +428,107 @@ TG_WELCOME,en,"**📚 Welcome to the HebrewBook bot on Telegram! 📚**
 This bot allows searching and browsing books on hebrewbooks.org
 
 **⚡️ Features:**
-	🔎 Searching for books in inline mode or by sending a message
-	📓 Browsing through the Shas masechtot
-	📚 Browse the library by category, date or letter
-	📖 Reading mode as an image or as a PDF (text coming soon)
-	⏩ Jump to page
-	♻️ Sharing books with friends
+🔎 Searching for books in inline mode or by sending a message
+📓 Browsing through the Shas masechtot
+📚 Browse the library by category, date or letter
+📖 Reading mode as an image or as a PDF (text coming soon)
+⏩ Jump to page
+♻️ Sharing books with friends
 
 **💡 Tips:**
-	• To search for a book by title or author, use the format `title:author`
-	• In Read Mode, you can jump to a page by replying to the message with the page number
+• To search for a book by title or author, use the format `title:author`
+• In Read Mode, you can jump to a page by replying to the message with the page number
 
 **🔜 Coming soon:**
-	• Search the contents of the books
-	• Saving favorite books and bookmarks
-	• Change language manually
+• Search the contents of the books
+• Saving favorite books and bookmarks
 
-__🕯 In memory of my grandfather, Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l 🕯__"
+__🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l 🕯__"
 TG_WELCOME,es,"📚 Bienvenido al bot de HebrewBook en Telegram! 📚
+
 Este bot te permite buscar y explorar libros en hebrewbooks.org
-⚡️ Características: 
+
+⚡️ **Características:**
 🔎 Buscar libros en modo inline o enviando un mensaje 
 📓 Explorar los masechtot del Shas 
 📚 Navegar por la biblioteca por categoría, fecha o letra 
 📖 Modo de lectura como imagen o como PDF (texto próximamente) 
 ⏩ Saltar a la página 
 ♻️ Compartir libros con amigos
-💡 Consejos: 
+
+💡 **Consejos:**
 • Para buscar un libro por título o autor, usa el formato título:autor 
 • En el modo de lectura, puedes saltar a una página respondiendo al mensaje con el número de página
-🔜 Próximamente: 
+
+🔜 **Próximamente:**
 • Buscar el contenido de los libros 
 • Guardar libros favoritos y marcadores 
-• Cambiar el idioma manualmente
-🕯 En memoria de mi abuelo, el rabino Aharon Yitzchak ben Shmuel Zanvil z""""l🕯
+
+🕯 __En memoria el rabino Aharon Yitzchak ben Shmuel Zanvil zl__ 🕯
 "
 TG_WELCOME,he,"**📚 ברוכים הבאים לבוט היברובוקס בטלגרם! 📚**
 
 בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org
 
 **⚡️ פיצ'רים:**
-	🔎 חיפוש ספרים במצב אינליין או על ידי שליחת הודעה
-	📓 עיון במסכתות הש""ס
-	📚 עיון בספריה לפי קטגוריה, תאריך או אות
-	📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)
-	⏪ קפיצה לעמוד
-	♻️ שיתוף ספרים עם חברים
+🔎 חיפוש ספרים במצב אינליין או על ידי שליחת הודעה
+📓 עיון במסכתות הש""ס
+📚 עיון בספריה לפי קטגוריה, תאריך או אות
+📖 מצב קריאה כתמונה או כקובץ PDF (טקסט בקרוב)
+⏪ קפיצה לעמוד
+♻️ שיתוף ספרים עם חברים
 
 **💡 טיפים:**
-	• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט `כותרת:מחבר`
-	• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר הדף
+• כדי לחפש ספר לפי כותר או מחבר, השתמשו בפורמט `כותר:מחבר`
+• במצב קריאה, ניתן לקפוץ לדף מסוים על ידי תגובה להודעה עם מספר הדף
 
 **🔜 בקרוב:**
-	• חיפוש בתוכן הספרים
-	• שמירת ספרים מועדפים וסימניות
-	• שינוי שפה באופן ידני
+• חיפוש בתוכן הספרים
+• שמירת ספרים מועדפים וסימניות
 
-__🕯 לעילוי נשמת סבי, הרב אהרן יצחק בן שמואל זנוויל ז""ל 🕯__"
+__🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל 🕯__"
 TG_WELCOME,yi,"**📚 ברוכים הבאים צו דער היברובוקס באט אויף טעלעגראַם! 📚**
 
 דער באט ערלויבט סערטשין און בראויזין ביכער אויף hebrewbooks.org
 
-**⚡️פיטשערס:**
+*⚡️פיטשערס:*
 🔎סערטשט ביכער דורך אינליין מאויד אדער דורך שיקען א מעסעדזש
- 📓 בראויזט אדורך דער מסכתות אין ש''ס
+📓 בראויזט אדורך דער מסכתות אין ש''ס
 📚 בראויז דער אוצר לויט די קאטעגארי, דאטום , אדער אות
- 📖 ליינען מאויד ווי א בילד אדער ווי א PDF (טעקסט קומט באלד) 
- ⏪ היפט צו דער בלאט
- ♻️ שער ביכער מיט חברים
+📖 ליינען מאויד ווי א בילד אדער ווי א PDF (טעקסט קומט באלד)
+⏪ היפט צו דער בלאט
+♻️ שער ביכער מיט חברים
 
 *💡 עצות:*
-• כדי צו סערטשין פאר א ביך לויט דער טיטעל אדער א מחבר, נוץ דער פארמאט 'title: author'     
+• כדי צו סערטשין פאר א ביך לויט דער טיטעל אדער א מחבר, נוץ דער פארמאט 'כותר:מחבר'
 • אין ליינען מאויד, מען קען היפען צו א בלאט דורך ענטפערין דעם מעסעדזש מיט דער בלאט נאמבער
 
 **🔜 קומט באלד:**
-        • סערטש דער אינהאלט פון דער ביכער
-        • שפארט דער באליבסטע ביכער און בוקמארקס
-        • טויש דער שפראך מאניואלי
+• סערטש דער אינהאלט פון דער ביכער
+• שפארט דער באליבסטע ביכער און בוקמארקס
 
-__🕯 לעילוי נשמת מיין זיידע, הרב אהרן יצחק בן שמואל זנוויל ז""ל  🕯__"
-TG_WELCOME,fr,**?? Bienvenue sur le bot HebrewBook
+__🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל  🕯__"
+TG_WELCOME,fr,"**📚 Bienvenue sur le bot HebrewBook sur Telegram ! 📚**
+
+Ce bot permet de rechercher et de parcourir des livres sur hebrewbooks.org
+
+**⚡️ Fonctionnalités :**
+🔎 Recherche de livres en mode inline ou en envoyant un message
+📓 Parcourir les masechtot du Shas
+📚 Parcourir la bibliothèque par catégorie, date ou lettre
+📖 Mode lecture en tant qu'image ou en PDF (texte à venir)
+⏩ Aller à la page
+♻️ Partager des livres avec des amis
+
+**💡 Conseils :**
+• Pour rechercher un livre par titre ou auteur, utilisez le format `titre:auteur`
+• En mode Lecture, vous pouvez sauter à une page en répondant au message avec le numéro de page
+
+**🔜 À venir :**
+• Rechercher le contenu des livres
+• Enregistrer des livres favoris et des signets
+
+__🕯 À la mémoire du rabbin Aharon Yitzchak ben Shmuel Zanvil z""l 🕯__"
 TUR_AND_SA,en,📓 Tur & Shulchan Aruch
 TUR_AND_SA,es,📓 Tur & Shulján Aruj 
 TUR_AND_SA,he,📓 טור ושולחן ערוך
@@ -573,7 +594,6 @@ WA_WELCOME_BODY,en,"This bot allows searching and browsing books on hebrewbooks.
 • Browsing through the Shas masechtot
 • Search the contents of the books
 • Saving favorite books and bookmarks
-• Change language manually
 "
 WA_WELCOME_BODY,es,"Este bot te permite buscar y explorar libros en hebrewbooks.org
 ⚡️ Características: 
@@ -589,7 +609,6 @@ WA_WELCOME_BODY,es,"Este bot te permite buscar y explorar libros en hebrewbooks.
 • Explorar los masechtot del Shas 
 • Buscar el contenido de los libros 
 • Guardar libros favoritos y marcadores 
-• Cambiar el idioma manualmente 
 "
 WA_WELCOME_BODY,he,"בוט זה מאפשר לחפש ולעיין בספרים באתר hebrewbooks.org
 
@@ -600,7 +619,7 @@ WA_WELCOME_BODY,he,"בוט זה מאפשר לחפש ולעיין בספרים ב
 ♻️ שיתוף ספרים עם חברים
 
 *💡 טיפים:*
-• כדי לחפש ספר לפי כותרת או מחבר, השתמשו בפורמט ```כותרת:מחבר```
+• כדי לחפש ספר לפי כותר או מחבר, השתמשו בפורמט ```כותר:מחבר```
 • כדי לקפוץ לדף מסוים, הגיבו על הספר עם מספר דף
 
 *🔜 בקרוב:*
@@ -608,58 +627,56 @@ WA_WELCOME_BODY,he,"בוט זה מאפשר לחפש ולעיין בספרים ב
 • עיון במסכתות הש""ס
 • חיפוש בתוכן הספרים
 • שמירת ספרים מועדפים וסימניות
-• שינוי שפה באופן ידני
 "
-WA_WELCOME_BODY,yi,"**📚 ברוכים הבאים צו דער היברובוקס באט אויף טעלעגראַם! 📚**
+WA_WELCOME_BODY,yi,"דער באט ערלויבט סערטשין און בראויזין ביכער אויף hebrewbooks.org
 
-דער באט ערלויבט סערטשין און בראויזין ביכער אויף hebrewbooks.org
-
-**⚡️פיטשערס:**
-🔎סערטשט ביכער דורך אינליין מאויד אדער דורך שיקען א מעסעדזש
- 📓 בראויזט אדורך דער מסכתות אין ש''ס
+*⚡️ פיטשערס:*
+🔎 סערטשט ביכער דורך אינליין מאויד אדער דורך שיקען א מעסעדזש
+📓 בראויזט אדורך דער מסכתות אין ש''ס
 📚 בראויז דער אוצר לויט די קאטעגארי, דאטום, אדער אות
- 📖 ליינען מאויד ווי א בילד אדער ווי א PDF (טעקסט קומט באלד) 
- ⏪ היפט צו דער בלאט
- ♻️ שער ביכער מיט חברים
+📖 ליינען מאויד ווי א בילד אדער ווי א PDF (טעקסט קומט באלד)
+⏪ היפט צו דער בלאט
+♻️ שער ביכער מיט חברים
 
 *💡 עצות:*
-• כדי צו סערטשין פאר א ביך לויט דער טיטעל אדער א מחבר, נוץ דער פארמאט 'title: author'     
+• כדי צו סערטשין פאר א ביך לויט דער טיטעל אדער א מחבר, נוץ דער פארמאט 'כותר:מחבר'
 • אין ליינען מאויד, מען קען היפען צו א בלאט דורך ענטפערין דעם מעסעדזש מיט דער בלאט נאמבער
 
-**🔜 קומט באלד:**
-        • סערטש דער אינהאלט פון דער ביכער
-        • שפארט דער באליבסטע ביכער און בוקמארקס
-        • טויש דער שפראך מאניואלי
-
-__🕯 לעילוי נשמת מיין זיידע, הרב אהרן יצחק בן שמואל זנוויל ז""ל  🕯__"
+*🔜 קומט באלד:*
+• סערטש דער אינהאלט פון דער ביכער
+• שפארט דער באליבסטע ביכער און בוקמארקס
+• טויש דער שפראך מאניואלי
+• שמירת ביכער מועדפים און בוקמארקס
+"
 WA_WELCOME_BODY,fr,"Ce bot permet de rechercher et de parcourir des livres sur hebrewbooks.org
  
 
- *?? Caractéristiques:*
- ?? Rechercher des livres en envoyant un message
- ?? Mode lecture sous forme d'image ou sous forme de PDF (texte à venir)
- ? Aller à la page
- ?? Partager des livres avec des amis
- 
+*⚡️ Fonctionnalités:*
 
- *?? Conseils:*
- • Pour rechercher un livre par titre ou par auteur, utilisez le format ```titre:auteur```
- • Vous pouvez accéder à une page en répondant au livre avec le numéro de page.
- 
+🔎 Recherche de livres en envoyant un message
+📓 Parcourir les masechtot du Shas
+📚 Parcourir la bibliothèque par catégorie, date ou lettre
+📖 Mode lecture sous forme d'image ou sous forme de PDF (texte à venir)
+⏩ Aller à la page
+♻️ Partager des livres avec des amis
 
- *?? À venir:*
- • Parcourez la bibliothèque par catégorie, date ou lettre
- • Parcourir le masechtot du Shas
- • Rechercher dans le contenu des livres
- • Enregistrer vos livres et signets préférés
- • Changer la langue manuellement"
+*💡 Conseils:*
+• Pour rechercher un livre par titre ou par auteur, utilisez le format ```titre:auteur```
+• Vous pouvez accéder à une page en répondant au livre avec le numéro de page
+
+*🔜 À venir:*
+• Parcourez la bibliothèque par catégorie, date ou lettre
+• Parcourir le masechtot du Shas
+• Rechercher dans le contenu des livres
+• Enregistrer vos livres et signets préférés
+• Changer la langue manuellement"
 WA_WELCOME_HEADER,en,"📚 Welcome to the HebrewBook bot on WhatsApp! 📚"
-WA_WELCOME_HEADER,es,📚 Bienvenido al bot de HebrewBook en WhatsApp! 📚
-WA_WELCOME_HEADER,he,"📚 ברוכים הבאים לבוט היברובוקס בוואטסאפ! 📚"
-WA_WELCOME_HEADER,yi,ברוכים הבאים צו דער היברובוקס באט אויף וואצאפ! 
-WA_WELCOME_HEADER,fr,?? Bienvenue sur le bot HebrewBook
+WA_WELCOME_HEADER,es,📚 Bienvenido al bot de Libros Hebreos de la edición Ryzman en WhatsApp! 📚
+WA_WELCOME_HEADER,he,"📚 ברוכים הבאים לבוט היברובוקס מהדורת רייזמן בוואטסאפ! 📚"
+WA_WELCOME_HEADER,yi,"ברוכים הבאים צו דער היברובוקס באט מהדורת רייזמן, אויף וואצאפ!"
+WA_WELCOME_HEADER,fr,📚 Bienvenue sur le bot des livres hébreux de l'édition Ryzman sur WhatsApp! 📚
 WAIT_FOR_PREVIEW,en,Wait a few seconds for the preview to load
-WAIT_FOR_PREVIEW,es,Espera unos segundos para que se cargue la vista previa 
+WAIT_FOR_PREVIEW,es,Espera unos segundos para que se cargue la vista previa
 WAIT_FOR_PREVIEW,he,יש להמתין מספר שניות לטעינת התצוגה המקדימה
 WAIT_FOR_PREVIEW,yi,ווארט א פאר סקונדערס פאר די פריוויו צו לאדין
 WAIT_FOR_PREVIEW,fr,Attendez quelques secondes que l'aperçu se charge

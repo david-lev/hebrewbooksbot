@@ -250,11 +250,10 @@ def on_stats_btn(_: WhatsApp, clb: CallbackButton):
 
 def on_about_btn(_: WhatsApp, clb: CallbackButton):
     wa_id = clb.from_user.wa_id
-    clb.reply_image(
-        image='https://user-images.githubusercontent.com/42866208/253792713-07c75d45-4613-4ff8-a077-9d9b2f61f144.png',
-        body=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
+    clb.reply_text(
+        text=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
-        buttons=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
+        keyboard=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
     )
 
 

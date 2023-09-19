@@ -154,11 +154,11 @@ IMAGE,es,🖼 Imagen
 IMAGE,he,🖼 תמונה
 IMAGE,yi,🖼 בילד
 IMAGE,fr,🖼 Image
-IN_MEMORY_FOOTER,en,"🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l"
-IN_MEMORY_FOOTER,es,"🕯 En memoria del rabino Aharon Yitzchak ben Shmuel Zanvil z""l "
-IN_MEMORY_FOOTER,he,"🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל"
-IN_MEMORY_FOOTER,yi,"🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל"
-IN_MEMORY_FOOTER,fr,"🕯 À la mémoire du rabbin Aharon Yitzchak ben Shmuel Zanvil z""l"
+HB_FOOTER,en,"⚜️ The Ryzman Edition • hebrewbooks.org ⚜️"
+HB_FOOTER,es,"⚜️ Edición Ryzman • HebrewBooks.org ⚜️ "
+HB_FOOTER,he,"⚜️ מהדורת ריזמן • HebrewBooks.org ⚜️"
+HB_FOOTER,yi,"⚜️ די ריזמאן אויסגאבע • HebrewBooks.org ⚜️"
+HB_FOOTER,fr,"⚜️ L'édition Ryzman • HebrewBooks.org ⚜️"
 INSTANT_READ,en,📖 Instant Read 📖
 INSTANT_READ,es,📖 Lectura instantánea 📖 
 INSTANT_READ,he,📖 קריאה מהירה 📖
@@ -207,11 +207,11 @@ NO_BOOK_SELECTED,en,No book selected or the message is too old
 NO_BOOK_SELECTED,es,No se ha seleccionado ningún libro o el mensaje es demasiado antiguo 
 NO_BOOK_SELECTED,he,לא נבחר ספר או שההודעה נשלחה לפני זמן רב
 NO_BOOK_SELECTED,yi,"קיין בוך איז נישט אויסגעקליבן געווארען, אָדער דער מעסעדזש איז צו אלט."
-NO_RESULTS_FOR_Q,en,No results found for: {q}
-NO_RESULTS_FOR_Q,es,No se encontraron resultados para: {q} 
-NO_RESULTS_FOR_Q,he,לא נמצאו תוצאות עבור: {q}
-NO_RESULTS_FOR_Q,yi,נישט דא קיין תוצאות פאר: {q}
-NO_RESULTS_FOR_Q,fr,Aucun résultat trouvé pour : {q}
+NO_RESULTS_FOR_Q,en,"No results found for: '{q}', Try typing the name of the Sefer or the author in Hebrew letters"
+NO_RESULTS_FOR_Q,es,"No se encontraron resultados para: '{q}', Intenta escribir el nombre del Sefer o el autor en letras hebreas"
+NO_RESULTS_FOR_Q,he,"לא נמצאו תוצאות עבור: '{q}', נסו להקליד את שם הספר או המחבר בעברית"
+NO_RESULTS_FOR_Q,yi,"קיין תוצאות געפֿונען פֿאַר: '{q}', פֿאַרזוכן צו טיפּן די נאמען פֿון די ספֿר אָדער די מחבר אין לשון הקודש"
+NO_RESULTS_FOR_Q,fr,"Aucun résultat trouvé pour : '{q}', essayez de taper le nom du Sefer ou l'auteur en lettres hébraïques"
 CLICK_TO_REGISTER,en,Click here to register
 NOT_REGISTERED_TITLE,en,You are not registered in the bot
 NOT_REGISTERED_BODY,en,Please send /start to the bot in order to register
@@ -670,11 +670,11 @@ WA_WELCOME_BODY,fr,"Ce bot permet de rechercher et de parcourir des livres sur h
 • Rechercher dans le contenu des livres
 • Enregistrer vos livres et signets préférés
 • Changer la langue manuellement"
-WA_WELCOME_HEADER,en,"📚 Welcome to the HebrewBook bot on WhatsApp! 📚"
-WA_WELCOME_HEADER,es,📚 Bienvenido al bot de Libros Hebreos de la edición Ryzman en WhatsApp! 📚
-WA_WELCOME_HEADER,he,"📚 ברוכים הבאים לבוט היברובוקס מהדורת רייזמן בוואטסאפ! 📚"
-WA_WELCOME_HEADER,yi,"ברוכים הבאים צו דער היברובוקס באט מהדורת רייזמן, אויף וואצאפ!"
-WA_WELCOME_HEADER,fr,📚 Bienvenue sur le bot des livres hébreux de l'édition Ryzman sur WhatsApp! 📚
+WA_WELCOME_HEADER,en,📚 Welcome to the Ryzman edition HebrewBooks bot on WhatsApp!
+WA_WELCOME_HEADER,es,📚 Bienvenido al bot de Libros Hebreos de la edición Ryzman en WhatsApp!
+WA_WELCOME_HEADER,he,📚 ברוכים הבאים לבוט היברובוקס מהדורת רייזמן בוואטסאפ!
+WA_WELCOME_HEADER,yi,"📚 ברוכים הבאים צו דער היברובוקס באט מהדורת רייזמן, אויף וואצאפ!"
+WA_WELCOME_HEADER,fr,📚 Bienvenue sur le bot des livres hébreux de l'édition Ryzman sur WhatsApp!
 WAIT_FOR_PREVIEW,en,Wait a few seconds for the preview to load
 WAIT_FOR_PREVIEW,es,Espera unos segundos para que se cargue la vista previa
 WAIT_FOR_PREVIEW,he,יש להמתין מספר שניות לטעינת התצוגה המקדימה

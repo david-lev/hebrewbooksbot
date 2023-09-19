@@ -1,6 +1,6 @@
 import data
 from pywa import WhatsApp
-from pywa.types import Message, CallbackSelection, SectionRow, SectionList
+from pywa.types import Message, CallbackSelection, SectionRow, SectionList, Button
 from data import api
 from db import repository
 from db.repository import StatsType
@@ -8,6 +8,7 @@ from pywa.types import Section
 from data.callbacks import SearchNavigation, ShowBook
 from data.strings import String as s
 from wa.helpers import get_string as gs, slice_long_string as sls
+from wa.utils import Menu
 
 
 def on_search(_: WhatsApp, mc: Message | CallbackSelection):
@@ -18,9 +19,13 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
     title, author = data.helpers.get_title_author(query)
     results, total = api.search(title=title, author=author, offset=offset, limit=9 if offset == 1 else 8)
     if total == 0:
+        mc.react("❌")
         mc.reply_text(
             text=gs(wa_id, s.NO_RESULTS_FOR_Q, q=query),
-            quote=True
+            keyboard=(
+                Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
+                Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)
+            ),
         )
         return
 

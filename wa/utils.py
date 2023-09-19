@@ -69,7 +69,7 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
                                      mime_type='application/pdf'),
         filename=file_name,
         caption=helpers.get_book_details(book),
-        footer=sls(gs(wa_id, s.IN_MEMORY_FOOTER), 60),
+        footer=sls(gs(wa_id, s.HB_FOOTER), 60),
         quote=True,
         buttons=[
             Button(
@@ -189,7 +189,7 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
         msg_or_clb.react("⬆️")
     caption = helpers.get_page_details(wa_id, book, gs(wa_id, s.PAGE_X_OF_Y, x=read.page, y=total)) \
         if is_book else helpers.get_masechet_details(masechet)
-    message_id = func(**kwargs, footer=sls(gs(wa_id, s.IN_MEMORY_FOOTER), 60), caption=caption)
+    message_id = func(**kwargs, footer=sls(gs(wa_id, s.HB_FOOTER), 60), caption=caption)
     MSG_TO_BOOK_CACHE[message_id] = dataclasses.replace(read, total=total)
     repository.increase_stats(StatsType.PAGES_READ)
     return message_id
@@ -261,7 +261,7 @@ def on_about_btn(_: WhatsApp, clb: CallbackButton):
 def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton | CallbackSelection):
     wa_id = msg_or_clb.from_user.wa_id
     msg_or_clb.reply_text(
-        header=gs(wa_id, s.WA_WELCOME_HEADER),
+        header=sls(gs(wa_id, s.WA_WELCOME_HEADER), 60),
         text=gs(wa_id, s.WA_WELCOME_BODY),
         keyboard=[
             Button(
@@ -277,7 +277,7 @@ def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton | CallbackSelecti
                 callback_data=Menu.ABOUT
             )
         ],
-        footer=sls(gs(wa_id, s.IN_MEMORY_FOOTER), 60)
+        footer=sls(gs(wa_id, s.HB_FOOTER), 60)
     )
 
 

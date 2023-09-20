@@ -73,11 +73,11 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         quote=True,
         buttons=[
             Button(
-                title=gs(wa_id, s.SHARE),
+                title=sls(gs(wa_id, s.SHARE), 20),
                 callback_data=ShareBook(book.id).to_callback()
             ),
             Button(
-                title=gs(wa_id, s.INSTANT_READ),
+                title=sls(gs(wa_id, s.INSTANT_READ), 20),
                 callback_data=read_btn.to_callback()
             )
         ]
@@ -157,7 +157,7 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
     total = book.pages if is_book else len(masechet.pages)
     buttons = [
         Button(
-            title=gs(wa_id, s.DOCUMENT if is_image else s.IMAGE),
+            title=sls(gs(wa_id, s.DOCUMENT if is_image else s.IMAGE), 20),
             callback_data=dataclasses.replace(
                 read,
                 read_mode=ReadMode.PDF if is_image else ReadMode.IMAGE
@@ -166,12 +166,12 @@ def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: Read
     ]
     if read.page < total:
         buttons.append(Button(
-            title=gs(wa_id, s.NEXT),
+            title=sls(gs(wa_id, s.NEXT), 20),
             callback_data=dataclasses.replace(read, page=read.page + 1).to_callback()
         ))
     if read.page > 1:
         buttons.append(Button(
-            title=gs(wa_id, s.PREVIOUS),
+            title=sls(gs(wa_id, s.PREVIOUS), 20),
             callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
         ))
     if is_image:

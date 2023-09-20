@@ -71,24 +71,24 @@ def slice_long_string(string: str, max_length: int, suffix: str = "...") -> str:
 
 
 def get_book_details(book: Book) -> str:
-    return "".join((
-        f"📚 {book.title}\n",
-        f"👤 {book.author}\n" if book.author else "",
-        f"{RTL}📅 {book.year}\n" if book.year else "",
-        f"🏙 {book.city}\n" if book.city else "",
-        f"{RTL}📖 {book.pages}\n",
+    return "\n".join((
+        f"{RTL}📚 {book.title}",
+        f"{RTL}👤 {book.author}" if book.author else "",
+        f"{RTL}📅 {book.year}" if book.year else "",
+        f"{RTL}🏙 {book.city}" if book.city else "",
+        f"{RTL}📖 {book.pages}",
     ))
 
 
 def get_page_details(wa_id: str, book: Book, page_status: str) -> str:
-    return "".join((
+    return "\n".join((
         f"*{gs(wa_id, s.INSTANT_READ)}*\n\n"
-        f"📚 {book.title}\n",
-        f"👤 {book.author}\n" if book.author else "",
-        f"{RTL}📅 {book.year}\n" if book.year else "",
-        f"🏙 {book.city}\n" if book.city else "",
-        f"📖 {page_status}\n",
-        f"\n_💡{gs(wa_id, s.JUMP_TIP)}_\n",
+        f"{RTL}📚 {book.title}",
+        f"{RTL}👤 {book.author}" if book.author else "",
+        f"{RTL}📅 {book.year}" if book.year else "",
+        f"{RTL}🏙 {book.city}" if book.city else "",
+        f"{RTL}📖 {page_status.strip()}\n",
+        f"_💡{gs(wa_id, s.JUMP_TIP)}_",
     ))
 
 

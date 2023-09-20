@@ -24,7 +24,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
             text=gs(wa_id, s.NO_RESULTS_FOR_Q, q=query),
             keyboard=(
                 Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
-                Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)
+                Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
             ),
         )
         return
@@ -32,7 +32,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
     books = (api.get_book(r.id) for r in results)
     sections = [
         Section(
-            title=gs(wa_id, s.SEARCH_RESULTS),
+            title=sls(gs(wa_id, s.SEARCH_RESULTS), 24),
             rows=[
                 SectionRow(
                     title=sls(b.title, 24),
@@ -47,7 +47,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
     if next_offset:
         nav_section_rows.append(
             SectionRow(
-                title=gs(wa_id, s.NEXT),
+                title=sls(gs(wa_id, s.NEXT), 24),
                 description=sls(query, 72),
                 callback_data=SearchNavigation(offset=next_offset, total=total).to_callback()
             )
@@ -55,7 +55,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
     if offset > 1:
         nav_section_rows.append(
             SectionRow(
-                title=gs(wa_id, s.PREVIOUS),
+                title=sls(gs(wa_id, s.PREVIOUS), 24),
                 description=sls(query, 72),
                 callback_data=SearchNavigation(offset=offset - 8, total=total).to_callback()
             )
@@ -63,14 +63,14 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
     if nav_section_rows:
         sections.append(
             Section(
-                title=gs(wa_id, s.NAVIGATE_BETWEEN_RESULTS),
+                title=sls(gs(wa_id, s.NAVIGATE_BETWEEN_RESULTS), 24),
                 rows=nav_section_rows
             )
         )
     mc.reply_text(
         text=gs(wa_id, s.X_TO_Y_OF_TOTAL_FOR_S, x=offset, y=(offset + 8) if (offset + 8 < total) else total, total=total, s=query),
         keyboard=SectionList(
-            button_title=gs(wa_id, s.SEARCH_RESULTS),
+            button_title=sls(gs(wa_id, s.SEARCH_RESULTS), 20),
             sections=sections
         )
     )

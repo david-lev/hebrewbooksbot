@@ -159,11 +159,11 @@ HB_FOOTER,es,"⚜️ Edición Ryzman • HebrewBooks.org ⚜️ "
 HB_FOOTER,he,"⚜️ מהדורת רייזמן • HebrewBooks.org ⚜️"
 HB_FOOTER,yi,"⚜️ די רייזמאן אויסגאבע • HebrewBooks.org"
 HB_FOOTER,fr,"⚜️ L'édition Ryzman • HebrewBooks.org"
-INSTANT_READ,en,📖 Instant Read 📖
-INSTANT_READ,es,📖 Lectura instantánea 📖 
-INSTANT_READ,he,📖 קריאה מהירה 📖
-INSTANT_READ,yi,📖 שנעל ליינען 📖
-INSTANT_READ,fr,📖 Lecture instantanée 📖
+INSTANT_READ,en,📖 Instant Read
+INSTANT_READ,es,📖 Lectura instantánea
+INSTANT_READ,he,📖 קריאה מהירה
+INSTANT_READ,yi,📖 שנעל ליינען
+INSTANT_READ,fr,📖 Lecture instantanée
 JUMP_ALSO_BY_EDIT_TIP,en,"Tip: instead of browsing, reply to this message with the page number you want to read.
 You can also edit the number you sent and the page will update accordingly."
 JUMP_ALSO_BY_EDIT_TIP,es,"Consejo: en lugar de explorar, responde a este mensaje con el número de página que quieres leer. También puedes editar el número que enviaste y la página se actualizará en consecuencia. "
@@ -292,11 +292,11 @@ SEARCH_INSTRUCTIONS,es,"🔎 Para buscar un libro, envía un mensaje con tu cons
 SEARCH_INSTRUCTIONS,he,"🔎 כדי לחפש ספר, שלחו הודעה עם מילות החיפוש"
 SEARCH_INSTRUCTIONS,yi,"🔎 כדי צו סערטשין א ספר, שיק א מעסעדזש מיט די סערטש קווערי"
 SEARCH_INSTRUCTIONS,fr,"🔎 Pour rechercher un livre, envoyez un message avec votre requête de recherche"
-SEARCH_RESULTS,en,📚 Results 📚
-SEARCH_RESULTS,es,📚 Resultados 📚 
-SEARCH_RESULTS,he,📚 תוצאות חיפוש 📚
-SEARCH_RESULTS,yi,📚 תוצאות 📚
-SEARCH_RESULTS,fr,📚 Résultats 📚
+SEARCH_RESULTS,en,📚 Results
+SEARCH_RESULTS,es,📚 Resultados
+SEARCH_RESULTS,he,📚 תוצאות חיפוש
+SEARCH_RESULTS,yi,📚 תוצאות
+SEARCH_RESULTS,fr,📚 Résultats
 SEARCH_TIP,en,Tip: You can search in the 'Title:Author' format in order to get more accurate results
 SEARCH_TIP,es,Consejo: Puedes buscar en el formato ‘Título:Autor’ para obtener resultados más precisos 
 SEARCH_TIP,he,טיפ: ניתן לחפש בפורמט 'כותר:מחבר' על מנת לקבל תוצאות מדוייקות
@@ -307,11 +307,11 @@ SEARCHING_FOR_Q,es,🔎 Buscando: {q}
 SEARCHING_FOR_Q,he,"🔍 מתבצע חיפוש עבור: ""{q}"""
 SEARCHING_FOR_Q,yi,"🔍 מען סערטשט פאר: ""{q}"""
 SEARCHING_FOR_Q,fr,🔍 Recherche : {q}
-SHARE,en,♻️ Share ♻️
-SHARE,es,♻️ Compartir ♻️ 
-SHARE,he,♻️ שיתוף ♻️
-SHARE,yi,♻️ שער♻️
-SHARE,fr,♻️ Partager ♻️
+SHARE,en,♻️ Share
+SHARE,es,♻️ Compartir
+SHARE,he,♻️ שיתוף
+SHARE,yi,♻️ שער
+SHARE,fr,♻️ Partager
 SHAS,en,📚 Shas
 SHAS,es, 📚 Shas 
 SHAS,he,"📚 ש""ס"

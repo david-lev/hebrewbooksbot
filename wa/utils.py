@@ -244,7 +244,7 @@ def on_stats_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_text(
         text=helpers.get_stats(wa_id),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
-        keyboard=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
+        keyboard=[Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)],
     )
 
 
@@ -253,7 +253,7 @@ def on_about_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_text(
         text=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
-        keyboard=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
+        keyboard=[Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)],
     )
 
 
@@ -291,7 +291,7 @@ def on_change_language(_: WhatsApp, clb: CallbackButton):
                     title=sls(gs(wa_id, s.CHOOSE_LANGUAGE), 24),
                     rows=tuple(
                         SectionRow(
-                            title=f"{lang.flag} {lang.name}",
+                            title=sls(f"{lang.flag} {lang.name}", 24),
                             callback_data=f"lang:{lang.code}"
                         ) for lang in Language
                     )

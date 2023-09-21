@@ -1,5 +1,6 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from pywa import WhatsApp, filters as fil
 from pywa.handlers import MessageHandler, CallbackButtonHandler, CallbackSelectionHandler
 from pywa.types import Message, MessageStatus
@@ -11,6 +12,12 @@ from wa import search, helpers, utils
 
 conf = get_settings()
 fastapi_app = FastAPI()
+
+
+@fastapi_app.exception_handler(RequestValidationError)
+async def request_validation_error_handler(request: Request, exc: RequestValidationError):
+    logging.error(f"Invalid request. detail: {exc.errors()}, body: {exc.body}")
+
 wa = WhatsApp(
     token=conf.wa_token,
     phone_id=conf.wa_phone_id,

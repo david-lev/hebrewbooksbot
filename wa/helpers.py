@@ -71,17 +71,17 @@ def slice_long_string(string: str, max_length: int, suffix: str = "...") -> str:
 
 
 def get_book_details(book: Book) -> str:
-    return "\n".join((
+    return "\n".join(i for i in (
         f"{RTL}📚 {book.title}",
         f"{RTL}👤 {book.author}" if book.author else "",
         f"{RTL}📅 {book.year}" if book.year else "",
         f"{RTL}🏙 {book.city}" if book.city else "",
         f"{RTL}📖 {book.pages}",
-    ))
+    ) if i)
 
 
 def get_page_details(wa_id: str, book: Book, page_status: str) -> str:
-    return "\n".join((
+    return "\n".join(i for i in (
         f"*{gs(wa_id, s.INSTANT_READ)}*\n\n"
         f"{RTL}📚 {book.title}",
         f"{RTL}👤 {book.author}" if book.author else "",
@@ -89,7 +89,7 @@ def get_page_details(wa_id: str, book: Book, page_status: str) -> str:
         f"{RTL}🏙 {book.city}" if book.city else "",
         f"{RTL}📖 {page_status.strip()}\n",
         f"_💡{gs(wa_id, s.JUMP_TIP)}_",
-    ))
+    ) if i)
 
 
 def get_stats(wa_id: str) -> str:

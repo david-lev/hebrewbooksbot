@@ -33,8 +33,9 @@ languages = {
     ("972",): Language.HE,
     # France
     ("33",): Language.FR,
-    # United States & Canada, Switzerland, Ukraine, Russia, Germany, Italy, Netherlands, Belgium, South Africa, Poland
-    ("1", "41", "380", "7", "49", "39", "31", "32", "27", "48", "44"): Language.EN,
+    # United States & Canada, Switzerland, Ukraine, Russia, Germany, Italy, Netherlands, Belgium,
+    # South Africa, Poland, Australia
+    ("1", "41", "380", "7", "49", "39", "31", "32", "27", "48", "44", "61"): Language.EN,
     # Spain, Argentina, Panama
     ("54", "34", "507", "52", "55"): Language.ES,
 }

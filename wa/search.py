@@ -14,6 +14,16 @@ from wa.utils import Menu
 def on_search(_: WhatsApp, mc: Message | CallbackSelection):
     wa_id = mc.from_user.wa_id
     query = mc.text if isinstance(mc, Message) else mc.description
+    if len(query) < 3:
+        mc.react("❌")
+        mc.reply_text(
+            text=gs(wa_id, s.SEARCH_TOO_SHORT),
+            keyboard=(
+                Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
+                Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
+            ),
+        )
+        return
     mc.react("🔍")
     offset = 1 if isinstance(mc, Message) else SearchNavigation.from_callback(mc.data).offset
     title, author = data.helpers.get_title_author(query)

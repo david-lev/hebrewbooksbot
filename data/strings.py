@@ -97,6 +97,11 @@ class String(str, Enum):
     WAIT_X_MINUTES = 'WAIT_X_MINUTES'
     X_IS_UPLOADED = 'X_IS_UPLOADED'
     RESEARCH = 'RESEARCH'
+    MEDIA_TOO_LARGE = 'MEDIA_TOO_LARGE'
+    SOMETHING_WENT_WRONG = 'SOMETHING_WENT_WRONG'
+    ACKNOWLEDGEMENTS = 'ACKNOWLEDGEMENTS'
+    CREDITS = 'CREDITS'
+    SEARCH_TOO_SHORT = 'SEARCH_TOO_SHORT'
 
     def __repr__(self):
         return f'{self.__class__.__name__}.{self.name}'

@@ -551,32 +551,29 @@ FEATURE_UNDER_MAINTENANCE,yi,"דער פיטשער איז יעצט ריפערד. 
 FEATURE_UNDER_MAINTENANCE,fr,Cette fonctionnalité est actuellement en maintenance. Veuillez réessayer plus tard.
 WA_ABOUT_MSG,en,"This bot was built with the aim of making the content of the hebrewbooks.org website accessible via WhatsApp.
 
-An improved version of the bot is also available on Telegram: t.me/hebooksbot
+🕯 In memory of Rabbi Aharon Yitzchak ben Shmuel Zanvil z""l 🕯
 
-The bot was built using the pywa library github.com/david-lev/pywa"
+An improved version of the bot is also available on Telegram: t.me/hebooksbot"
 WA_ABOUT_MSG,es,"Este bot fue creado con el objetivo de hacer accesible el contenido del sitio web hebrewbooks.org a través de WhatsApp.
 
-Una versión mejorada del bot también está disponible en Telegram: t.me/hebooksbot
+🕯 En memoria del rabino Aharon Yitzchak ben Shmuel Zanvil zl 🕯
 
-El bot fue construido usando la biblioteca pywa github.com/david-lev/pywa
-"
+Una versión mejorada del bot también está disponible en Telegram: t.me/hebooksbot"
 WA_ABOUT_MSG,he,"*בוט זה נבנה במטרה להנגיש את תוכן אתר hebrewbooks.org באמצעות וואטסאפ.*
 
+🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל 🕯
 
-גרסה משופרת של הבוט קיימת גם בטלגרם: t.me/hebooksbot
-
-הבוט נבנה באמצעות ספריית pywa github.com/david-lev/pywa"
+גרסה משופרת של הבוט קיימת גם בטלגרם: t.me/hebooksbot"
 WA_ABOUT_MSG,yi,"*דער באָט איז געמאכט געווארען מיט דער ציל צו מאכן די אינהאַלט פון די hebrewbooks.org וועבסייט אבעילאביל דורך וואצאפ.*
 
+🕯 לעילוי נשמת הרב אהרן יצחק בן שמואל זנוויל ז""ל 🕯
 
 א פרישע ווערסיע פון ​​די באט איז אויך בנימצא אויף טעלעגראם: t.me/hebooksbot"
 WA_ABOUT_MSG,fr,"Ce bot a été construit dans le but de rendre le contenu du site hebrewbooks.org accessible via WhatsApp.
- 
 
- Une version améliorée du bot est également disponible sur Telegram : t.me/hebooksbot
- 
+🕯 À la mémoire du rabbin Aharon Yitzchak ben Shmuel Zanvil z""l 🕯
 
- Le bot a été construit à l'aide de la bibliothèque pywa github.com/david-lev/pywa"
+Une version améliorée du bot est également disponible sur Telegram : t.me/hebooksbot"
 WA_WELCOME_BODY,en,"This bot allows searching and browsing books on hebrewbooks.org
 
 *⚡️ Features:*
@@ -710,3 +707,28 @@ X_TO_Y_OF_TOTAL_FOR_S,es,"{x:,} - {y:,} de {total:,} resultados para: {s} "
 X_TO_Y_OF_TOTAL_FOR_S,he,"‏{x:,} - {y:,} מתוך {total:,} תוצאות עבור: {s}"
 X_TO_Y_OF_TOTAL_FOR_S,yi,"{x:,} - {y:,} פון {total:,} תוצאות פאר: {s}"
 X_TO_Y_OF_TOTAL_FOR_S,fr,"{x:,} - {y:,} sur {total:,} résultats pour : {s}"
+MEDIA_TOO_LARGE,en,The media is too large to be sent as a document. Here is the book in Instant Read mode:
+MEDIA_TOO_LARGE,es,El archivo es demasiado grande para ser enviado como documento. Aquí está el libro en modo de lectura instantánea:
+MEDIA_TOO_LARGE,he,הקובץ גדול מדי כדי להישלח כמסמך. הנה הספר במצב קריאה מהירה:
+MEDIA_TOO_LARGE,yi,די מעדיע איז צו גרויס צו זיין געשיקט ווי א דאקומענט. דאס איז דער ביך אין אינסטאַנט ליינען מאָדע:
+MEDIA_TOO_LARGE,fr,Le média est trop volumineux pour être envoyé en tant que document. Voici le livre en mode lecture instantanée :
+SOMETHING_WENT_WRONG,en,"Something went wrong, please try again later. If the problem persists, please contact whatsapp@hebrewbooks.org"
+SOMETHING_WENT_WRONG,es,"Algo salió mal, por favor inténtalo de nuevo más tarde. Si el problema persiste, por favor contacta con whatsapp@hebrewbooks.org"
+SOMETHING_WENT_WRONG,he,"משהו השתבש, נא לנסות שוב מאוחר יותר. אם הבעיה נמשכת, נא דווחו למייל whatsapp@hebrewbooks.org"
+SOMETHING_WENT_WRONG,yi,"אַזוי וואָס געגאַנגען איז געגאַנגען, ביטע פרעבירן שפעטער. אויב די פּראָבלעם פּערסיסט, ביטע קאָנטאַקט whatsapp@hebrewbooks.org"
+SOMETHING_WENT_WRONG,fr,"Quelque chose s'est mal passé, veuillez réessayer plus tard. Si le problème persiste, veuillez contacter whatsapp@hebrewbooks.org"
+ACKNOWLEDGEMENTS,en,Acknowledgements
+ACKNOWLEDGEMENTS,es,Agradecimientos
+ACKNOWLEDGEMENTS,he,קרדיטים
+ACKNOWLEDGEMENTS,yi,אַקנאָוולעדגעמענטס
+ACKNOWLEDGEMENTS,fr,Remerciements
+CREDITS,en,The bot was built using the pywa library github.com/david-lev/pywa
+CREDITS,es,El bot fue construido usando la biblioteca pywa github.com/david-lev/pywa
+CREDITS,he,הבוט נבנה באמצעות ספריית pywa github.com/david-lev/pywa
+CREDITS,yi,דער באט איז געמאכט געווארען מיט דער ציל צו מאכן די אינהאַלט פון די hebrewbooks.org וועבסייט אבעילאביל דורך וואצאפ.
+CREDITS,fr,Le bot a été construit à l'aide de la bibliothèque pywa github.com/david-lev/pywa
+SEARCH_TOO_SHORT,en,The search query is too short. Please try again.
+SEARCH_TOO_SHORT,es,La consulta de búsqueda es demasiado corta. Por favor inténtalo de nuevo.
+SEARCH_TOO_SHORT,he,שאילתת החיפוש קצרה מדי. נא לנסות שוב.
+SEARCH_TOO_SHORT,yi,די זוכן פרעג איז צו קורץ. ביטע פרעבירן שפעטער.
+SEARCH_TOO_SHORT,fr,La requête de recherche est trop courte. Veuillez réessayer.

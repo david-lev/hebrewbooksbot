@@ -93,30 +93,6 @@ def get_page_details(wa_id: str, book: Book, page_status: str) -> str:
     ) if i)
 
 
-def get_stats(wa_id: str) -> str:
-    stats = repository.get_stats()
-    if is_admin(wa_id=wa_id):
-        return gs(
-            wa_id=wa_id,
-            string=s.SHOW_STATS_ADMIN,
-            tg_users_count=repository.get_tg_users_count(),
-            wa_users_count=repository.get_wa_users_count(),
-            books_read=stats.books_read,
-            pages_read=stats.pages_read,
-            inline_searches=stats.inline_searches,
-            msg_searches=stats.msg_searches,
-            jumps=stats.jumps,
-        )
-    else:
-        return gs(
-            wa_id=wa_id,
-            string=s.SHOW_STATS,
-            books_read=stats.books_read,
-            pages_read=stats.pages_read,
-            searches=stats.searches
-        )
-
-
 def get_masechet_details(masechet: Masechet):
     return "".join((
         f"📚 {masechet.name}\n",

@@ -1,6 +1,11 @@
 import dataclasses
+import logging
+import re
+
 from pywa import WhatsApp
-from pywa.types import Message, CallbackSelection, Button, CallbackButton, SectionList, Section, SectionRow
+from pywa.errors import MediaUploadError
+from pywa.types import Message, CallbackSelection, Button, CallbackButton, SectionList, Section, SectionRow, \
+    MessageStatus
 from data import api, config
 from data.callbacks import ShareBook, ReadBook, ShowBook
 from data.enums import BookType, ReadMode, Language
@@ -21,10 +26,7 @@ class Menu:
     SEARCH = 'search'
     CHANGE_LANGUAGE = 'change_lang'
     ABOUT = 'about'
-    STATS = 'stats'
-    CONTACT_URL = 'https://t.me/davidlev'
-    GITHUB_URL = 'https://github.com/david-lev/hebrewbooksbot'
-    HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
+    ACKNOWLEDGEMENTS = 'acknowledgements'
 
 
 def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
@@ -86,7 +88,11 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
     repository.increase_stats(StatsType.BOOKS_READ)
 
 
-def read_book(client: WhatsApp, msg_or_clb: Message | CallbackButton, data: ReadBook | None = None) -> str | None:
+def read_book(
+        client: WhatsApp,
+        msg_or_clb: Message | CallbackButton | MessageStatus,
+        data: ReadBook | None = None
+) -> str | None:
     wa_id = msg_or_clb.from_user.wa_id
     book, masechet, page = None, None, None
     if data is not None:
@@ -222,7 +228,7 @@ def on_share_btn(_: WhatsApp, clb: CallbackButton):
     book_id = ShareBook.from_callback(clb.data).id
     book = api.get_book(book_id)
     clb.reply_text(
-        text="".join((
+        text="\n".join((
             helpers.get_book_details(book),
             f"🔗 {helpers.get_self_share(ShowBook(book_id).to_callback())}",
         )),
@@ -239,19 +245,22 @@ def on_search_btn(_: WhatsApp, clb: CallbackButton):
     )
 
 
-def on_stats_btn(_: WhatsApp, clb: CallbackButton):
-    wa_id = clb.from_user.wa_id
-    clb.reply_text(
-        text=helpers.get_stats(wa_id),
-        footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
-        keyboard=[Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)],
-    )
-
-
 def on_about_btn(_: WhatsApp, clb: CallbackButton):
     wa_id = clb.from_user.wa_id
     clb.reply_text(
         text=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
+        footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
+        keyboard=[
+            Button(title=sls(gs(wa_id, s.ACKNOWLEDGEMENTS), 20), callback_data=Menu.ACKNOWLEDGEMENTS),
+            Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
+        ],
+    )
+
+
+def on_acknowledgements_btn(_: WhatsApp, clb: CallbackButton):
+    wa_id = clb.from_user.wa_id
+    clb.reply_text(
+        text=gs(wa_id, s.CREDITS),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
         keyboard=[Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)],
     )
@@ -308,3 +317,47 @@ def on_language_selected(client: WhatsApp, clb: CallbackSelection):
     repository.update_wa_user(wa_id=wa_id, lang=Language.from_code(clb.data.split(':')[1]).code)
     clb.reply_text(text=gs(wa_id, s.LANGUAGE_CHANGED), quote=True)
     on_start(client, clb)
+
+
+def unblock_user_admin(_: WhatsApp, msg: Message):
+    _, number = msg.text.split(' ', 1)
+    wa_id = re.sub(r'\D', '', number)
+    if not repository.is_wa_user_exists(wa_id=wa_id):
+        msg.reply_text(text=f"User {wa_id} not found. Please check the number and try again")
+        return
+    if repository.is_wa_user_active(wa_id=wa_id):
+        msg.reply_text(text=f"User {wa_id} is already not blocked")
+        return
+    repository.update_wa_user(wa_id=wa_id, active=True)
+    msg.reply_text(text=f"User {wa_id} was successfully unblocked!")
+
+
+def on_stats_admin(_: WhatsApp, msg: Message):
+    wa_id = msg.from_user.wa_id
+    stats = repository.get_stats()
+    msg.reply_text(
+        text=gs(
+            wa_id=wa_id,
+            string=s.SHOW_STATS_ADMIN,
+            tg_users_count=repository.get_tg_users_count(),
+            wa_users_count=repository.get_wa_users_count(),
+            books_read=stats.books_read,
+            pages_read=stats.pages_read,
+            inline_searches=stats.inline_searches,
+            msg_searches=stats.msg_searches,
+            jumps=stats.jumps,
+        ),
+    )
+
+
+def on_failed_message(client: WhatsApp, status: MessageStatus):
+    wa_id = status.from_user.wa_id
+    if isinstance(status.error, MediaUploadError):
+        status.reply_text(text=helpers.get_string(wa_id, s.MEDIA_TOO_LARGE))
+        read = MSG_TO_BOOK_CACHE.get(status.message_id_to_reply)
+        message_id = read_book(client, status, read)
+        if message_id is not None:
+            MSG_TO_BOOK_CACHE[message_id] = read
+        return
+    status.reply_text(text=helpers.get_string(wa_id, s.SOMETHING_WENT_WRONG))
+    logging.error(f"Message failed to send to {wa_id} with error: {status.error}")

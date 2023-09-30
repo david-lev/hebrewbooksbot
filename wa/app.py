@@ -2,8 +2,8 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from pywa import WhatsApp, filters as fil
-from pywa.handlers import MessageHandler, CallbackButtonHandler, CallbackSelectionHandler
-from pywa.types import Message, MessageStatus
+from pywa.handlers import MessageHandler, CallbackButtonHandler, CallbackSelectionHandler, MessageStatusHandler
+from pywa.types import Message
 from data.callbacks import ShowBook, ShareBook, SearchNavigation, ReadBook
 from data.config import get_settings
 from db import repository
@@ -15,7 +15,7 @@ fastapi_app = FastAPI()
 
 
 @fastapi_app.exception_handler(RequestValidationError)
-async def request_validation_error_handler(request: Request, exc: RequestValidationError):
+async def request_validation_error_handler(_: Request, exc: RequestValidationError):
     logging.error(f"Invalid request. detail: {exc.errors()}, body: {exc.body}")
 
 wa = WhatsApp(
@@ -25,18 +25,11 @@ wa = WhatsApp(
     verify_token=conf.wa_verify_token,
     webhook_endpoint='/wa_webhook',
 )
-# console_handler = logging.StreamHandler()
-# console_handler.setLevel(conf.log_level)
-# file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * (2 ** 20), backupCount=1, mode='D')
-# file_handler.setLevel(logging.DEBUG)
-# logging.basicConfig(
-#     level=conf.log_level,
-#     format="Time: %(asctime)s | Level: %(levelname)s | Module: %(module)s | Message: %(message)s",
-#     handlers=[console_handler, file_handler],
-# )
 
-country_filter = lambda _, m: m.from_user.wa_id.startswith(helpers.SUPPORTED_COUNTRIES)  # noqa
 active_filter = lambda _, m: repository.is_wa_user_active(wa_id=m.from_user.wa_id)  # noqa
+admins_filter = lambda _, m: m.from_user.wa_id in conf.wa_admins  # noqa
+
+wa.add_handlers(MessageStatusHandler(utils.on_failed_message, fil.message_status.failed))
 
 if conf.under_maintenance:
     @wa.on_message()
@@ -60,7 +53,7 @@ else:
                 repository.add_wa_user(
                 wa_id=msg.from_user.wa_id,
                 lang=helpers.phone_number_to_lang(msg.from_user.wa_id).code,
-                active=(allowed := country_filter(client, msg))
+                active=(allowed := fil.from_countries(helpers.SUPPORTED_COUNTRIES)(client, msg))
         )):
             if allowed:
                 utils.on_start(client, msg)
@@ -73,7 +66,7 @@ else:
             search.on_search,
             active_filter,
             fil.text,
-            fil.text.length((3, 72)),
+            fil.text.length((1, 72)),  # description limit
             fil.not_(fil.reply),
             lambda _, m: m.text is not None and not m.text.isdigit()
         ),
@@ -130,17 +123,19 @@ else:
             fil.callback.data_matches(utils.Menu.SEARCH)
         ),
         CallbackButtonHandler(
-            utils.on_stats_btn,
-            fil.callback.data_matches(utils.Menu.STATS)
-        ),
-        CallbackButtonHandler(
             utils.on_about_btn,
             fil.callback.data_matches(utils.Menu.ABOUT)
         ),
-
+        CallbackButtonHandler(
+            utils.on_acknowledgements_btn,
+            fil.callback.data_matches(utils.Menu.ACKNOWLEDGEMENTS)
+        ),
+        MessageHandler(
+            utils.unblock_user_admin,
+            admins_filter, fil.text.command("unblock", "un", prefixes=("!", "/")),
+        ),
+        MessageHandler(
+            utils.on_stats_admin,
+            admins_filter, fil.text.command("stats", prefixes=("!", "/")),
+        ),
     )
-
-
-@wa.on_message_status(fil.message_status.failed)
-def on_message_failed(_: WhatsApp, status: MessageStatus):
-    logging.error(f"Message failed to send to {status.from_user.wa_id} with error: {status.error}")

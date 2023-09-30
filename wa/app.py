@@ -65,7 +65,7 @@ else:
         MessageHandler(
             search.on_search,
             active_filter,
-            fil.text,
+            fil.not_(fil.text.is_command),
             fil.text.length((1, 72)),  # description limit
             fil.not_(fil.reply),
             lambda _, m: m.text is not None and not m.text.isdigit()

@@ -95,7 +95,8 @@ else:
         ),
         MessageHandler(
             utils.jump_to_page,
-            active_filter, fil.reply
+            active_filter,
+            fil.reply, lambda _, m: m.text is not None and m.text.isdigit()
         ),
         MessageHandler(
             utils.on_start,

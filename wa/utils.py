@@ -37,7 +37,8 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         msg_or_cb.react("❌")
         msg_or_cb.reply_text(
             text=gs(wa_id, s.NUMBERS_ONLY),
-            quote=True
+            footer=gs(wa_id, s.HB_FOOTER),
+            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     if (seconds := limiter.get_seconds_to_wait(
@@ -47,14 +48,16 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         msg_or_cb.reply_text(
             text=gs(wa_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
                     x=int(seconds // 60 if seconds >= 60 else seconds)),
-            quote=True
+            footer=gs(wa_id, s.HB_FOOTER),
+            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     if (book := api.get_book(show.id)) is None:
         msg_or_cb.react("❌")
         msg_or_cb.reply_text(
             text=gs(wa_id, s.BOOK_NOT_FOUND),
-            quote=True
+            footer=gs(wa_id, s.HB_FOOTER),
+            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     msg_or_cb.react("⬆️")
@@ -106,7 +109,8 @@ def read_book(
             msg_or_clb.react("❌")
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.NUMBERS_ONLY),
-                quote=True
+                footer=gs(wa_id, s.HB_FOOTER),
+                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
     is_book = read.book_type == BookType.BOOK
@@ -118,7 +122,8 @@ def read_book(
         msg_or_clb.reply_text(
             text=gs(wa_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
                     x=int(seconds // 60 if seconds >= 60 else seconds)),
-            quote=True
+            footer=gs(wa_id, s.HB_FOOTER),
+            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     if is_book:
@@ -128,7 +133,11 @@ def read_book(
                 raise ValueError
         except ValueError:
             msg_or_clb.react("❌")
-            msg_or_clb.reply_text(text=gs(wa_id, s.BOOK_NOT_FOUND), quote=True)
+            msg_or_clb.reply_text(
+                text=gs(wa_id, s.BOOK_NOT_FOUND),
+                footer=gs(wa_id, s.HB_FOOTER),
+                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            )
             return
         try:
             url = book.get_page_img(page=read.page, width=750, height=1334) if is_image \
@@ -137,7 +146,8 @@ def read_book(
             msg_or_clb.react("❌")
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=book.pages),
-                quote=True
+                footer=gs(wa_id, s.HB_FOOTER),
+                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
     else:
@@ -145,7 +155,11 @@ def read_book(
             masechet = api.get_masechet(int(read.id))
         except ValueError:
             msg_or_clb.react("❌")
-            msg_or_clb.reply_text(text=gs(wa_id, s.MASECHET_NOT_FOUND), quote=True)
+            msg_or_clb.reply_text(
+                text=gs(wa_id, s.MASECHET_NOT_FOUND),
+                footer=gs(wa_id, s.HB_FOOTER),
+                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            )
             return
         try:
             page = masechet.pages[read.page - 1]
@@ -154,7 +168,8 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,
                         x=masechet.pages[0].name, y=masechet.pages[-1].name),
-                quote=True
+                footer=gs(wa_id, s.HB_FOOTER),
+                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
         url = page.get_page_img(width=750, height=1334) if is_image else page.pdf_url
@@ -203,22 +218,12 @@ def read_book(
 
 def jump_to_page(client: WhatsApp, msg: Message):
     wa_id = msg.from_user.wa_id
-    try:
-        jump = int(msg.text)
-    except ValueError:
-        msg.react("❌")
-        msg.reply_text(text=gs(wa_id, s.NUMBERS_ONLY), quote=True)
-        return
+    jump_to = int(msg.text)
     if (read := MSG_TO_BOOK_CACHE.get(msg.reply_to_message.message_id)) is None:
         msg.react("❌")
         msg.reply_text(text=gs(wa_id, s.NO_BOOK_SELECTED), quote=True)
         return
-    if jump > read.total or jump < 1:
-        msg.react("❌")
-        msg.reply_text(text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=read.total), quote=True)
-        return
-    msg.react("⬆️")
-    message_id = read_book(client, msg, dataclasses.replace(read, page=jump))
+    message_id = read_book(client, msg, dataclasses.replace(read, page=jump_to))
     if message_id is not None:
         MSG_TO_BOOK_CACHE[message_id] = read
     repository.increase_stats(StatsType.JUMPS)

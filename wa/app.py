@@ -13,6 +13,16 @@ from wa import search, helpers, utils
 conf = get_settings()
 fastapi_app = FastAPI()
 
+console_handler = logging.StreamHandler()
+console_handler.setLevel(conf.log_level)
+file_handler = logging.handlers.RotatingFileHandler(filename='wa.log', maxBytes=5 * (2 ** 20), backupCount=1, mode='D')
+file_handler.setLevel(logging.DEBUG)
+logging.basicConfig(
+    level=conf.log_level,
+    format="Time: %(asctime)s | Level: %(levelname)s | Module: %(module)s | Message: %(message)s",
+    handlers=(console_handler, file_handler),
+)
+
 
 @fastapi_app.exception_handler(RequestValidationError)
 async def request_validation_error_handler(_: Request, exc: RequestValidationError):
@@ -53,7 +63,7 @@ else:
                 repository.add_wa_user(
                 wa_id=msg.from_user.wa_id,
                 lang=helpers.phone_number_to_lang(msg.from_user.wa_id).code,
-                active=(allowed := fil.from_countries(helpers.SUPPORTED_COUNTRIES)(client, msg))
+                active=(allowed := fil.from_countries(*helpers.SUPPORTED_COUNTRIES)(client, msg))
         )):
             if allowed:
                 utils.on_start(client, msg)

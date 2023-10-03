@@ -42,5 +42,5 @@ pip install -r requirements.txt
 python3 tg/app.py  # only tg is supported for now
 ```
 
----
-This bot is not affiliated with [hebrewbooks.org](https://hebrewbooks.org).
+# License
+Copyright (c) 2023 by the Society for the Preservation of Hebrew Books. All rights reserved.

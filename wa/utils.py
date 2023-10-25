@@ -38,7 +38,7 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         msg_or_cb.reply_text(
             text=gs(wa_id, s.NUMBERS_ONLY),
             footer=gs(wa_id, s.HB_FOOTER),
-            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     if (seconds := limiter.get_seconds_to_wait(
@@ -49,7 +49,7 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
             text=gs(wa_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
                     x=int(seconds // 60 if seconds >= 60 else seconds)),
             footer=gs(wa_id, s.HB_FOOTER),
-            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     if (book := api.get_book(show.id)) is None:
@@ -57,7 +57,7 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         msg_or_cb.reply_text(
             text=gs(wa_id, s.BOOK_NOT_FOUND),
             footer=gs(wa_id, s.HB_FOOTER),
-            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     msg_or_cb.react("⬆️")
@@ -110,7 +110,7 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.NUMBERS_ONLY),
                 footer=gs(wa_id, s.HB_FOOTER),
-                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
     is_book = read.book_type == BookType.BOOK
@@ -123,7 +123,7 @@ def read_book(
             text=gs(wa_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
                     x=int(seconds // 60 if seconds >= 60 else seconds)),
             footer=gs(wa_id, s.HB_FOOTER),
-            keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
         )
         return
     if is_book:
@@ -136,7 +136,7 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.BOOK_NOT_FOUND),
                 footer=gs(wa_id, s.HB_FOOTER),
-                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
         try:
@@ -147,7 +147,7 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=book.pages),
                 footer=gs(wa_id, s.HB_FOOTER),
-                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
     else:
@@ -158,7 +158,7 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.MASECHET_NOT_FOUND),
                 footer=gs(wa_id, s.HB_FOOTER),
-                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
         try:
@@ -169,7 +169,7 @@ def read_book(
                 text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,
                         x=masechet.pages[0].name, y=masechet.pages[-1].name),
                 footer=gs(wa_id, s.HB_FOOTER),
-                keyboard=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
             )
             return
         url = page.get_page_img(width=750, height=1334) if is_image else page.pdf_url
@@ -245,7 +245,7 @@ def on_search_btn(_: WhatsApp, clb: CallbackButton):
     wa_id = clb.from_user.wa_id
     clb.reply_text(
         text=f"{gs(wa_id, s.SEARCH_INSTRUCTIONS)}\n{gs(wa_id, s.SEARCH_TIP)}",
-        keyboard=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
+        buttons=[Button(title=gs(wa_id, s.BACK), callback_data=Menu.START)],
         footer=gs(wa_id, s.PYWA_CREDIT),
     )
 
@@ -255,7 +255,7 @@ def on_about_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_text(
         text=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
-        keyboard=[
+        buttons=[
             Button(title=sls(gs(wa_id, s.ACKNOWLEDGEMENTS), 20), callback_data=Menu.ACKNOWLEDGEMENTS),
             Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
         ],
@@ -267,7 +267,7 @@ def on_acknowledgements_btn(_: WhatsApp, clb: CallbackButton):
     clb.reply_text(
         text=gs(wa_id, s.CREDITS),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
-        keyboard=[Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)],
+        buttons=[Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)],
     )
 
 
@@ -276,7 +276,7 @@ def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton | CallbackSelecti
     msg_or_clb.reply_text(
         header=sls(gs(wa_id, s.WA_WELCOME_HEADER), 60),
         text=gs(wa_id, s.WA_WELCOME_BODY),
-        keyboard=[
+        buttons=[
             Button(
                 title=sls(gs(wa_id, s.SEARCH), 20),
                 callback_data=Menu.SEARCH
@@ -298,7 +298,7 @@ def on_change_language(_: WhatsApp, clb: CallbackButton):
     wa_id = clb.from_user.wa_id
     clb.reply_text(
         text=gs(wa_id, s.CHOOSE_LANGUAGE),
-        keyboard=SectionList(
+        buttons=SectionList(
             button_title=sls(gs(wa_id, s.CHOOSE_LANGUAGE), 20),
             sections=(
                 Section(

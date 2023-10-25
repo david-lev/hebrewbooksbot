@@ -33,6 +33,9 @@ wa = WhatsApp(
     phone_id=conf.wa_phone_id,
     server=fastapi_app,
     verify_token=conf.wa_verify_token,
+    callback_url=conf.wa_callback_url,
+    app_id=conf.wa_app_id,
+    app_secret=conf.wa_app_secret,
     webhook_endpoint='/wa_webhook',
 )
 
@@ -69,6 +72,7 @@ else:
                 utils.on_start(client, msg)
             else:
                 logging.info(f"User {msg.from_user.wa_id} is not allowed to use the bot.")
+            msg.stop_handling()
 
 
     wa.add_handlers(

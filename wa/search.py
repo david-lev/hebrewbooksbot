@@ -19,7 +19,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
         mc.reply_text(
             text=gs(wa_id, s.SEARCH_TOO_SHORT),
             footer=gs(wa_id, s.HB_FOOTER),
-            keyboard=(
+            buttons=(
                 Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
                 Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
             ),
@@ -34,7 +34,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
         mc.reply_text(
             text=gs(wa_id, s.NO_RESULTS_FOR_Q, q=query),
             footer=gs(wa_id, s.HB_FOOTER),
-            keyboard=(
+            buttons=(
                 Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
                 Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
             ),
@@ -83,7 +83,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
         text=gs(wa_id, s.X_TO_Y_OF_TOTAL_FOR_S,
                 x=offset, y=(offset + 8) if (offset + 8 < total) else total, total=total, s=query),
         footer=gs(wa_id, s.HB_FOOTER),
-        keyboard=SectionList(
+        buttons=SectionList(
             button_title=sls(gs(wa_id, s.SEARCH_RESULTS), 20),
             sections=sections
         )

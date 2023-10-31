@@ -237,7 +237,6 @@ def on_share_btn(_: WhatsApp, clb: CallbackButton):
             helpers.get_book_details(book),
             f"🔗 {helpers.get_self_share(ShowBook(book_id).to_callback())}",
         )),
-        quote=True,
     )
 
 

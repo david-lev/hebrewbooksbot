@@ -4,11 +4,11 @@ from data.models import Section
 
 
 def get_sections(
-        soup: BeautifulSoup,
-        soup_func: Callable[[BeautifulSoup], ResultSet[PageElement]],
-        title_funcs: tuple[Callable[[PageElement], str], ...],
-        content_funcs: tuple[Callable[[PageElement], str], ...],
-        sep: str = ' '
+    soup: BeautifulSoup,
+    soup_func: Callable[[BeautifulSoup], ResultSet[PageElement]],
+    title_funcs: tuple[Callable[[PageElement], str], ...],
+    content_funcs: tuple[Callable[[PageElement], str], ...],
+    sep: str = " ",
 ) -> list[Section]:
     """
     Get a section from a BeautifulSoup object
@@ -29,7 +29,7 @@ def get_sections(
             sections.append(
                 Section(
                     title=sep.join([func(span).strip() for func in title_funcs]),
-                    content=sep.join([func(span).strip() for func in content_funcs])
+                    content=sep.join([func(span).strip() for func in content_funcs]),
                 )
             )
         except AttributeError:
@@ -42,7 +42,9 @@ def get_title_author(text: str) -> tuple[str, str]:
     """
     Get the title and author from a text.
     """
-    return (t.strip() for t in text.split(':', 1)) if ':' in text else (text.strip(), '')
+    return (
+        (t.strip() for t in text.split(":", 1)) if ":" in text else (text.strip(), "")
+    )
 
 
 def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
@@ -60,4 +62,3 @@ def get_offset(current_offset: int, total: int, increase: int = 5) -> int:
         offset = total - current_offset
         return 0 if offset < increase else offset
     return current_offset + increase
-

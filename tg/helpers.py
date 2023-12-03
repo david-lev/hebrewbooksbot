@@ -12,7 +12,11 @@ from db import repository
 
 def get_string(user_id: int, string: String, **kwargs) -> str:
     """Get a string in the user's language."""
-    return _gs(string=string, lng=Language.from_code(repository.get_tg_user(tg_id=user_id).lang), **kwargs)
+    return _gs(
+        string=string,
+        lng=Language.from_code(repository.get_tg_user(tg_id=user_id).lang),
+        **kwargs,
+    )
 
 
 def get_string_by_lang(lang: str, string: String, **kwargs) -> str:
@@ -21,19 +25,22 @@ def get_string_by_lang(lang: str, string: String, **kwargs) -> str:
 
 
 class Menu:
-    START = 'start'
-    BROADCAST = 'broadcast'
-    BROWSE = 'browse_menu'
-    STATS = 'stats'
-    CHOOSE_LANG = 'choose_lang'
-    CONTACT_URL = 'https://t.me/davidlev'
-    HEBREWBOOKS_SITE_URL = 'https://hebrewbooks.org'
+    START = "start"
+    BROADCAST = "broadcast"
+    BROWSE = "browse_menu"
+    STATS = "stats"
+    CHOOSE_LANG = "choose_lang"
+    CONTACT_URL = "https://t.me/davidlev"
+    HEBREWBOOKS_SITE_URL = "https://hebrewbooks.org"
 
 
 MESSAGE_SEARCH_FILTER = (
-        filters.text & ~filters.via_bot & ~filters.reply & ~filters.command([Menu.START, Menu.BROADCAST]) &
-        ~filters.create(lambda _, __, msg: msg.text.isdigit())
-        & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
+    filters.text
+    & ~filters.via_bot
+    & ~filters.reply
+    & ~filters.command([Menu.START, Menu.BROADCAST])
+    & ~filters.create(lambda _, __, msg: msg.text.isdigit())
+    & ~filters.create(lambda _, __, ms: len(ms.text) <= 2)
 )
 
 
@@ -44,7 +51,9 @@ def is_admin(user_id: int) -> bool:
     return user_id in config.get_settings().tg_admins
 
 
-def get_book_text(book: Book, page: int | None = None, read_mode: ReadMode | None = None) -> str:
+def get_book_text(
+    book: Book, page: int | None = None, read_mode: ReadMode | None = None
+) -> str:
     """
     Get the text for a book.
 
@@ -62,13 +71,15 @@ def get_book_text(book: Book, page: int | None = None, read_mode: ReadMode | Non
             url = book.pdf_url
         case _:
             raise ValueError(f"Invalid read mode: {read_mode}")
-    return "".join((
-        f"{RTL}[📚]({url}) {book.title}\n",
-        f"{RTL}👤 {book.author}\n" if book.author else "",
-        f"{RTL}📅 {book.year}\n" if book.year else "",
-        f"{RTL}🏙 {book.city}\n" if book.city else "",
-        f"{RTL}📖 {book.pages}\n",
-    ))
+    return "".join(
+        (
+            f"{RTL}[📚]({url}) {book.title}\n",
+            f"{RTL}👤 {book.author}\n" if book.author else "",
+            f"{RTL}📅 {book.year}\n" if book.year else "",
+            f"{RTL}🏙 {book.city}\n" if book.city else "",
+            f"{RTL}📖 {book.pages}\n",
+        )
+    )
 
 
 def get_masechet_page_text(masechet: Masechet, page: int, read_mode: ReadMode) -> str:
@@ -88,10 +99,7 @@ def get_masechet_page_text(masechet: Masechet, page: int, read_mode: ReadMode) -
             url = page_obj.get_page_img(width=2138, height=3038)
         case _:
             raise ValueError(f"Invalid read mode: {read_mode}")
-    return "".join((
-        f"{RTL}[📚]({url}) {masechet.name}\n",
-        f"{RTL}📄 {page_obj.name}"
-    ))
+    return "".join((f"{RTL}[📚]({url}) {masechet.name}\n", f"{RTL}📄 {page_obj.name}"))
 
 
 def get_tursa_text(tursa: Tursa, previous_tursa: Tursa) -> str:
@@ -109,16 +117,16 @@ def jump_to_page_filter(_, __, msg: Message) -> bool:
     """Filter for jump_to_page_handler."""
     try:
         return any(
-            callback_matcher(
-                clb=clb,
-                data=JumpToPage
-            ) for clb in msg.reply_to_message.reply_markup.inline_keyboard[1]
+            callback_matcher(clb=clb, data=JumpToPage)
+            for clb in msg.reply_to_message.reply_markup.inline_keyboard[1]
         )
     except (AttributeError, IndexError):
         return False
 
 
-def callback_matcher(clb: CallbackQuery | InlineKeyboardButton | str, data: type[CallbackData]) -> bool:
+def callback_matcher(
+    clb: CallbackQuery | InlineKeyboardButton | str, data: type[CallbackData]
+) -> bool:
     """
     Check if the callback query matches the callback data.
 
@@ -127,15 +135,17 @@ def callback_matcher(clb: CallbackQuery | InlineKeyboardButton | str, data: type
         data: The callback data.
     """
     return (
-        clb.data if isinstance(clb, CallbackQuery)
-        else clb.callback_data if isinstance(clb, InlineKeyboardButton)
+        clb.data
+        if isinstance(clb, CallbackQuery)
+        else clb.callback_data
+        if isinstance(clb, InlineKeyboardButton)
         else clb
     ).startswith(data.__clbname__)
 
 
 @lru_cache
 def get_browse_type_data(
-        browse_type: BrowseTypeEnum
+    browse_type: BrowseTypeEnum
 ) -> tuple[Callable[[str | None], list[Any]] | Callable[[], list[Any]], s, int]:
     """
     Helper function to get the data for a browse type.
@@ -160,11 +170,11 @@ def get_browse_type_data(
 
 
 def read_mode_chooser(
-        user_id: int,
-        read_clb: ReadBook,
-        page: int,
-        others: list[str],
-        read_modes: tuple[ReadMode, ...] = (ReadMode.PDF, ReadMode.IMAGE),
+    user_id: int,
+    read_clb: ReadBook,
+    page: int,
+    others: list[str],
+    read_modes: tuple[ReadMode, ...] = (ReadMode.PDF, ReadMode.IMAGE),
 ) -> list[InlineKeyboardButton]:
     """
     Get the read mode chooser buttons.
@@ -176,35 +186,41 @@ def read_mode_chooser(
         others: The other callback data to join to the callback data.
         read_modes: The read modes to choose from.
     """
-    modes = list(filter(
-        lambda rm: rm[0] in read_modes, (
-            (ReadMode.PDF, "📄", s.DOCUMENT),
-            (ReadMode.IMAGE, "🖼", s.IMAGE),
-            (ReadMode.TEXT, "📝", s.TEXT)
+    modes = list(
+        filter(
+            lambda rm: rm[0] in read_modes,
+            (
+                (ReadMode.PDF, "📄", s.DOCUMENT),
+                (ReadMode.IMAGE, "🖼", s.IMAGE),
+                (ReadMode.TEXT, "📝", s.TEXT),
+            ),
         )
-    ))
+    )
     if not modes:
         return []
     return [
         InlineKeyboardButton(
-            text=get_string(user_id, string) if new_read_mode is read_clb.read_mode else emoji,
+            text=get_string(user_id, string)
+            if new_read_mode is read_clb.read_mode
+            else emoji,
             callback_data=ReadBook(
                 id=read_clb.id,
                 page=page,
                 total=read_clb.total,
                 read_mode=new_read_mode,
-                book_type=read_clb.book_type
-            ).join_to_callback(*others)
-        ) for new_read_mode, emoji, string in modes
+                book_type=read_clb.book_type,
+            ).join_to_callback(*others),
+        )
+        for new_read_mode, emoji, string in modes
     ]
 
 
 def next_previous_buttons(
-        user_id: int,
-        read_clb: ReadBook,
-        page: int,
-        total: int,
-        others: list[str],
+    user_id: int,
+    read_clb: ReadBook,
+    page: int,
+    total: int,
+    others: list[str],
 ) -> list[InlineKeyboardButton]:
     """
     Get the next and previous buttons.
@@ -221,27 +237,26 @@ def next_previous_buttons(
     if not total:
         return buttons
     if page < total:
-        buttons.append(InlineKeyboardButton(
-            text=get_string(user_id=user_id, string=s.NEXT),
-            callback_data=ReadBook(
-                id=read_clb.id,
-                page=page + 1,
-                total=total,
-                read_mode=read_clb.read_mode,
-                book_type=read_clb.book_type
-            ).join_to_callback(*others)
-        ))
+        buttons.append(
+            InlineKeyboardButton(
+                text=get_string(user_id=user_id, string=s.NEXT),
+                callback_data=ReadBook(
+                    id=read_clb.id,
+                    page=page + 1,
+                    total=total,
+                    read_mode=read_clb.read_mode,
+                    book_type=read_clb.book_type,
+                ).join_to_callback(*others),
+            )
+        )
 
     if read_clb.book_type == BookType.BOOK:
         buttons.append(
             InlineKeyboardButton(
                 text=f"< {page}/{total} >",
                 callback_data=JumpToPage(
-                    id=int(read_clb.id),
-                    page=page,
-                    total=total,
-                    book_type=BookType.BOOK
-                ).to_callback()
+                    id=int(read_clb.id), page=page, total=total, book_type=BookType.BOOK
+                ).to_callback(),
             )
         )
     elif read_clb.book_type == BookType.MASECHET:
@@ -255,22 +270,24 @@ def next_previous_buttons(
                     id=int(read_clb.id),
                     page=page,
                     total=masechet.total,
-                    book_type=BookType.MASECHET
-                ).to_callback()
+                    book_type=BookType.MASECHET,
+                ).to_callback(),
             )
         )
 
     if page > 1:
-        buttons.append(InlineKeyboardButton(
-            text=get_string(user_id=user_id, string=s.PREVIOUS),
-            callback_data=ReadBook(
-                id=read_clb.id,
-                page=page - 1,
-                total=total,
-                read_mode=read_clb.read_mode,
-                book_type=read_clb.book_type
-            ).join_to_callback(*others)
-        ))
+        buttons.append(
+            InlineKeyboardButton(
+                text=get_string(user_id=user_id, string=s.PREVIOUS),
+                callback_data=ReadBook(
+                    id=read_clb.id,
+                    page=page - 1,
+                    total=total,
+                    read_mode=read_clb.read_mode,
+                    book_type=read_clb.book_type,
+                ).join_to_callback(*others),
+            )
+        )
     return buttons if Language.from_code(user_lang).rtl else buttons[::-1]
 
 

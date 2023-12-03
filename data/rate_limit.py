@@ -22,9 +22,13 @@ class RateLimiter:
         return RateLimiter._instance
 
     def __init__(self):
-        self.user_rates: dict[tuple[str | int, str], tuple[float, int]] = collections.defaultdict(lambda: (0, 0))
+        self.user_rates: dict[
+            tuple[str | int, str], tuple[float, int]
+        ] = collections.defaultdict(lambda: (0, 0))
 
-    def get_seconds_to_wait(self, user_id: str | int, rate_limit_type: RateLimit) -> int:
+    def get_seconds_to_wait(
+        self, user_id: str | int, rate_limit_type: RateLimit
+    ) -> int:
         """Get the number of seconds to wait before making a request."""
         now = time.time()
         last_time, count = self.user_rates[user_id, rate_limit_type.name]

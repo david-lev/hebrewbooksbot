@@ -15,24 +15,24 @@ class BrowseType(BaseEnum):
 
 
 class BookType(BaseEnum):
-    BOOK = 'b'
-    MASECHET = 'm'
-    TURSA = 't'
+    BOOK = "b"
+    MASECHET = "m"
+    TURSA = "t"
 
 
 class ReadMode(BaseEnum):
-    PDF = 'p'
-    IMAGE = 'i'
-    TEXT = 't'
+    PDF = "p"
+    IMAGE = "i"
+    TEXT = "t"
 
 
 class Language(Enum):
     # CONST -> (CODE, NAME, FLAG, RTL)
-    EN = ('en', 'English', '🇺🇸', False)
-    HE = ('he', 'עברית', '🇮🇱', True)
-    FR = ('fr', 'Français', '🇫🇷', False)
-    ES = ('es', 'Español', '🇪🇸', False)
-    YI = ('yi', 'ייִדיש', '🔯', True)
+    EN = ("en", "English", "🇺🇸", False)
+    HE = ("he", "עברית", "🇮🇱", True)
+    FR = ("fr", "Français", "🇫🇷", False)
+    ES = ("es", "Español", "🇪🇸", False)
+    YI = ("yi", "ייִדיש", "🔯", True)
 
     def __new__(cls, *values):
         obj = object.__new__(cls)
@@ -50,7 +50,7 @@ class Language(Enum):
             return cls.EN
 
     def __repr__(self):
-        return f'{self.flag}'
+        return f"{self.flag}"
 
     @property
     def code(self) -> str:

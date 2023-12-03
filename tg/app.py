@@ -1,5 +1,10 @@
 from pyrogram import Client, filters
-from pyrogram.handlers import InlineQueryHandler, MessageHandler, CallbackQueryHandler, EditedMessageHandler
+from pyrogram.handlers import (
+    InlineQueryHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    EditedMessageHandler,
+)
 from pyrogram.types import BotCommand
 from data import config, strings
 from data.enums import Language
@@ -7,7 +12,14 @@ from tg import search, helpers
 from tg import browse
 from tg import utils
 from tg.helpers import jump_to_page_filter, Menu
-from data.callbacks import BrowseNavigation, BrowseType, ShowBook, SearchNavigation, ReadBook, JumpToPage
+from data.callbacks import (
+    BrowseNavigation,
+    BrowseType,
+    ShowBook,
+    SearchNavigation,
+    ReadBook,
+    JumpToPage,
+)
 from tg.helpers import get_string as gs
 from data.strings import String as s
 
@@ -18,26 +30,23 @@ app = Client(
     # workdir="../",
     api_id=cfg.tg_api_id,
     api_hash=cfg.tg_api_hash,
-    bot_token=cfg.tg_bot_token
+    bot_token=cfg.tg_bot_token,
 )
 
-app.add_handler(
-    MessageHandler(
-        utils.start, filters=filters.command(Menu.START)
-    )
-)
+app.add_handler(MessageHandler(utils.start, filters=filters.command(Menu.START)))
 
 if cfg.under_maintenance:
     app.add_handler(
         MessageHandler(
-            callback=lambda _, m: m.reply_text(gs(m.from_user.id, s.BOT_UNDER_MAINTENANCE)),
+            callback=lambda _, m: m.reply_text(
+                gs(m.from_user.id, s.BOT_UNDER_MAINTENANCE)
+            ),
         )
     )
     app.add_handler(
         CallbackQueryHandler(
             lambda _, cq: cq.answer(
-                text=gs(cq, s.BOT_UNDER_MAINTENANCE),
-                show_alert=True
+                text=gs(cq, s.BOT_UNDER_MAINTENANCE), show_alert=True
             ),
         )
     )
@@ -46,60 +55,75 @@ if cfg.under_maintenance:
             lambda _, iq: iq.answer(
                 results=[],
                 switch_pm_text=gs(iq, s.BOT_UNDER_MAINTENANCE),
-                switch_pm_parameter="start"
+                switch_pm_parameter="start",
             ),
         )
     )
 else:
     app.add_handler(
         CallbackQueryHandler(
-            utils.choose_lang, filters=filters.create(lambda _, __, query: query.data.startswith(Menu.CHOOSE_LANG))
+            utils.choose_lang,
+            filters=filters.create(
+                lambda _, __, query: query.data.startswith(Menu.CHOOSE_LANG)
+            ),
         )
     )
     app.add_handler(
         CallbackQueryHandler(
-            utils.set_lang, filters=filters.create(lambda _, __, query: query.data.startswith("lang:"))
+            utils.set_lang,
+            filters=filters.create(lambda _, __, query: query.data.startswith("lang:")),
         )
     )
     app.add_handler(
         CallbackQueryHandler(
-            utils.start, filters=filters.create(lambda _, __, query: query.data == Menu.START)
-        )
-    )
-
-    app.add_handler(
-        CallbackQueryHandler(
-            utils.show_stats, filters=filters.create(lambda _, __, query: query.data == Menu.STATS)
-        )
-    )
-
-    app.add_handler(
-        InlineQueryHandler(search.search_books_inline, filters=filters.create(lambda _, __, query: len(query.query) > 2)),
-    )
-
-    app.add_handler(
-        InlineQueryHandler(search.empty_search, filters=filters.create(lambda _, __, query: len(query.query) <= 2))
-    )
-
-    app.add_handler(
-        CallbackQueryHandler(
-            browse.browse_menu, filters=filters.create(lambda _, __, query: query.data == Menu.BROWSE)
+            utils.start,
+            filters=filters.create(lambda _, __, query: query.data == Menu.START),
         )
     )
 
     app.add_handler(
         CallbackQueryHandler(
-            browse.browse_types, filters=filters.create(
+            utils.show_stats,
+            filters=filters.create(lambda _, __, query: query.data == Menu.STATS),
+        )
+    )
+
+    app.add_handler(
+        InlineQueryHandler(
+            search.search_books_inline,
+            filters=filters.create(lambda _, __, query: len(query.query) > 2),
+        ),
+    )
+
+    app.add_handler(
+        InlineQueryHandler(
+            search.empty_search,
+            filters=filters.create(lambda _, __, query: len(query.query) <= 2),
+        )
+    )
+
+    app.add_handler(
+        CallbackQueryHandler(
+            browse.browse_menu,
+            filters=filters.create(lambda _, __, query: query.data == Menu.BROWSE),
+        )
+    )
+
+    app.add_handler(
+        CallbackQueryHandler(
+            browse.browse_types,
+            filters=filters.create(
                 lambda _, __, query: helpers.callback_matcher(query, BrowseType)
-            )
+            ),
         )
     )
 
     app.add_handler(
         CallbackQueryHandler(
-            browse.browse_books_navigator, filters=filters.create(
+            browse.browse_books_navigator,
+            filters=filters.create(
                 lambda _, __, query: helpers.callback_matcher(query, BrowseNavigation)
-            )
+            ),
         )
     )
 
@@ -111,27 +135,35 @@ else:
 
     app.add_handler(
         CallbackQueryHandler(
-            search.search_books_navigator, filters=filters.create(
+            search.search_books_navigator,
+            filters=filters.create(
                 lambda _, __, query: helpers.callback_matcher(query, SearchNavigation)
-            )
+            ),
         )
     )
 
     app.add_handler(
         CallbackQueryHandler(
-            utils.show_book, filters=filters.create(lambda _, __, query: helpers.callback_matcher(query, ShowBook))
+            utils.show_book,
+            filters=filters.create(
+                lambda _, __, query: helpers.callback_matcher(query, ShowBook)
+            ),
         )
     )
 
     app.add_handler(
         CallbackQueryHandler(
-            utils.read_book, filters=filters.create(lambda _, __, query: helpers.callback_matcher(query, ReadBook))
+            utils.read_book,
+            filters=filters.create(
+                lambda _, __, query: helpers.callback_matcher(query, ReadBook)
+            ),
         )
     )
 
     app.add_handler(
         MessageHandler(
-            utils.jump_to_page, filters=filters.reply & filters.create(jump_to_page_filter)
+            utils.jump_to_page,
+            filters=filters.reply & filters.create(jump_to_page_filter),
         )
     )
 
@@ -143,13 +175,14 @@ else:
 
     app.add_handler(
         CallbackQueryHandler(
-            utils.jump_tip, filters=filters.create(
+            utils.jump_tip,
+            filters=filters.create(
                 lambda _, __, query: helpers.callback_matcher(query, JumpToPage)
-            )
+            ),
         )
     )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # app.start()
     # for lang in Language:
     #     app.set_bot_commands(

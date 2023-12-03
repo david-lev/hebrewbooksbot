@@ -4,8 +4,16 @@ import re
 
 from pywa import WhatsApp
 from pywa.errors import MediaUploadError
-from pywa.types import Message, CallbackSelection, Button, CallbackButton, SectionList, Section, SectionRow, \
-    MessageStatus
+from pywa.types import (
+    Message,
+    CallbackSelection,
+    Button,
+    CallbackButton,
+    SectionList,
+    Section,
+    SectionRow,
+    MessageStatus,
+)
 from data import api, config
 from data.callbacks import ShareBook, ReadBook, ShowBook
 from data.enums import BookType, ReadMode, Language
@@ -22,34 +30,40 @@ MSG_TO_BOOK_CACHE: dict[str, ReadBook] = {}
 
 
 class Menu:
-    START = 'start'
-    SEARCH = 'search'
-    CHANGE_LANGUAGE = 'change_lang'
-    ABOUT = 'about'
-    ACKNOWLEDGEMENTS = 'acknowledgements'
+    START = "start"
+    SEARCH = "search"
+    CHANGE_LANGUAGE = "change_lang"
+    ABOUT = "about"
+    ACKNOWLEDGEMENTS = "acknowledgements"
 
 
 def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
     wa_id = msg_or_cb.from_user.wa_id
     try:
-        show = ShowBook.from_callback(msg_or_cb.text if isinstance(msg_or_cb, Message) else msg_or_cb.data)
+        show = ShowBook.from_callback(
+            msg_or_cb.text if isinstance(msg_or_cb, Message) else msg_or_cb.data
+        )
     except ValueError:
         msg_or_cb.react("❌")
         msg_or_cb.reply_text(
             text=gs(wa_id, s.NUMBERS_ONLY),
             footer=gs(wa_id, s.HB_FOOTER),
-            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
         )
         return
-    if (seconds := limiter.get_seconds_to_wait(
-            user_id=wa_id,
-            rate_limit_type=RateLimit.PDF_FULL
-    )) > 0:
+    if (
+        seconds := limiter.get_seconds_to_wait(
+            user_id=wa_id, rate_limit_type=RateLimit.PDF_FULL
+        )
+    ) > 0:
         msg_or_cb.reply_text(
-            text=gs(wa_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
-                    x=int(seconds // 60 if seconds >= 60 else seconds)),
+            text=gs(
+                wa_id,
+                (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
+                x=int(seconds // 60 if seconds >= 60 else seconds),
+            ),
             footer=gs(wa_id, s.HB_FOOTER),
-            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
         )
         return
     if (book := api.get_book(show.id)) is None:
@@ -57,7 +71,7 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         msg_or_cb.reply_text(
             text=gs(wa_id, s.BOOK_NOT_FOUND),
             footer=gs(wa_id, s.HB_FOOTER),
-            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
         )
         return
     msg_or_cb.react("⬆️")
@@ -66,12 +80,15 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         page=1,
         total=book.pages,
         read_mode=ReadMode.IMAGE,
-        book_type=BookType.BOOK
+        book_type=BookType.BOOK,
     )
     message_id = msg_or_cb.reply_document(
-        document=helpers.get_file_id(wa=client, url=book.pdf_url,
-                                     file_name=(file_name := f"{book.title} • {book.author}.pdf"),
-                                     mime_type='application/pdf'),
+        document=helpers.get_file_id(
+            wa=client,
+            url=book.pdf_url,
+            file_name=(file_name := f"{book.title} • {book.author}.pdf"),
+            mime_type="application/pdf",
+        ),
         filename=file_name,
         caption=helpers.get_book_details(book),
         footer=sls(gs(wa_id, s.HB_FOOTER), 60),
@@ -79,22 +96,22 @@ def show_book(client: WhatsApp, msg_or_cb: Message | CallbackSelection):
         buttons=[
             Button(
                 title=sls(gs(wa_id, s.SHARE), 20),
-                callback_data=ShareBook(book.id).to_callback()
+                callback_data=ShareBook(book.id).to_callback(),
             ),
             Button(
                 title=sls(gs(wa_id, s.INSTANT_READ), 20),
-                callback_data=read_btn.to_callback()
-            )
-        ]
+                callback_data=read_btn.to_callback(),
+            ),
+        ],
     )
     MSG_TO_BOOK_CACHE[message_id] = read_btn
     repository.increase_stats(StatsType.BOOKS_READ)
 
 
 def read_book(
-        client: WhatsApp,
-        msg_or_clb: Message | CallbackButton | MessageStatus,
-        data: ReadBook | None = None
+    client: WhatsApp,
+    msg_or_clb: Message | CallbackButton | MessageStatus,
+    data: ReadBook | None = None,
 ) -> str | None:
     wa_id = msg_or_clb.from_user.wa_id
     book, masechet, page = None, None, None
@@ -110,20 +127,25 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.NUMBERS_ONLY),
                 footer=gs(wa_id, s.HB_FOOTER),
-                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
             )
             return
     is_book = read.book_type == BookType.BOOK
     is_image = read.read_mode == ReadMode.IMAGE
-    if (seconds := limiter.get_seconds_to_wait(
+    if (
+        seconds := limiter.get_seconds_to_wait(
             user_id=wa_id,
-            rate_limit_type=RateLimit.IMAGE_PAGE if is_image else RateLimit.PDF_PAGE
-    )) > 0:
+            rate_limit_type=RateLimit.IMAGE_PAGE if is_image else RateLimit.PDF_PAGE,
+        )
+    ) > 0:
         msg_or_clb.reply_text(
-            text=gs(wa_id, (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
-                    x=int(seconds // 60 if seconds >= 60 else seconds)),
+            text=gs(
+                wa_id,
+                (s.WAIT_X_MINUTES if seconds >= 60 else s.WAIT_X_SECONDS),
+                x=int(seconds // 60 if seconds >= 60 else seconds),
+            ),
             footer=gs(wa_id, s.HB_FOOTER),
-            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+            buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
         )
         return
     if is_book:
@@ -136,18 +158,21 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.BOOK_NOT_FOUND),
                 footer=gs(wa_id, s.HB_FOOTER),
-                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
             )
             return
         try:
-            url = book.get_page_img(page=read.page, width=750, height=1334) if is_image \
+            url = (
+                book.get_page_img(page=read.page, width=750, height=1334)
+                if is_image
                 else book.get_page_pdf(page=read.page)
+            )
         except ValueError:
             msg_or_clb.react("❌")
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y, x=1, y=book.pages),
                 footer=gs(wa_id, s.HB_FOOTER),
-                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
             )
             return
     else:
@@ -158,7 +183,7 @@ def read_book(
             msg_or_clb.reply_text(
                 text=gs(wa_id, s.MASECHET_NOT_FOUND),
                 footer=gs(wa_id, s.HB_FOOTER),
-                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
             )
             return
         try:
@@ -166,10 +191,14 @@ def read_book(
         except IndexError:
             msg_or_clb.react("❌")
             msg_or_clb.reply_text(
-                text=gs(wa_id, s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,
-                        x=masechet.pages[0].name, y=masechet.pages[-1].name),
+                text=gs(
+                    wa_id,
+                    s.PAGE_NOT_EXIST_CHOOSE_BETWEEN_X_Y,
+                    x=masechet.pages[0].name,
+                    y=masechet.pages[-1].name,
+                ),
                 footer=gs(wa_id, s.HB_FOOTER),
-                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),)
+                buttons=(Button(title=gs(wa_id, s.SEARCH), callback_data=Menu.SEARCH),),
             )
             return
         url = page.get_page_img(width=750, height=1334) if is_image else page.pdf_url
@@ -180,36 +209,57 @@ def read_book(
         Button(
             title=sls(gs(wa_id, s.DOCUMENT if is_image else s.IMAGE), 20),
             callback_data=dataclasses.replace(
-                read,
-                read_mode=ReadMode.PDF if is_image else ReadMode.IMAGE
-            ).to_callback()
+                read, read_mode=ReadMode.PDF if is_image else ReadMode.IMAGE
+            ).to_callback(),
         ),
     ]
     if read.page < total:
-        buttons.append(Button(
-            title=sls(gs(wa_id, s.NEXT), 20),
-            callback_data=dataclasses.replace(read, page=read.page + 1).to_callback()
-        ))
+        buttons.append(
+            Button(
+                title=sls(gs(wa_id, s.NEXT), 20),
+                callback_data=dataclasses.replace(
+                    read, page=read.page + 1
+                ).to_callback(),
+            )
+        )
     if read.page > 1:
-        buttons.append(Button(
-            title=sls(gs(wa_id, s.PREVIOUS), 20),
-            callback_data=dataclasses.replace(read, page=read.page - 1).to_callback()
-        ))
+        buttons.append(
+            Button(
+                title=sls(gs(wa_id, s.PREVIOUS), 20),
+                callback_data=dataclasses.replace(
+                    read, page=read.page - 1
+                ).to_callback(),
+            )
+        )
     if is_image:
         kwargs = dict(
-            image=helpers.get_file_id(wa=client, url=url, file_name='image.png', mime_type='image/jpeg'),
-            buttons=buttons
+            image=helpers.get_file_id(
+                wa=client, url=url, file_name="image.png", mime_type="image/jpeg"
+            ),
+            buttons=buttons,
         )
     else:
-        file_name = f"{book.title} • {book.author} ({read.page}).pdf" \
-            if is_book else f"{masechet.name} ({page.name}).pdf"
+        file_name = (
+            f"{book.title} • {book.author} ({read.page}).pdf"
+            if is_book
+            else f"{masechet.name} ({page.name}).pdf"
+        )
         kwargs = dict(
-            document=helpers.get_file_id(wa=client, url=url, file_name=file_name, mime_type='application/pdf'),
-            filename=file_name, buttons=buttons)
+            document=helpers.get_file_id(
+                wa=client, url=url, file_name=file_name, mime_type="application/pdf"
+            ),
+            filename=file_name,
+            buttons=buttons,
+        )
     if isinstance(msg_or_clb, Message):
         msg_or_clb.react("⬆️")
-    caption = helpers.get_page_details(wa_id, book, gs(wa_id, s.PAGE_X_OF_Y, x=read.page, y=total)) \
-        if is_book else helpers.get_masechet_details(masechet)
+    caption = (
+        helpers.get_page_details(
+            wa_id, book, gs(wa_id, s.PAGE_X_OF_Y, x=read.page, y=total)
+        )
+        if is_book
+        else helpers.get_masechet_details(masechet)
+    )
     message_id = func(**kwargs, footer=sls(gs(wa_id, s.HB_FOOTER), 60), caption=caption)
     MSG_TO_BOOK_CACHE[message_id] = dataclasses.replace(read, total=total)
     repository.increase_stats(StatsType.PAGES_READ)
@@ -233,10 +283,12 @@ def on_share_btn(_: WhatsApp, clb: CallbackButton):
     book_id = ShareBook.from_callback(clb.data).id
     book = api.get_book(book_id)
     clb.reply_text(
-        text="\n".join((
-            helpers.get_book_details(book),
-            f"🔗 {helpers.get_self_share(ShowBook(book_id).to_callback())}",
-        )),
+        text="\n".join(
+            (
+                helpers.get_book_details(book),
+                f"🔗 {helpers.get_self_share(ShowBook(book_id).to_callback())}",
+            )
+        ),
     )
 
 
@@ -255,8 +307,11 @@ def on_about_btn(_: WhatsApp, clb: CallbackButton):
         text=gs(wa_id, s.WA_ABOUT_MSG, contact_phone_number=conf.contact_phone),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
         buttons=[
-            Button(title=sls(gs(wa_id, s.ACKNOWLEDGEMENTS), 20), callback_data=Menu.ACKNOWLEDGEMENTS),
-            Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
+            Button(
+                title=sls(gs(wa_id, s.ACKNOWLEDGEMENTS), 20),
+                callback_data=Menu.ACKNOWLEDGEMENTS,
+            ),
+            Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START),
         ],
     )
 
@@ -276,20 +331,14 @@ def on_start(_: WhatsApp, msg_or_clb: Message | CallbackButton | CallbackSelecti
         header=sls(gs(wa_id, s.WA_WELCOME_HEADER), 60),
         text=gs(wa_id, s.WA_WELCOME_BODY),
         buttons=[
-            Button(
-                title=sls(gs(wa_id, s.SEARCH), 20),
-                callback_data=Menu.SEARCH
-            ),
+            Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
             Button(
                 title=sls(gs(wa_id, s.CHANGE_LANGUAGE), 20),
                 callback_data=Menu.CHANGE_LANGUAGE,
             ),
-            Button(
-                title=sls(gs(wa_id, s.ABOUT), 20),
-                callback_data=Menu.ABOUT
-            )
+            Button(title=sls(gs(wa_id, s.ABOUT), 20), callback_data=Menu.ABOUT),
         ],
-        footer=sls(gs(wa_id, s.HB_FOOTER), 60)
+        footer=sls(gs(wa_id, s.HB_FOOTER), 60),
     )
 
 
@@ -305,11 +354,12 @@ def on_change_language(_: WhatsApp, clb: CallbackButton):
                     rows=tuple(
                         SectionRow(
                             title=sls(f"{lang.flag} {lang.name}", 24),
-                            callback_data=f"lang:{lang.code}"
-                        ) for lang in Language
-                    )
+                            callback_data=f"lang:{lang.code}",
+                        )
+                        for lang in Language
+                    ),
                 ),
-            )
+            ),
         ),
         footer=sls(gs(wa_id, s.PYWA_CREDIT), 60),
     )
@@ -318,16 +368,20 @@ def on_change_language(_: WhatsApp, clb: CallbackButton):
 def on_language_selected(client: WhatsApp, clb: CallbackSelection):
     wa_id = clb.from_user.wa_id
     clb.react("✅")
-    repository.update_wa_user(wa_id=wa_id, lang=Language.from_code(clb.data.split(':')[1]).code)
+    repository.update_wa_user(
+        wa_id=wa_id, lang=Language.from_code(clb.data.split(":")[1]).code
+    )
     clb.reply_text(text=gs(wa_id, s.LANGUAGE_CHANGED), quote=True)
     on_start(client, clb)
 
 
 def unblock_user_admin(_: WhatsApp, msg: Message):
-    _, number = msg.text.split(' ', 1)
-    wa_id = re.sub(r'\D', '', number)
+    _, number = msg.text.split(" ", 1)
+    wa_id = re.sub(r"\D", "", number)
     if not repository.is_wa_user_exists(wa_id=wa_id):
-        msg.reply_text(text=f"User {wa_id} not found. Please check the number and try again")
+        msg.reply_text(
+            text=f"User {wa_id} not found. Please check the number and try again"
+        )
         return
     if repository.is_wa_user_active(wa_id=wa_id):
         msg.reply_text(text=f"User {wa_id} is already not blocked")

@@ -21,14 +21,18 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
             footer=gs(wa_id, s.HB_FOOTER),
             buttons=(
                 Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
-                Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
+                Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START),
             ),
         )
         return
     mc.react("🔍")
-    offset = 1 if isinstance(mc, Message) else SearchNavigation.from_callback(mc.data).offset
+    offset = (
+        1 if isinstance(mc, Message) else SearchNavigation.from_callback(mc.data).offset
+    )
     title, author = data.helpers.get_title_author(query)
-    results, total = api.search(title=title, author=author, offset=offset, limit=9 if offset == 1 else 8)
+    results, total = api.search(
+        title=title, author=author, offset=offset, limit=9 if offset == 1 else 8
+    )
     if total == 0:
         mc.react("❌")
         mc.reply_text(
@@ -36,7 +40,7 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
             footer=gs(wa_id, s.HB_FOOTER),
             buttons=(
                 Button(title=sls(gs(wa_id, s.SEARCH), 20), callback_data=Menu.SEARCH),
-                Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START)
+                Button(title=sls(gs(wa_id, s.BACK), 20), callback_data=Menu.START),
             ),
         )
         return
@@ -49,9 +53,10 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
                 SectionRow(
                     title=sls(b.title, 24),
                     description=sls(b.description, 72),
-                    callback_data=ShowBook(b.id).to_callback()
-                ) for b in books
-            ]
+                    callback_data=ShowBook(b.id).to_callback(),
+                )
+                for b in books
+            ],
         )
     ]
     next_offset = data.helpers.get_offset(offset, total, increase=8)
@@ -61,7 +66,9 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
             SectionRow(
                 title=sls(gs(wa_id, s.NEXT), 24),
                 description=sls(query, 72),
-                callback_data=SearchNavigation(offset=next_offset, total=total).to_callback()
+                callback_data=SearchNavigation(
+                    offset=next_offset, total=total
+                ).to_callback(),
             )
         )
     if offset > 1:
@@ -69,23 +76,30 @@ def on_search(_: WhatsApp, mc: Message | CallbackSelection):
             SectionRow(
                 title=sls(gs(wa_id, s.PREVIOUS), 24),
                 description=sls(query, 72),
-                callback_data=SearchNavigation(offset=offset - 8, total=total).to_callback()
+                callback_data=SearchNavigation(
+                    offset=offset - 8, total=total
+                ).to_callback(),
             )
         )
     if nav_section_rows:
         sections.append(
             Section(
                 title=sls(gs(wa_id, s.NAVIGATE_BETWEEN_RESULTS), 24),
-                rows=nav_section_rows
+                rows=nav_section_rows,
             )
         )
     mc.reply_text(
-        text=gs(wa_id, s.X_TO_Y_OF_TOTAL_FOR_S,
-                x=offset, y=(offset + 8) if (offset + 8 < total) else total, total=total, s=query),
+        text=gs(
+            wa_id,
+            s.X_TO_Y_OF_TOTAL_FOR_S,
+            x=offset,
+            y=(offset + 8) if (offset + 8 < total) else total,
+            total=total,
+            s=query,
+        ),
         footer=gs(wa_id, s.HB_FOOTER),
         buttons=SectionList(
-            button_title=sls(gs(wa_id, s.SEARCH_RESULTS), 20),
-            sections=sections
-        )
+            button_title=sls(gs(wa_id, s.SEARCH_RESULTS), 20), sections=sections
+        ),
     )
     repository.increase_stats(StatsType.MSG_SEARCHES)

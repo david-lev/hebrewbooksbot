@@ -14,18 +14,22 @@ conf = get_settings()
 
 def get_string(wa_id: str, string: s, **kwargs) -> str:
     """Get a string from the strings file."""
-    return _gs(string=string, lng=Language.from_code(repository.get_wa_user(wa_id=wa_id).lang), **kwargs)
+    return _gs(
+        string=string,
+        lng=Language.from_code(repository.get_wa_user(wa_id=wa_id).lang),
+        **kwargs,
+    )
 
 
 gs = get_string  # internal alias
 
 
 class Commands:
-    SHAS = ('shas', 'שס')
-    SUBJECT = ('sub', 'נושא')
-    DATERANGE = ('date', 'תאריך')
-    LETTER = ('let', 'אות')
-    TURSA = ('tur', 'טור')
+    SHAS = ("shas", "שס")
+    SUBJECT = ("sub", "נושא")
+    DATERANGE = ("date", "תאריך")
+    LETTER = ("let", "אות")
+    TURSA = ("tur", "טור")
 
 
 languages = {
@@ -35,7 +39,20 @@ languages = {
     ("33",): Language.FR,
     # United States & Canada, Switzerland, Ukraine, Russia, Germany, Italy, Netherlands, Belgium,
     # South Africa, Poland, Australia
-    ("1", "41", "380", "7", "49", "39", "31", "32", "27", "48", "44", "61"): Language.EN,
+    (
+        "1",
+        "41",
+        "380",
+        "7",
+        "49",
+        "39",
+        "31",
+        "32",
+        "27",
+        "48",
+        "44",
+        "61",
+    ): Language.EN,
     # Spain, Argentina, Panama
     ("54", "34", "507", "52", "55"): Language.ES,
 }
@@ -68,36 +85,49 @@ def is_admin(wa_id: str) -> bool:
 
 def slice_long_string(string: str, max_length: int, suffix: str = "...") -> str:
     """Slice a long string."""
-    return string[:max_length - len(suffix)] + suffix if len(string) > max_length else string
+    return (
+        string[: max_length - len(suffix)] + suffix
+        if len(string) > max_length
+        else string
+    )
 
 
 def get_book_details(book: Book) -> str:
-    return "\n".join(i for i in (
-        f"{RTL}📚 {book.title}",
-        f"{RTL}👤 {book.author}" if book.author else "",
-        f"{RTL}📅 {book.year}" if book.year else "",
-        f"{RTL}🏙 {book.city}" if book.city else "",
-        f"{RTL}📖 {book.pages}",
-    ) if i)
+    return "\n".join(
+        i
+        for i in (
+            f"{RTL}📚 {book.title}",
+            f"{RTL}👤 {book.author}" if book.author else "",
+            f"{RTL}📅 {book.year}" if book.year else "",
+            f"{RTL}🏙 {book.city}" if book.city else "",
+            f"{RTL}📖 {book.pages}",
+        )
+        if i
+    )
 
 
 def get_page_details(wa_id: str, book: Book, page_status: str) -> str:
-    return "\n".join(i for i in (
-        f"*{gs(wa_id, s.INSTANT_READ)}*\n\n"
-        f"{RTL}📚 {book.title}",
-        f"{RTL}👤 {book.author}" if book.author else "",
-        f"{RTL}📅 {book.year}" if book.year else "",
-        f"{RTL}🏙 {book.city}" if book.city else "",
-        f"{RTL}📖 {page_status.strip()}\n",
-        f"_💡{gs(wa_id, s.JUMP_TIP)}_",
-    ) if i)
+    return "\n".join(
+        i
+        for i in (
+            f"*{gs(wa_id, s.INSTANT_READ)}*\n\n" f"{RTL}📚 {book.title}",
+            f"{RTL}👤 {book.author}" if book.author else "",
+            f"{RTL}📅 {book.year}" if book.year else "",
+            f"{RTL}🏙 {book.city}" if book.city else "",
+            f"{RTL}📖 {page_status.strip()}\n",
+            f"_💡{gs(wa_id, s.JUMP_TIP)}_",
+        )
+        if i
+    )
 
 
 def get_masechet_details(masechet: Masechet):
-    return "".join((
-        f"📚 {masechet.name}\n",
-        f"{RTL}📖 {masechet.pages[0].name}- {masechet.pages[-1].name}\n"
-    ))
+    return "".join(
+        (
+            f"📚 {masechet.name}\n",
+            f"{RTL}📖 {masechet.pages[0].name}- {masechet.pages[-1].name}\n",
+        )
+    )
 
 
 def get_file_id(wa: WhatsApp, url: str, file_name: str, mime_type: str) -> str:

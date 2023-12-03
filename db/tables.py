@@ -5,11 +5,11 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, sessionmaker
 
 conf = config.get_settings()
 engine = create_engine(
-    url=f'sqlite:///{conf.sqlite_file_path}',
+    url=f"sqlite:///{conf.sqlite_file_path}",
     pool_size=20,
     max_overflow=10,
     pool_timeout=30,
-    echo=conf.log_level == 'DEBUG',
+    echo=conf.log_level == "DEBUG",
 )
 Session = sessionmaker(bind=engine)
 
@@ -29,21 +29,21 @@ class BaseTable(DeclarativeBase):
 
 
 class TgUser(BaseTable):
-    __tablename__ = 'tg_user'
+    __tablename__ = "tg_user"
     tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     lang: Mapped[str] = mapped_column(String(2), nullable=False)
     active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
 
 class WaUser(BaseTable):
-    __tablename__ = 'wa_user'
+    __tablename__ = "wa_user"
     wa_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     lang: Mapped[str] = mapped_column(String(2), nullable=False)
     active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
 
 class Stats(BaseTable):
-    __tablename__ = 'stats'
+    __tablename__ = "stats"
     inline_searches: Mapped[int] = mapped_column(BigInteger, default=0)
     msg_searches: Mapped[int] = mapped_column(BigInteger, default=0)
     books_read: Mapped[int] = mapped_column(BigInteger, default=0)

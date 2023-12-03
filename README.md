@@ -1,11 +1,13 @@
-<img src="https://user-images.githubusercontent.com/42866208/254011871-e2cfe5e5-70c1-45b6-b375-b56a006c576f.png" width="100" height="100" alg/>
+
+![avatar](https://images.weserv.nl/?url=github.com/david-lev/hebrewbooksbot/assets/42866208/ab932b89-6dbd-473e-8f93-849db7f8b244?v=4&h=150&w=150&fit=cover&mask=circle&maxage=7d)
+
 
 # HebrewBooksBot
 
 **A bot that allows you to search and browse books from [hebrewbooks.org](https://hebrewbooks.org).**
 
 - Telegram: [@HeBooksBot](https://t.me/HeBooksBot)
-- WhatsApp: [+972 54-813-2440](https://wa.me/972548132440?text=!start)
+- WhatsApp: [+1 (929) 647-6710](https://wa.me/19296476710) (Countries limited)
 
 ---
 ### Features
@@ -39,8 +41,7 @@ Directly:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-python3 tg/app.py  # only tg is supported for now
+python3 tg/app.py  # for Telegram
+python3 wa/app.py  # for WhatsApp
 ```
 
-# License
-Copyright (c) 2023 by the Society for the Preservation of Hebrew Books. All rights reserved.
